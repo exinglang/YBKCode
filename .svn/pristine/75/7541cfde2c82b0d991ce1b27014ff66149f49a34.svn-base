@@ -1,0 +1,97 @@
+<resources>
+
+
+    <style name="trade_login_tabrow_style">
+        <item name="android:gravity">center</item>
+        <item name="android:padding">0.0dip</item>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_marginBottom">10.0dip</item>
+    </style>
+
+    <style name="trade_login_label_style">
+        <item name="android:textSize">?attr/middle</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:gravity">right|center</item>
+        <item name="android:paddingRight">6.0dip</item>
+        <item name="android:layout_width">80.0dip</item>
+        <item name="android:layout_height">fill_parent</item>
+    </style>
+
+    <style name="trade_check_style" parent="@android:style/Widget.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/btn_checkbox_bg</item>
+    </style>
+
+    <style name="Dialog_Transparent">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+
+    <style name="text_size_0">
+        <item name="large">13sp</item>
+        <item name="middle">11sp</item>
+        <item name="small">9sp</item>
+    </style>
+
+    <style name="text_size_1">
+        <item name="large">14sp</item>
+        <item name="middle">12sp</item>
+        <item name="small">10sp</item>
+    </style>
+
+    <style name="text_size_2">
+        <item name="large">15sp</item>
+        <item name="middle">13sp</item>
+        <item name="small">11sp</item>
+    </style>
+
+    <style name="text_size_3">
+        <item name="large">16sp</item>
+        <item name="middle">14sp</item>
+        <item name="small">12sp</item>
+    </style>
+
+    <style name="text_size_4">
+        <item name="large">17sp</item>
+        <item name="middle">15sp</item>
+        <item name="small">13sp</item>
+    </style>
+
+    <style name="text_size_5">
+        <item name="large">18sp</item>
+        <item name="middle">16sp</item>
+        <item name="small">14sp</item>
+    </style>
+
+    <style name="text_size_6">
+        <item name="large">19sp</item>
+        <item name="middle">17sp</item>
+        <item name="small">15sp</item>
+    </style>
+
+    <style name="text_size_7">
+        <item name="large">20sp</item>
+        <item name="middle">18sp</item>
+        <item name="small">16sp</item>
+    </style>
+
+    <style name="text_size_8">
+        <item name="large">21sp</item>
+        <item name="middle">19sp</item>
+        <item name="small">17sp</item>
+    </style>
+
+    <style name="text_size_9">
+        <item name="large">22sp</item>
+        <item name="middle">20sp</item>
+        <item name="small">18sp</item>
+    </style>
+    <style name="text_size_10">
+        <item name="large">23sp</item>
+        <item name="middle">21sp</item>
+        <item name="small">19sp</item>
+    </style>
+</resources>

@@ -1,0 +1,149 @@
+package com.puxtech.ybk.jiaoyi.page;
+
+import android.app.Activity;
+import android.app.Dialog;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Spinner;
+import android.widget.TextView;
+
+import com.puxtech.ybk.BaseFragment;
+import com.puxtech.ybk.R;
+import com.puxtech.ybk.jiaoyi.responsedata.BaseResponseDataTrade;
+import com.puxtech.ybk.util.ActivityUtils;
+
+public class LoginFragment extends BaseFragment {
+    private static int REQUEST_CHECK_CODE = 1;
+    private static int REQUEST_HAVE_TIME = 2;
+    private static int REQUEST_MORE = 3;
+    View view;
+
+    public LoginFragment() {
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        view = inflater.inflate(R.layout.fragment_login, container, false);
+
+        initWidget();
+//        requestCheckCodeImg();
+        return view;
+    }
+
+    Spinner sp_tradetype, sp_accounttype;
+    AutoCompleteTextView act_account;
+    EditText et_password, et_checkcode;
+    ImageView img_checkcode;
+    TextView tv_reset;
+    CheckBox cb_remember;
+    Button bt_cancel, bt_login;
+
+    private void initWidget() {
+        sp_tradetype = (Spinner) view.findViewById(R.id.sp_tradetype);
+        sp_accounttype = (Spinner) view.findViewById(R.id.sp_accounttype);
+        act_account = (AutoCompleteTextView) view.findViewById(R.id.act_account);
+        et_password = (EditText) view.findViewById(R.id.et_password);
+        et_checkcode = (EditText) view.findViewById(R.id.et_checkcode);
+        img_checkcode = (ImageView) view.findViewById(R.id.img_checkcode);
+        tv_reset = (TextView) view.findViewById(R.id.tv_reset);
+        cb_remember = (CheckBox) view.findViewById(R.id.cb_remember);
+        bt_cancel = (Button) view.findViewById(R.id.bt_cancel);
+        bt_login = (Button) view.findViewById(R.id.bt_login);
+
+
+    }
+
+    //请求验证码
+    private void requestCheckCodeImg() {
+        request(REQUEST_CHECK_CODE);
+    }
+
+
+    private void request(final int type) {
+        putAsyncTask(new AsyncTask<Void, Void, Boolean>() {
+            BaseResponseDataTrade responseData;
+            Dialog dialog;
+
+            protected void onPreExecute() {
+                dialog = ActivityUtils.showLoadingProgressDialog(context);
+//                if (type == REQUEST_HAVE_TIME) {
+//                    startNum=1;
+////                    InOutHistoryAdapter adapter = new InOutHistoryAdapter(context, new ArrayList<InOutHistoryEntity>());
+////                    recyclerView.setAdapter(adapter);
+//                }
+
+                super.onPreExecute();
+            }
+
+            @SuppressWarnings("ResourceType")
+            protected Boolean doInBackground(Void... params) {
+//                try {
+//                    HttpManagerMoney httpManager = new HttpManagerMoney(context);
+//
+//                    if (type == REQUEST_INIT) {
+//                        responseData = httpManager.requestInOutHistory(startTime, endTime, startNum);
+//                    } else if (type == REQUEST_HAVE_TIME) {
+//                        responseData = httpManager.requestInOutHistory(startTime, endTime, startNum);
+//                    } else if (type == REQUEST_MORE) {
+//                        startNum = startNum + 5;
+//                        responseData = httpManager.requestInOutHistory(startTime, endTime, startNum);
+//                    }
+//
+//                    //获取开户信息
+//
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                    responseData.setRetCode(Constant.CODE_ERROR_UNKNOW);
+//                    responseData.setRetMessage(Constant.MESSAGE_ERROR_UNKNOW);
+//                }
+                return true;
+            }
+
+            protected void onPostExecute(Boolean result) {
+                super.onPostExecute(result);
+                dialog.dismiss();
+
+                if (0 == responseData.getRetCode()) {
+//                    if (type == REQUEST_CHECK_CODE) {
+//                        startNum += 5;
+//
+//                        showList = responseData.getInOutHistoryEntityArrayList();
+//                        adapter = new InOutHistoryAdapter(headView, showList);
+//                        recyclerView.setAdapter(adapter);
+//
+//                    } else if (type == REQUEST_HAVE_TIME) {
+//
+//                    } else if (type == REQUEST_MORE) {
+//                       otifyDataSetChanged();
+//                    }
+//
+//
+//                } else {
+//
+//                    if (type == REQUEST_MORE) {
+//                        //之前加过一次.如果失败,需要不加
+//                        startNum = startNum - 5;
+//
+//                    }
+//                    ActivityUtils.showAlert(context, responseData.getRetMessage() + "(" + responseData.getRetCode() + ")");
+                }
+            }
+        });
+    }
+}

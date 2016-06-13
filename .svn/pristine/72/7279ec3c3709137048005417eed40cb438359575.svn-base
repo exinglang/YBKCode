@@ -1,0 +1,177 @@
+package com.puxtech.ybk.jiaoyi;
+
+import android.app.Service;
+import android.content.Context;
+import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.IBinder;
+import android.widget.Toast;
+
+
+import com.puxtech.ybk.Constant;
+import com.puxtech.ybk.MyApplication;
+import com.puxtech.ybk.jiaoyi.entitydata.HeartBeatData;
+import com.puxtech.ybk.jiaoyi.entitydata.TodayDealData;
+import com.puxtech.ybk.jiaoyi.httpmanager.HttpManagerLogin;
+import com.puxtech.ybk.jiaoyi.httpmanager.HttpManagerTrade;
+import com.puxtech.ybk.jiaoyi.responsedata.HeartBeatResponseData;
+import com.puxtech.ybk.util.SharedPreferenceManager;
+
+import java.util.Timer;
+import java.util.TimerTask;
+
+/**
+ * <p/>
+ * 自动刷新最新价格的service，根据用户定义时间请求数据，然后发送广播，需要刷新价格的Activity自行注册广播接收器
+ */
+public class HeartBeat  {
+    public static final String HEART_BEAT = "HEART_BEAT";
+
+    MyApplication myapp;
+    Context context;
+    public HeartBeat(Context context){
+        this.context=context;
+        myapp=(MyApplication)context.getApplicationContext();
+    }
+    //firstLogin?1:0
+
+//    public void onCreate() {
+//        super.onCreate();
+//        myapp = (MyApplication) getApplicationContext();
+//        context = HeartBeatService.this;
+//        //heartbeatmanager = HeartBeatManager.getInstance(getBaseContext());
+//        //initLogoutReceiver();
+//        // 创建定时线程
+//        timer = new Timer();
+//        TimerTask task = new TimerTask() {
+//            @Override
+//            public void run() {
+//
+//
+//                if (myapp.getMoniTradeEntity().isHasLogin()) {
+//                    requestHeartBeat(myapp.getMoniTradeEntity());
+//                }
+//                if (myapp.getShipanTradeEntity().isHasLogin()) {
+//                    requestHeartBeat(myapp.getShipanTradeEntity());
+//                }
+//            }
+//        };
+//        timer.schedule(task, 1, 20000);// 暂时每隔15秒取一次
+//    }
+
+
+    public void requestHeartBeat(final boolean isFirstLogin) {
+        AsyncTask<Void, Void, Integer> task = new AsyncTask<Void, Void, Integer>() {
+            HeartBeatResponseData heartBeatResponseData;
+            SharedPreferenceManager spf = new SharedPreferenceManager(context, HEART_BEAT );
+            long trade_cnt = spf.getLong(SharedPreferenceManager.TRADE_CNT, -1);
+            long lastnew_id = spf.getLong( SharedPreferenceManager.LASTNEW_ID, 0);
+            String clear_date = spf.getString(SharedPreferenceManager.CLEAR_DATE, "");
+
+            //上面的值已在登录时赋值过.
+            @Override
+            protected Integer doInBackground(Void... arg0) {
+                try {
+                    HttpManagerLogin httpManagerlogin = new HttpManagerLogin(context);
+                    //登录时已访问过一遍,所以传0即可
+                    heartBeatResponseData = httpManagerlogin.requestHeartBeat(isFirstLogin?"-1":trade_cnt+"");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return 0;
+                }
+                return 0;
+            }
+
+            @Override
+            protected void onPostExecute(Integer result) {
+                super.onPostExecute(result);
+
+                if (0 == heartBeatResponseData.getRetCode()) {
+                    HeartBeatData heartBeatData=   heartBeatResponseData.getHeartBeatData();
+                    // 判断是否有新的广播
+                    if (heartBeatData.getLASTNEW_ID() > lastnew_id) {
+
+                            Toast.makeText(context, "您有新的公告  请注意查收", Toast.LENGTH_LONG)
+                                    .show();
+//                        spf.putBoolean(context, SharedPreferenceManager.TRADER_PUBLIC_NEW_INFO, true);
+                    }
+                    //检测是否有新成交
+                    checkNewDeal(heartBeatData);
+                    //登录时已请求过TD,此处只需判断交易日是否切换.
+                    // 交易日变化的话要退出重新登陆
+                    if ((!heartBeatData.getCLEAR_DATE().equals(clear_date))&&!isFirstLogin) {
+                        relogon();
+                    }
+                    //0:等待开市中,1:开市准备中,2:结算中,3:休市中,4:交易暂停中,5:交易中,6:节间休息中,7:准备结算中
+                    if (heartBeatData.getSYSTEM_STATUS() == 0 || heartBeatData.getSYSTEM_STATUS() == 1 || heartBeatData.getSYSTEM_STATUS() == 3) {
+                        myapp.getTradeEntity().setHeartBeatTradeState(false);
+                    } else {
+                        myapp.getTradeEntity().setHeartBeatTradeState(true);
+                    }
+                    //        long trade_cnt = spf.getLong(context, SharedPreferenceManager.TRADE_CNT, -1);
+//        long lastnew_id = spf.getLong(context, SharedPreferenceManager.LASTNEW_ID, 0);
+//        String clear_date = spf.getString( SharedPreferenceManager.CLEAR_DATE, "");
+                    //保存下次发送需要的数据
+                    new TradeHelper(context).saveSpf(spf, heartBeatData.getTRADE_CNT(), heartBeatData.getLASTNEW_ID(), heartBeatData.getCLEAR_DATE());
+                } else {
+                    //重新登录
+                    relogon();
+                }
+
+            }
+        };
+        task.execute();
+    }
+
+    /**
+     * 检查是否有新成交
+     *
+     *
+     */
+    private void checkNewDeal(HeartBeatData heartBeatData) {
+        for (int i = 0; i < heartBeatData.getDataArrayList().size(); i++) {
+            TodayDealData todayDealData = heartBeatData.getDataArrayList().get(i);
+            String typ = todayDealData.getTR_T_CH();
+//            if (todayDealData.getTYP() == 1) {
+//                typ = Constant.JIAN_CANG;
+//            } else if (heartBeatDealData.getTYP() == 2) {
+//                typ = Constant.PING_CANG;
+//            }
+            String bs = todayDealData.getBS_FLAG_CH();
+//            if (heartBeatDealData.getBS() == 1) {
+//                bs = Constant.BUY;
+//            } else if (heartBeatDealData.getBS() == 2) {
+//                bs = Constant.SELL;
+//            }
+            String sname =todayDealData.getCOMMODITY_NAME();
+            Toast.makeText(context, todayDealData.getTRADE_NO() + "号委托成交" + "\n" + sname + " " + typ + bs + todayDealData.getQUANTITY() + "手", Toast.LENGTH_LONG)
+                    .show();
+        }
+    }
+
+    /**
+     * 重新登录
+     */
+    private void relogon() {
+        TradeHelper.logoutWithprompt(context, Constant.HEART_BEAT_ERROR_CODE_MESSAGE);
+    }
+
+
+
+
+//	@Override
+//	public boolean onUnbind(Intent intent) {
+//		return super.onUnbind(intent);
+//	}
+//	class LogoutReceiver extends BroadcastReceiver {
+//		@Override
+//		public void onReceive(Context context, Intent intent) {
+//			if (intent.getAction().equals(Constant.LOGOFF)) {
+//				stopSelf();
+//			}
+//
+//
+//		}
+//	}
+
+}

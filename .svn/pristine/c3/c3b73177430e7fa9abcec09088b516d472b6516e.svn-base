@@ -1,0 +1,281 @@
+package com.puxtech.ybk.hangqing.controller;
+
+import android.content.Context;
+import android.os.AsyncTask;
+import android.view.View;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.puxtech.ybk.MyApplication;
+import com.puxtech.ybk.hangqing.HangQingLogger;
+import com.puxtech.ybk.hangqing.exception.SessionErrorException;
+import com.puxtech.ybk.hangqing.jsondata.RepData;
+import com.puxtech.ybk.hangqing.jsondata.getcommodities.Commodity;
+import com.puxtech.ybk.hangqing.jsondata.getcommodities.GetCommoditiesRepBody;
+import com.puxtech.ybk.hangqing.jsondata.getmarkets.GetMarketsRepBody;
+import com.puxtech.ybk.hangqing.jsondata.getmarkets.Market;
+import com.puxtech.ybk.hangqing.jsondata.getplates.GetPlatesRepBody;
+import com.puxtech.ybk.hangqing.jsondata.gettradetime.GetTradeTimeRepBody;
+import com.puxtech.ybk.hangqing.jsondata.gettradetimes.GetTradeTimesRepBody;
+import com.puxtech.ybk.hangqing.protocol.RequestManager;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.List;
+
+/**
+ * 获取行情初始化数据的控制类
+ */
+public class HangQingBasicDataController {
+
+
+    private Context context;
+    private BasicDataCallBack callBack;
+    private MyApplication mApplication;
+    private RequestManager requestManager;
+
+    public interface BasicDataCallBack{
+        public void onSuccess();
+        public void onFailed();
+    }
+
+    public HangQingBasicDataController(Context context, BasicDataCallBack callBack) {
+        this.context = context;
+        this.callBack = callBack;
+        this.mApplication = (MyApplication) context.getApplicationContext();
+        requestManager = new RequestManager();
+    }
+
+    private void failed() {
+        callBack.onFailed();
+    }
+
+    public void getBasicData(){
+        getMarkets();
+    }
+
+    private void getMarkets(){
+        new AsyncTask<Void, Void, Boolean>() {
+
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                try {
+                    JSONObject repJson = requestManager.getMarkets(mApplication);
+                    Gson gson = new Gson();
+                    TypeToken typeToken = new TypeToken<RepData<GetMarketsRepBody>>(){};
+                    RepData<GetMarketsRepBody> repData = gson.fromJson(repJson.toString(),typeToken.getType());
+                    int ret = repData.getMmts().getRepHeader().getRet();
+                    if(ret == 0){
+                        if(repData.getMmts().getRepBody().getMarketList() == null
+                                || repData.getMmts().getRepBody().getMarketList().size() == 0
+                                || repData.getMmts().getRepBody().getMarketList().get(0).getPanList() == null
+                                || repData.getMmts().getRepBody().getMarketList().get(0).getPanList().size() == 0){
+                            HangQingLogger.d("获取到的市场或盘为空");
+                            return false;
+                        }
+                        Market market = repData.getMmts().getRepBody().getMarketList().get(0);
+                        int marketId = market.getMarketId();
+                        int panId = market.getPanList().get(0).getPandId();
+                        mApplication.getHangQingData().setMarketId(marketId);
+                        mApplication.getHangQingData().setPanId(panId);
+                        return true;
+                    }
+                    else{
+                        return false;
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    return false;
+                } catch (SessionErrorException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                super.onPostExecute(aBoolean);
+                if(aBoolean){
+                    getCommodities();
+                }
+                else{
+                    failed();
+                }
+            }
+        }.execute();
+    }
+
+    private void getCommodities() {
+
+        new AsyncTask<Void, Void, Boolean>() {
+
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                try {
+                    int marketId = mApplication.getHangQingData().getMarketId();
+                    int panId = mApplication.getHangQingData().getPanId();
+                    JSONObject repJson = requestManager.getCommodities(mApplication, marketId, panId);
+                    Gson gson = new Gson();
+                    TypeToken typeToken = new TypeToken<RepData<GetCommoditiesRepBody>>(){};
+                    RepData<GetCommoditiesRepBody> repData = gson.fromJson(repJson.toString(),typeToken.getType());
+                    int ret = repData.getMmts().getRepHeader().getRet();
+                    if(ret == 0){
+                        List<Commodity> commodityList = repData.getMmts().getRepBody().getCli();
+                        mApplication.getHangQingData().setCommodities(commodityList);
+                        return true;
+                    }
+                    else{
+                        return false;
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    return false;
+                } catch (SessionErrorException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                super.onPostExecute(aBoolean);
+                if(aBoolean){
+                    getTradeTime();
+                }
+                else{
+                    failed();
+                }
+            }
+        }.execute();
+
+    }
+
+    private void getTradeTime() {
+
+        new AsyncTask<Void, Void, Boolean>() {
+
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                try {
+                    int marketId = mApplication.getHangQingData().getMarketId();
+                    int panId = mApplication.getHangQingData().getPanId();
+                    JSONObject repJson = requestManager.getTradeTime(mApplication, marketId, panId);
+                    Gson gson = new Gson();
+                    TypeToken typeToken = new TypeToken<RepData<GetTradeTimeRepBody>>(){};
+                    RepData<GetTradeTimeRepBody> repData = gson.fromJson(repJson.toString(),typeToken.getType());
+                    int ret = repData.getMmts().getRepHeader().getRet();
+                    if(ret == 0){
+                        return true;
+                    }
+                    else{
+                        return false;
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    return false;
+                } catch (SessionErrorException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                super.onPostExecute(aBoolean);
+                if(aBoolean){
+                    getPlates();
+                }
+                else{
+                    failed();
+                }
+            }
+        }.execute();
+
+    }
+
+    private void getPlates() {
+
+        new AsyncTask<Void, Void, Boolean>() {
+
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                try {
+                    JSONObject repJson = requestManager.getPlates(mApplication);
+                    Gson gson = new Gson();
+                    TypeToken typeToken = new TypeToken<RepData<GetPlatesRepBody>>(){};
+                    RepData<GetPlatesRepBody> repData = gson.fromJson(repJson.toString(),typeToken.getType());
+                    int ret = repData.getMmts().getRepHeader().getRet();
+                    if(ret == 0){
+                        mApplication.getHangQingData().setPlates(repData.getMmts().getRepBody().getPlal());
+                        return true;
+                    }
+                    else{
+                        return false;
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    return false;
+                } catch (SessionErrorException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                super.onPostExecute(aBoolean);
+                if(aBoolean){
+                    getTradeTimes();
+                }
+                else{
+                    failed();
+                }
+            }
+        }.execute();
+
+    }
+
+    private void getTradeTimes() {
+
+        new AsyncTask<Void, Void, Boolean>() {
+
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                try {
+                    JSONObject repJson = requestManager.getTradeTimes(mApplication);
+                    Gson gson = new Gson();
+                    TypeToken typeToken = new TypeToken<RepData<GetTradeTimesRepBody>>(){};
+                    RepData<GetTradeTimesRepBody> repData = gson.fromJson(repJson.toString(),typeToken.getType());
+                    int ret = repData.getMmts().getRepHeader().getRet();
+                    if(ret == 0){
+                        return true;
+                    }
+                    else{
+                        return false;
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    return false;
+                } catch (SessionErrorException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                super.onPostExecute(aBoolean);
+                if(aBoolean){
+                    callBack.onSuccess();
+                }
+                else{
+                    failed();
+                }
+            }
+        }.execute();
+
+    }
+
+
+}

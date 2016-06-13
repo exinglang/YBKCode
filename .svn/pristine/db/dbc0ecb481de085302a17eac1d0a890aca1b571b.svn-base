@@ -1,0 +1,206 @@
+package com.puxtech.ybk.hangqing.charts;
+
+import android.content.Context;
+import android.graphics.Canvas;
+import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewConfiguration;
+
+import com.puxtech.ybk.hangqing.util.PriceUtil;
+
+import java.util.List;
+
+/**
+ * Created by fanshuo on 16/5/17.
+ */
+public class TimeLineCrossLineView extends View {
+
+    private Context context;
+    private FenShiPaintFactory paintFactory;
+    private boolean canTouch = true;// 是否消耗touch事件，即：是否将touch事件传递里面一层（分时图的View）,此view一直为visible状态，依靠这个变量来确定是否响应触摸事件
+    private float startX, startY, endX, endY;
+    private boolean moving = false;// 用于区分是点击消失还是开始滑动，因为点击消失的时候总会有微小的晃动，这里设置为超过10才算ACTION_MOVE
+    private boolean drawAll;
+    private int mSlop;// 视为滑动的临界点
+    private OnShowListener onShowListener;
+    private FenShiChartModel fenShiChartModel;
+    private FenShiPointModel pointToDraw;//要画的那个分时点
+    private float fenShiStartY,fenShiEndY,fenShiStartX,fenShiEndX;//分时区域的起止点坐标
+    private float volumeStartY,volumeEndY,volumeStartX,volumeEndX;//交易量区域的起止点坐标
+
+    public TimeLineCrossLineView(Context context) {
+        super(context);
+        this.context = context;
+        init();
+    }
+
+    public TimeLineCrossLineView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        this.context = context;
+        init();
+    }
+
+    public TimeLineCrossLineView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        this.context = context;
+        init();
+    }
+
+    private void init(){
+        paintFactory = new FenShiPaintFactory(context);
+        ViewConfiguration vc = ViewConfiguration.get(context);
+        mSlop = vc.getScaledTouchSlop();
+    }
+
+    private void initData() {
+        int viewWidth = getMeasuredWidth();
+        int viewHeight = getMeasuredHeight();
+
+        //一行的高度，(总高度-顶部文字高度-中间文字高度-底部文字高度)/行数
+        float fenshiRowHeight = (viewHeight - ChartsScreenSizeUtil.Dp2Px(context,FenShiView.TOP_TEXT_HEIGHT_DP) - ChartsScreenSizeUtil.Dp2Px(context,FenShiView.MIDDLE_TEXT_HEIGHT_DP) - ChartsScreenSizeUtil.Dp2Px(context,FenShiView.BOTTOM_TEXT_HEIGHT_DP))/(float)(FenShiView.FENSHI_ROW_NUM+FenShiView.VOLUME_ROW_NUM);
+
+        fenShiStartX = ChartsScreenSizeUtil.Dp2Px(context,FenShiView.LEFT_TEXT_WIDTH_DP);
+        fenShiEndX = viewWidth;
+        fenShiStartY = ChartsScreenSizeUtil.Dp2Px(context,FenShiView.TOP_TEXT_HEIGHT_DP);
+        fenShiEndY = fenShiStartY + fenshiRowHeight * (float)FenShiView.FENSHI_ROW_NUM;
+
+        volumeStartX = ChartsScreenSizeUtil.Dp2Px(context,FenShiView.LEFT_TEXT_WIDTH_DP);
+        volumeEndX = viewWidth;
+        volumeStartY = fenShiEndY + ChartsScreenSizeUtil.Dp2Px(context,FenShiView.MIDDLE_TEXT_HEIGHT_DP);
+        volumeEndY = viewHeight-ChartsScreenSizeUtil.Dp2Px(context,FenShiView.BOTTOM_TEXT_HEIGHT_DP);
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        initData();
+        if(drawAll){
+            drawAll(canvas);
+        }
+    }
+
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (!canTouch) {
+            return super.onTouchEvent(event);
+        }
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                startX = event.getX();
+                startY = event.getY();
+                endX = event.getX();
+                endY = event.getY();
+                break;
+            case MotionEvent.ACTION_MOVE:
+                endX = event.getX();
+                endY = event.getY();
+                if (moving) {
+                    drawAll = true;
+                    pointToDraw = searchPointByX(endX);
+                    invalidate();
+                } else if (Math.abs(endX - startX) > mSlop) {
+                    moving = true;
+                    drawAll = true;
+                    pointToDraw = searchPointByX(endX);
+                    invalidate();
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+                moving = false;
+                endX = event.getX();
+                endY = event.getY();
+                if (Math.abs(endX - startX) < mSlop && Math.abs(endY - startY) < mSlop) {
+                    canTouch = false;
+                    drawAll = false;
+                    invalidate();
+                    onShowListener.onHide();
+                }
+                break;
+            default:
+                break;
+        }
+        return true;
+    }
+
+
+    //private methods
+    private void drawAll(Canvas canvas){
+        if(pointToDraw == null){
+            return;
+        }
+        float screenWidth = getMeasuredWidth();
+        float screenHeight = getMeasuredHeight();
+        float x = pointToDraw.getPointX();
+        float y = pointToDraw.getPointY();
+        canvas.drawLine(0, y, screenWidth, y, paintFactory.crossLinePaint);
+        canvas.drawLine(x, 0, x, screenHeight, paintFactory.crossLinePaint);
+        drawText(canvas);
+    }
+
+    private void drawText(Canvas canvas) {
+        String lastPrice = PriceUtil.keepPrecision(pointToDraw.getLastPrice(),fenShiChartModel.getMcu());
+        String avgPrice = PriceUtil.keepPrecision(pointToDraw.getAveragePrice(),fenShiChartModel.getMcu());
+        String time = pointToDraw.getTimeStr();
+        String text = "时间："+time+"    现价："+lastPrice+"    均价："+avgPrice;
+        canvas.drawText(text, fenShiStartX, fenShiStartY-4, paintFactory.topTextPaint);
+
+        String volumeText = "成交量："+pointToDraw.getVolume();
+        canvas.drawText(volumeText, volumeStartX, volumeStartY-4, paintFactory.volumeTextPaint);
+    }
+
+    /**
+     * 查找最近的点
+     */
+    private FenShiPointModel searchPointByX(float x) {
+        if(fenShiChartModel == null){
+            return null;
+        }
+        List<FenShiPointModel> allPoint = fenShiChartModel.getPoints();
+        if (allPoint == null || allPoint.size() == 0) {
+            return null;
+        }
+        FenShiPointModel point = null;
+        float deltaX = 10000;
+        for (int i = 0; i < allPoint.size(); i++) {
+            FenShiPointModel item = allPoint.get(i);
+            if (Math.abs(item.getPointX() - x) < deltaX) {
+                deltaX = Math.abs(item.getPointX() - x);
+                point = item;
+            }
+        }
+        return point;
+    }
+
+    //public methods
+    public void startDrawCrossLine(float x) {
+        drawAll = true;
+        pointToDraw = searchPointByX(x);
+        invalidate();
+    }
+
+    //getters and setters
+
+
+    public void setOnShowListener(OnShowListener onShowListener) {
+        this.onShowListener = onShowListener;
+    }
+
+    public void setFenShiChartModel(FenShiChartModel fenShiChartModel) {
+        this.fenShiChartModel = fenShiChartModel;
+    }
+
+    public void setCanTouch(boolean canTouch) {
+        this.canTouch = canTouch;
+        onShowListener.onShow();
+    }
+
+    //public classes
+
+    public interface OnShowListener{
+        public void onShow();
+        public void onHide();
+    }
+
+}

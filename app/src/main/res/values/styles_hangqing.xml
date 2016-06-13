@@ -1,0 +1,106 @@
+<resources>
+
+
+    <style name="hangqing_list_row_header_text">
+        <item name="android:gravity">right</item>
+        <item name="android:layout_width">100dp</item>
+        <item name="android:layout_height">@dimen/hangqing_list_row_header_height</item>
+        <item name="android:textColor">@color/hangqing_list_row_header_text_blue</item>
+        <item name="android:textSize">12dp</item>
+    </style>
+
+    <style name="hangqing_list_row_right_text">
+        <item name="android:gravity">right|center_vertical</item>
+        <item name="android:layout_width">100dp</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:textColor">@color/hangqing_white_text</item>
+        <item name="android:textSize">14dp</item>
+    </style>
+
+    <style name="hangqing_detail_top_price">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">12dp</item>
+        <item name="android:textColor">@color/hangqing_detail_top_price_name</item>
+    </style>
+
+    <!--商品详情五档文字-->
+    <style name="hangqing_detail_wd_row">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">center</item>
+        <item name="android:orientation">horizontal</item>
+    </style>
+
+    <!--商品详情五档文字-->
+    <style name="hangqing_detail_wd_name">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:textSize">12dp</item>
+        <item name="android:textColor">@color/hangqing_detail_wd_name</item>
+    </style>
+
+    <!--商品详情五档价格-->
+    <style name="hangqing_detail_wd_price">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">center</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:textSize">12dp</item>
+        <item name="android:textColor">@color/hangqing_red_text</item>
+    </style>
+
+    <!--商品详情五档数量-->
+    <style name="hangqing_detail_wd_volume">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:textSize">12dp</item>
+        <item name="android:textColor">@color/hangqing_yellow_text</item>
+    </style>
+
+    <!--商品详情左下信息文字-->
+    <style name="hangqing_detail_info_name">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">left</item>
+        <item name="android:textSize">12dp</item>
+        <item name="android:layout_marginTop">4dp</item>
+        <item name="android:layout_marginBottom">4dp</item>
+        <item name="android:textColor">@color/hangqing_detail_wd_name</item>
+    </style>
+
+    <!--商品详情左下信息价格-->
+    <style name="hangqing_detail_info_price">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">right</item>
+        <item name="android:textSize">12dp</item>
+        <item name="android:layout_marginTop">4dp</item>
+        <item name="android:layout_marginBottom">4dp</item>
+        <item name="android:textColor">@color/hangqing_red_text</item>
+    </style>
+    <!--k线周期小按钮-->
+    <style name="hangqing_detail_period_btn">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">fill_parent</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_marginRight">1dp</item>
+        <item name="android:background">@drawable/hangqing_period_btn_bg_selector</item>
+        <item name="android:gravity">center</item>
+        <item name="android:minWidth">38dp</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:clickable">true</item>
+        <item name="android:textColor">@drawable/hangqing_period_btn_text_selector</item>
+        <item name="android:onClick">onPeriodButtonClick</item>
+    </style>
+
+</resources>

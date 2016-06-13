@@ -1,0 +1,630 @@
+package com.puxtech.ybk.hangqing.charts;
+
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.Rect;
+import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewConfiguration;
+
+import com.puxtech.ybk.R;
+import com.puxtech.ybk.hangqing.util.PriceUtil;
+
+import java.util.LinkedList;
+import java.util.List;
+
+/**
+ * Created by fanshuo on 16/5/12.
+ */
+public class KLineView extends View{
+
+    public static final int KLINE_ROW_NUM = 4;//k线区域的行数
+    public static final int VOLUME_ROW_NUM = 2;//成交量的行数
+    public static final int INDEX_ROW_NUM = 2;//指标的行数
+    public static final float KLINE_HEIGHT_PROPORTION = 3f/5f;//k线区域高度所占比例，去掉上、中、下的间隔
+    public static final float VOLUME_HEIGHT_PROPORTION = 1f/5f;//成交量所占比例
+    public static final float INDEX_HEIGHT_PROPORTION = 1f/5f;//指标所占比例
+    public static final float MARGIN_DP = 8f;
+    public static final float LEFT_TEXT_WIDTH_DP = 40f;//左侧文字区域宽度
+    public static final float TOP_TEXT_HEIGHT_DP = 20f;//顶部文字区域高度
+    public static final float MIDDLE_TEXT_HEIGHT_DP = 20f;//中间文字区域高度
+    public static final float BOTTOM_TEXT_HEIGHT_DP = 30f;//底部文字区域高度
+    private Context context;
+    private KLinePaintFactory paintFactory;
+    private KLineChartModel kLineChartModel;
+    private LinkedList<KLinePointModel> pointModelListToShow;//当前显示的k线
+    private float kPointWidthDP = 5;//k线柱子的宽度，单位是dp，默认是5dp
+    private float kPointMarginDP = 1;//k线柱子左右空隙的宽度，单位是dp
+    private int kPointToShowSize;//当前显示的k线柱子的数量
+    private float kLineHighestPrice,kLineLowestPrice;//k线显示区域的最高价和最低价
+    private float kLineRowHeight,volumeRowHeight,indexRowHeight;
+    private float kLineStartY,kLineEndY,kLineStartX,kLineEndX;//k线区域的起止点坐标
+    private float volumeStartY,volumeEndY,volumeStartX,volumeEndX;//成交量区域的起止点坐标
+    private float indexStartY,indexEndY,indexStartX,indexEndX;//成交量区域的起止点坐标
+
+    //画十字线
+    private int mSlop;// 视为滑动的临界点
+    private float onTouchStartX = 0, onTouchStartY, onTouchEndX, onTouchEndY;
+    private boolean drawCrossLine;//是否绘制十字线
+    private KLinePointModel crossLinePoint;
+    private OnShowListener onShowListener;
+
+    public KLineView(Context context) {
+        super(context);
+        init(context);
+    }
+
+    public KLineView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init(context);
+    }
+
+    public KLineView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init(context);
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        initData();
+        drawFrame(canvas);
+        if(kLineChartModel != null){
+            List<KLinePointModel> kLinePointModelList = kLineChartModel.getPoints();
+            pointModelListToShow = new LinkedList<>();
+            pointModelListToShow.addAll(kLinePointModelList.subList(kLinePointModelList.size()-kPointToShowSize,kLinePointModelList.size()));
+            drawLeftText(canvas);
+            drawPoints(canvas);
+            drawPma(canvas);
+            drawVolume(canvas);//drawVolume必须在drawPoints之后执行，因为要用到前面计算出来的x坐标
+            drawBottomIndex(canvas);
+            if(drawCrossLine){
+                drawCrossLine(canvas);
+                drawPointText(canvas);
+            }
+        }
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        switch (event.getAction() & MotionEvent.ACTION_MASK) {
+            case MotionEvent.ACTION_DOWN:
+                onTouchStartX = event.getX();
+                onTouchStartY = event.getY();
+                onTouchEndX = event.getX();
+                onTouchEndY = event.getY();
+                break;
+            case MotionEvent.ACTION_MOVE:
+                onTouchEndX = event.getX();
+                onTouchEndY = event.getY();
+                if (drawCrossLine) {
+                    crossLinePoint = searchPointByX(onTouchEndX);
+                    invalidate();
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+                onTouchEndX = event.getX();
+                float offset2 = onTouchEndX - onTouchStartX;
+                // 如果点击的是上面的部分
+                if (Math.abs(offset2) < mSlop) {
+                    // 如果有分时数据，就开始画十字线
+                    if (kLineChartModel != null && kLineChartModel.getPoints() != null && kLineChartModel.getPoints().size() > 0) {
+                        if(drawCrossLine){
+                            drawCrossLine = false;
+                            invalidate();
+                            onShowListener.onHide();
+                        }
+                        else{
+                            drawCrossLine = true;
+                            crossLinePoint = searchPointByX(event.getX());
+                            invalidate();
+                            onShowListener.onShow();
+                        }
+                    }
+                }
+                break;
+        }
+        return true;
+    }
+
+    //private classes
+
+    private void init(Context mContext){
+        this.context = mContext;
+        paintFactory = new KLinePaintFactory(context);
+        ViewConfiguration vc = ViewConfiguration.get(context);
+        mSlop = vc.getScaledTouchSlop();
+    }
+
+    private void initData(){
+        int viewWidth = getMeasuredWidth();
+        int viewHeight = getMeasuredHeight();
+        //整个画线区域高度
+        float lineHeight = viewHeight - ChartsScreenSizeUtil.Dp2Px(context, MARGIN_DP) *2 - ChartsScreenSizeUtil.Dp2Px(context, TOP_TEXT_HEIGHT_DP) - ChartsScreenSizeUtil.Dp2Px(context, MIDDLE_TEXT_HEIGHT_DP)*2 - ChartsScreenSizeUtil.Dp2Px(context, BOTTOM_TEXT_HEIGHT_DP);
+        float kLineHeight = lineHeight * KLINE_HEIGHT_PROPORTION;
+        float volumeHeight = lineHeight * VOLUME_HEIGHT_PROPORTION;
+        float indexHeight = lineHeight * INDEX_HEIGHT_PROPORTION;
+        kLineRowHeight = kLineHeight/4;
+        volumeRowHeight = volumeHeight/2;
+        indexRowHeight = indexHeight/2;
+
+        kLineStartX = ChartsScreenSizeUtil.Dp2Px(context, LEFT_TEXT_WIDTH_DP) + ChartsScreenSizeUtil.Dp2Px(context, MARGIN_DP);
+        kLineStartY = ChartsScreenSizeUtil.Dp2Px(context, TOP_TEXT_HEIGHT_DP) + ChartsScreenSizeUtil.Dp2Px(context, MARGIN_DP);
+        kLineEndX = viewWidth - ChartsScreenSizeUtil.Dp2Px(context, MARGIN_DP);
+        kLineEndY = kLineStartY + kLineRowHeight * (float)KLINE_ROW_NUM;
+
+        volumeStartX = ChartsScreenSizeUtil.Dp2Px(context, LEFT_TEXT_WIDTH_DP) + ChartsScreenSizeUtil.Dp2Px(context, MARGIN_DP);
+        volumeStartY = kLineEndY + ChartsScreenSizeUtil.Dp2Px(context, MIDDLE_TEXT_HEIGHT_DP);
+        volumeEndX = viewWidth - ChartsScreenSizeUtil.Dp2Px(context, MARGIN_DP);
+        volumeEndY = volumeStartY + volumeRowHeight * (float)VOLUME_ROW_NUM;
+
+        indexStartX = ChartsScreenSizeUtil.Dp2Px(context, LEFT_TEXT_WIDTH_DP) + ChartsScreenSizeUtil.Dp2Px(context, MARGIN_DP);
+        indexStartY = volumeEndY + ChartsScreenSizeUtil.Dp2Px(context, MIDDLE_TEXT_HEIGHT_DP);
+        indexEndX = viewWidth - ChartsScreenSizeUtil.Dp2Px(context, MARGIN_DP);
+        indexEndY = viewHeight - ChartsScreenSizeUtil.Dp2Px(context, MARGIN_DP) - ChartsScreenSizeUtil.Dp2Px(context, BOTTOM_TEXT_HEIGHT_DP);
+
+        float kPointWidthWithMargin = ChartsScreenSizeUtil.Dp2Px(context, kPointWidthDP) + ChartsScreenSizeUtil.Dp2Px(context,kPointMarginDP);
+        kPointToShowSize = (int) ((kLineEndX - kLineStartX)/kPointWidthWithMargin);
+    }
+
+    private void drawFrame(Canvas canvas){
+        drawBoarder(canvas, KLINE_ROW_NUM,1, kLineRowHeight, kLineStartX,kLineStartY,kLineEndX,kLineEndY);
+        drawBoarder(canvas, VOLUME_ROW_NUM,1, volumeRowHeight, volumeStartX,volumeStartY,volumeEndX,volumeEndY);
+        drawBoarder(canvas, INDEX_ROW_NUM,1, indexRowHeight, indexStartX,indexStartY,indexEndX,indexEndY);
+    }
+
+    /**
+     * 画边框通用方法
+     */
+    private void drawBoarder(Canvas canvas, int row, int column, float rowHeight, float startX,float startY,float endX,float endY){
+        float curY = startY;// 画横线时，当前这条线的y坐标
+        // 画横线
+        for (int i = 0; i < (row + 1); i++) {
+            if (i == 0 || i == row) {
+                canvas.drawLine(startX, curY, endX, curY, paintFactory.linePaint);
+            } else {
+                canvas.drawLine(startX, curY, endX, curY, paintFactory.linePaintDashed);
+            }
+            curY = curY + rowHeight;
+        }
+
+        //画竖线
+        float xSpacing = (endX - startX)/column;//列间隔
+        float curX = startX;
+        for (int j = 0; j < (column + 1); j++) {
+            if(j == 0){
+                canvas.drawLine(curX,startY,curX,endY,paintFactory.linePaint);
+            }
+            else if(j == column){
+                canvas.drawLine(curX,startY,curX,endY,paintFactory.linePaint);
+            }
+            else{
+                canvas.drawLine(curX,startY,curX,endY,paintFactory.linePaintDashed);
+            }
+            curX = curX + xSpacing;
+        }
+    }
+
+    private void drawLeftText(Canvas canvas){
+        if(pointModelListToShow == null || pointModelListToShow.size() == 0){
+            return;
+        }
+        kLineHighestPrice = 0f;
+        kLineLowestPrice = pointModelListToShow.get(0).getLowestPrice();
+        for (int i = 0; i < pointModelListToShow.size(); i++) {
+            KLinePointModel kLinePointModel = pointModelListToShow.get(i);
+            if(kLinePointModel.getHighestPrice() > kLineHighestPrice){
+                kLineHighestPrice = kLinePointModel.getHighestPrice();
+            }
+            if(kLinePointModel.getPma5() > kLineHighestPrice){
+                kLineHighestPrice = kLinePointModel.getPma5();
+            }
+            if(kLinePointModel.getPma10() > kLineHighestPrice){
+                kLineHighestPrice = kLinePointModel.getPma10();
+            }
+            if(kLinePointModel.getPma30() > kLineHighestPrice){
+                kLineHighestPrice = kLinePointModel.getPma30();
+            }
+            if(kLinePointModel.getLowestPrice() < kLineLowestPrice){
+                kLineLowestPrice = kLinePointModel.getLowestPrice();
+            }
+            if(kLinePointModel.getPma5() < kLineLowestPrice){
+                kLineLowestPrice = kLinePointModel.getPma5();
+            }
+            if(kLinePointModel.getPma10() < kLineLowestPrice){
+                kLineLowestPrice = kLinePointModel.getPma10();
+            }
+            if(kLinePointModel.getPma30() < kLineLowestPrice){
+                kLineLowestPrice = kLinePointModel.getPma30();
+            }
+        }
+        if(kLineHighestPrice == kLineLowestPrice)
+        {
+            kLineHighestPrice += 1f;
+            kLineLowestPrice -= 1f;
+        }
+        float kLineOneRowPrice = (kLineHighestPrice - kLineLowestPrice)/KLINE_ROW_NUM;
+        Paint.FontMetrics fontMetrics = paintFactory.leftTextPaintWhite.getFontMetrics();
+        //字体的高度
+        float fontHeight = paintFactory.leftTextSize;
+        canvas.drawText(PriceUtil.keepPrecision(kLineHighestPrice,kLineChartModel.getMcu()),kLineStartX,kLineStartY+fontHeight,paintFactory.leftTextPaintWhite);
+        canvas.drawText(PriceUtil.keepPrecision((kLineHighestPrice+kLineLowestPrice)/2,kLineChartModel.getMcu()),kLineStartX,kLineStartY+kLineRowHeight*2,paintFactory.leftTextPaintWhite);
+        canvas.drawText(PriceUtil.keepPrecision(kLineLowestPrice,kLineChartModel.getMcu()),kLineStartX,kLineEndY,paintFactory.leftTextPaintWhite);
+
+
+    }
+
+    private void drawPoints(Canvas canvas) {
+        canvas.drawRect(kLineStartX, kLineStartY, kLineEndX, kLineStartY, paintFactory.averagePricePaint);
+        float kPointWidthWithMargin = ChartsScreenSizeUtil.Dp2Px(context, kPointWidthDP) + ChartsScreenSizeUtil.Dp2Px(context,kPointMarginDP);
+        float pixelsInPrice = (kLineEndY-kLineStartY)/(kLineHighestPrice - kLineLowestPrice);
+        for (int i = 0; i < pointModelListToShow.size(); i++) {
+            KLinePointModel kLinePointModel = pointModelListToShow.get(i);
+            float pointX = kPointWidthWithMargin * i + kPointWidthWithMargin/2 + kLineStartX;//柱子中心的横坐标
+            kLinePointModel.setCenterX(pointX);
+            float lineStartY = kLineStartY + (kLineHighestPrice - kLinePointModel.getHighestPrice())*pixelsInPrice;
+            float lineEndY = kLineStartY + (kLineHighestPrice - kLinePointModel.getLowestPrice())*pixelsInPrice;
+            if(kLinePointModel.getClosePrice() < kLinePointModel.getOpenPrice()){
+                //收盘价低于开盘价，绿色柱子
+                canvas.drawLine(pointX,lineStartY,pointX,lineEndY,paintFactory.greenTextPaint);
+                float left = pointX - ChartsScreenSizeUtil.Dp2Px(context, kPointWidthDP) / 2;
+                float right = pointX + ChartsScreenSizeUtil.Dp2Px(context, kPointWidthDP) / 2;
+                float bottom = kLineStartY + (kLineHighestPrice - kLinePointModel.getClosePrice())*pixelsInPrice;
+                float top = kLineStartY + (kLineHighestPrice - kLinePointModel.getOpenPrice()) * pixelsInPrice;
+                kLinePointModel.setClosePriceY(bottom);
+                canvas.drawRect(left, top, right, bottom, paintFactory.greenTextPaint);
+            }
+            else if(kLinePointModel.getClosePrice() > kLinePointModel.getOpenPrice()){
+                //收盘价高于开盘价，红色柱子
+                canvas.drawLine(pointX,lineStartY,pointX,lineEndY,paintFactory.redTextPaint);
+                float left = pointX - ChartsScreenSizeUtil.Dp2Px(context, kPointWidthDP) / 2;
+                float right = pointX + ChartsScreenSizeUtil.Dp2Px(context, kPointWidthDP) / 2;
+                float bottom = kLineStartY + (kLineHighestPrice - kLinePointModel.getOpenPrice())*pixelsInPrice;
+                float top = kLineStartY + (kLineHighestPrice - kLinePointModel.getClosePrice())*pixelsInPrice;
+                kLinePointModel.setClosePriceY(top);
+                canvas.drawRect(left, top, right, bottom, paintFactory.redTextPaint);
+            }
+            else{
+                //收盘价等于开盘价，红色横线
+                canvas.drawLine(pointX,lineStartY,pointX,lineEndY,paintFactory.redTextPaint);
+                float left = pointX - ChartsScreenSizeUtil.Dp2Px(context, kPointWidthDP) / 2;
+                float right = pointX + ChartsScreenSizeUtil.Dp2Px(context, kPointWidthDP) / 2;
+                float bottom = kLineStartY + (kLineHighestPrice - kLinePointModel.getOpenPrice())*pixelsInPrice;
+                float top = kLineStartY + (kLineHighestPrice - kLinePointModel.getClosePrice())*pixelsInPrice;
+                kLinePointModel.setClosePriceY(top);
+                canvas.drawLine(left, top, right, bottom, paintFactory.redTextPaint);
+            }
+        }
+    }
+
+    private void drawPma(Canvas canvas){
+        float kPointWidthWithMargin = ChartsScreenSizeUtil.Dp2Px(context, kPointWidthDP) + ChartsScreenSizeUtil.Dp2Px(context,kPointMarginDP);
+        float pixelsInPrice = (kLineEndY-kLineStartY)/(kLineHighestPrice - kLineLowestPrice);
+        Path path5 = new Path();
+        Path path10 = new Path();
+        Path path30 = new Path();
+        //从右往左画
+        for (int i = kPointToShowSize-1; i >= 0; i--) {
+            KLinePointModel item = pointModelListToShow.get(i);
+            float pointX = item.getCenterX();
+            float pointY5 = (float) ((kLineHighestPrice - item.getPma5()) * pixelsInPrice)
+                    + kLineStartY;
+            float pointY10 = (float) ((kLineHighestPrice - item.getPma10()) * pixelsInPrice)
+                    + kLineStartY;
+            float pointY30 = (float) ((kLineHighestPrice - item.getPma30()) * pixelsInPrice)
+                    + kLineStartY;
+            if(i == kPointToShowSize-1){
+                path5.moveTo(pointX, pointY5);
+                path10.moveTo(pointX, pointY10);
+                path30.moveTo(pointX, pointY30);
+            }
+            else{
+                if (item.getPma5() > 0) {
+                    path5.lineTo(pointX, pointY5);
+                }
+                if (item.getPma10() > 0) {
+                    path10.lineTo(pointX, pointY10);
+                }
+                if (item.getPma30() > 0) {
+                    path30.lineTo(pointX, pointY30);
+                }
+            }
+        }
+        canvas.drawPath(path5, paintFactory.pma5Paint);
+        canvas.drawPath(path10, paintFactory.pma10Paint);
+        canvas.drawPath(path30, paintFactory.pma30Paint);
+    }
+
+
+
+
+    private void drawVolume(Canvas canvas){
+        int highestVolume = 0;
+        for (int i = 0; i < pointModelListToShow.size(); i++) {
+            int volume = pointModelListToShow.get(i).getVolume();
+            if (volume > highestVolume) {
+                highestVolume = volume;
+            }
+        }
+        if(highestVolume == 0){
+            return;
+        }
+
+        //画交易量左侧文字
+        String topVolumeStr = highestVolume+"";
+        String centerVolumeStr = highestVolume/2+"";
+        float topVolumeY = volumeStartY;
+        float centerVolumeY = volumeStartY + volumeRowHeight;
+        float fontHeight = paintFactory.leftTextSize;
+        canvas.drawText(topVolumeStr,volumeStartX,topVolumeY+fontHeight,paintFactory.leftTextPaintYellow);
+        canvas.drawText(centerVolumeStr, volumeStartX, centerVolumeY + fontHeight / 2, paintFactory.leftTextPaintYellow);
+        canvas.drawText("0", volumeStartX, volumeEndY, paintFactory.leftTextPaintYellow);
+
+        float pixelsInOneVolume = (volumeEndY - volumeStartY)/highestVolume;
+        for (int i = 0; i < pointModelListToShow.size(); i++) {
+            KLinePointModel pointModel = pointModelListToShow.get(i);
+            float centerX = pointModel.getCenterX();
+            float left = centerX - ChartsScreenSizeUtil.Dp2Px(context, kPointWidthDP) / 2;
+            float right = centerX + ChartsScreenSizeUtil.Dp2Px(context, kPointWidthDP) / 2;
+            float top = volumeEndY - pixelsInOneVolume*pointModel.getVolume();
+            float bottom = volumeEndY;
+            if(pointModel.getClosePrice() < pointModel.getOpenPrice()){
+                canvas.drawRect(left, top, right, bottom, paintFactory.greenTextPaint);
+            }
+            else if(pointModel.getClosePrice() > pointModel.getOpenPrice()) {
+                canvas.drawRect(left, top, right, bottom, paintFactory.redTextPaint);
+            }
+            else{
+                canvas.drawRect(left, top, right, bottom, paintFactory.redTextPaint);
+            }
+        }
+    }
+
+    private void drawBottomIndex(Canvas canvas){
+        //画MACD
+        float highest=0,lowest=0;
+        for (int i = 0; i < pointModelListToShow.size(); i++) {
+            KLinePointModel item = pointModelListToShow.get(i);
+            if(item.getDif() > highest){
+                highest = item.getDif();
+            }
+            if(item.getDif() < lowest){
+                lowest = item.getDif();
+            }
+            if(item.getDea() > highest){
+                highest = item.getDea();
+            }
+            if(item.getDea() < lowest){
+                lowest = item.getDea();
+            }
+            if(item.getMacd() > highest){
+                highest = item.getMacd();
+            }
+            if(item.getMacd() < lowest){
+                lowest = item.getMacd();
+            }
+        }
+        if(PriceUtil.keepPrecision(highest,2).equals(PriceUtil.keepPrecision(lowest,2))){
+            highest += 1;
+            lowest -= 1;
+        }
+        //画左侧文字
+        String topIndexStr = PriceUtil.keepPrecision(highest,2);
+        String bottomIndexStr = PriceUtil.keepPrecision(lowest,2);
+        float fontHeight = paintFactory.leftTextSize;
+        canvas.drawText(topIndexStr,indexStartX,indexStartY+fontHeight,paintFactory.leftTextPaintWhite);
+        canvas.drawText(bottomIndexStr,indexStartX,indexEndY,paintFactory.leftTextPaintWhite);
+
+        //画中间横线
+        float pixelsInPrice = (indexEndY-indexStartY)/(highest - lowest);
+        float zeroY = indexStartY + highest * pixelsInPrice;
+        canvas.drawLine(indexStartX, zeroY, indexEndX, zeroY, paintFactory.whiteTextPaint);
+
+        //画柱子
+        for (int i = 0; i < pointModelListToShow.size(); i++) {
+            KLinePointModel item = pointModelListToShow.get(i);
+            float macd = item.getMacd();
+            float startY = zeroY;
+            float endY = indexStartY + (highest - macd)*pixelsInPrice;
+            if(endY < startY){
+                canvas.drawLine(item.getCenterX(),startY,item.getCenterX(),endY,paintFactory.redTextPaint);
+            }
+            else{
+                canvas.drawLine(item.getCenterX(),startY,item.getCenterX(),endY,paintFactory.greenTextPaint);
+            }
+        }
+
+        //画dif、dea线
+        Path difPath = new Path();
+        Path deaPath = new Path();
+        for (int i = 0; i < pointModelListToShow.size(); i++) {
+            KLinePointModel item = pointModelListToShow.get(i);
+            float pointX = item.getCenterX();
+            float difY = (highest - item.getDif()) * pixelsInPrice
+                    + indexStartY;
+            float deaY = (highest - item.getDea()) * pixelsInPrice
+                    + indexStartY;
+            if(i == 0){
+                difPath.moveTo(pointX,difY);
+                deaPath.moveTo(pointX,deaY);
+            }
+            else{
+                difPath.lineTo(pointX,difY);
+                deaPath.lineTo(pointX,deaY);
+            }
+        }
+        canvas.drawPath(difPath, paintFactory.difPaint);
+        canvas.drawPath(deaPath,paintFactory.deaPaint);
+    }
+
+    /**
+     * 查找最近的点
+     */
+    private KLinePointModel searchPointByX(float x) {
+        if (pointModelListToShow == null || pointModelListToShow.size() == 0) {
+            return null;
+        }
+        KLinePointModel point = null;
+        float deltaX = 10000;
+        for (int i = 0; i < pointModelListToShow.size(); i++) {
+            KLinePointModel item = pointModelListToShow.get(i);
+            if (Math.abs(item.getCenterX() - x) < deltaX) {
+                deltaX = Math.abs(item.getCenterX() - x);
+                point = item;
+            }
+        }
+        return point;
+    }
+
+    private void drawCrossLine(Canvas canvas){
+        if(crossLinePoint == null){
+            return;
+        }
+        float screenWidth = getMeasuredWidth();
+        float screenHeight = getMeasuredHeight();
+        float x = crossLinePoint.getCenterX();
+        float y = crossLinePoint.getClosePriceY();
+        canvas.drawLine(0, y, screenWidth, y, paintFactory.crossLinePaint);
+        canvas.drawLine(x, 0, x, screenHeight, paintFactory.crossLinePaint);
+    }
+
+    private void drawTopText(Canvas canvas){
+
+    }
+
+    private void getPaintColor(Paint paint, int UpOrDown) {
+        switch (UpOrDown) {
+            case 1: {
+                paint.setColor(context.getResources().getColor(R.color.hangqing_red_text));
+                break;
+            }
+            case 0: {
+                paint.setColor(Color.WHITE);
+                break;
+            }
+            case -1: {
+                paint.setColor(context.getResources().getColor(R.color.hangqing_green_text));
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
+    private void drawPointText(Canvas canvas){
+        float textSize = ChartsScreenSizeUtil.Dp2Px(context, 80)/7;
+        Paint nameTextPaint = new Paint();
+        nameTextPaint.setAntiAlias(true);
+        nameTextPaint.setColor(Color.WHITE);
+        nameTextPaint.setStrokeWidth(1);
+        nameTextPaint.setTextAlign(Paint.Align.LEFT);
+        nameTextPaint.setTextSize(textSize);
+
+        Paint valueTextPaint = new Paint();
+        valueTextPaint.setAntiAlias(true);
+        valueTextPaint.setColor(getResources().getColor(R.color.hangqing_red_text));
+        valueTextPaint.setTextAlign(Paint.Align.RIGHT);
+        valueTextPaint.setStrokeWidth(1.0f);
+        valueTextPaint.setTextSize(textSize);
+
+
+        //整个文字部分的宽高
+        float rowHeightOffset = ChartsScreenSizeUtil.Dp2Px(context, 4);//每一行文字之间的空隙高度
+        float rectWidth = ChartsScreenSizeUtil.Dp2Px(context, 60);
+        float rectHeight = ChartsScreenSizeUtil.Dp2Px(context, 80) + rowHeightOffset * 7;
+        float width = getWidth();
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setAlpha(180);
+        paint.setColor(context.getResources().getColor(R.color.black));
+        //确定矩形的顶点位置
+        float rectLeft, rectRight;
+        float centerX = (kLineEndX-kLineStartX)/2 + kLineStartX;
+        if(crossLinePoint.getCenterX()<centerX){
+            //选中的点在左半边
+            rectLeft = kLineEndX - rectWidth;
+            rectRight = kLineEndX;
+        }
+        else{
+            //选中的点在右半边
+            rectLeft = kLineStartX;
+            rectRight = kLineStartX + rectWidth;
+        }
+        Rect r = new Rect((int) rectLeft, (int)kLineStartY, (int) rectRight, (int)(kLineStartY+rectHeight));
+        canvas.drawRect(r, paint);
+        //每一行的高度为字体大小+偏移量
+        float rowHeight = rectHeight/7;
+
+        int rowCount = 1;
+        // 画文字
+        // 日期
+        canvas.drawText(crossLinePoint.getFormatDate(), rectLeft, kLineStartY+rowHeight*rowCount,
+                nameTextPaint);
+        rowCount++;
+        //如果是201403170600这种的才画时间，如果是20140317这种没有小时分钟的就不用画
+        if(crossLinePoint.getTime() > 100000000){
+            // 时间
+            canvas.drawText(crossLinePoint.getFormatTime(), rectLeft, kLineStartY+rowHeight*rowCount,
+                    nameTextPaint);
+            rowCount++;
+        }
+        // 开
+        canvas.drawText("开", rectLeft, kLineStartY+rowHeight*rowCount, nameTextPaint);
+        getPaintColor(valueTextPaint, crossLinePoint.getOpenUpOrDown());
+        canvas.drawText(PriceUtil.keepPrecision(crossLinePoint.getOpenPrice(), kLineChartModel.getMcu()), rectRight, kLineStartY+rowHeight*rowCount,
+                valueTextPaint);
+        rowCount++;
+        //高
+        canvas.drawText("高", rectLeft, kLineStartY+rowHeight*rowCount, nameTextPaint);
+        getPaintColor(valueTextPaint, crossLinePoint.getHighUpOrDown());
+        canvas.drawText(PriceUtil.keepPrecision(crossLinePoint.getHighestPrice(), kLineChartModel.getMcu()), rectRight, kLineStartY+rowHeight*rowCount,
+                valueTextPaint);
+        rowCount++;
+        // 低
+        canvas.drawText("低", rectLeft, kLineStartY+rowHeight*rowCount, nameTextPaint);
+        getPaintColor(valueTextPaint, crossLinePoint.getLowUpOrDown());
+        canvas.drawText(PriceUtil.keepPrecision(crossLinePoint.getLowestPrice(), kLineChartModel.getMcu()), rectRight, kLineStartY+rowHeight*rowCount,
+                valueTextPaint);
+        rowCount++;
+        // 收
+        canvas.drawText("收", rectLeft, kLineStartY+rowHeight*rowCount, nameTextPaint);
+        getPaintColor(valueTextPaint, crossLinePoint.getUpOrDown());
+        canvas.drawText(PriceUtil.keepPrecision(crossLinePoint.getClosePrice(), kLineChartModel.getMcu()), rectRight, kLineStartY+rowHeight*rowCount,
+                valueTextPaint);
+        rowCount++;
+        //幅
+        canvas.drawText("幅", rectLeft, kLineStartY+rowHeight*rowCount, nameTextPaint);
+        canvas.drawText(crossLinePoint.getChange(), rectRight, kLineStartY+rowHeight*rowCount, valueTextPaint);
+
+    }
+
+    //public methods
+    public void addNewPoints(List<KLinePointModel> points){
+        kLineChartModel.getPoints().addAll(points);
+    }
+
+    //getters and setters
+
+    public KLineChartModel getkLineChartModel() {
+        return kLineChartModel;
+    }
+
+    public void setkLineChartModel(KLineChartModel kLineChartModel) {
+        this.kLineChartModel = kLineChartModel;
+    }
+
+
+    public void setOnShowListener(OnShowListener onShowListener) {
+        this.onShowListener = onShowListener;
+    }
+
+    public interface OnShowListener{
+        public void onShow();
+        public void onHide();
+    }
+
+}

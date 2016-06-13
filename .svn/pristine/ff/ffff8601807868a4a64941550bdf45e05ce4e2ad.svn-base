@@ -1,0 +1,96 @@
+<resources>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="tradetype_label">交易类型</string>
+    <string name="sales_department_label">营业部</string>
+    <string name="account_type_label">账号类型</string>
+    <string name="account_label">账号</string>
+    <string name="password_label">密码</string>
+    <string name="account_tip_text">请输入账号</string>
+    <string name="password_tip_text">请输入密码</string>
+    <string name="login_safety_verify_hint">请输入验证码</string>
+    <string name="captcha_tip">看不清楚,换一个</string>
+    <string name="cancel_btn_text">取消</string>
+    <string name="login_btn_text">登录</string>
+    <string name="addaccount_btn_text">开户</string>
+    <string name="card_btn_text">非西南用户</string>
+    <string name="checkcode_label">验证码</string>
+    <string name="confirm">确定</string>
+    <string name="remember_label">记住账号</string>
+
+    <string name="chaxun_zijinchaxun">资金查询</string>
+    <string name="chaxun_gonggao">公告查询</string>
+
+    <string name="chaxun_shangpinchicang">商品持仓</string>
+    <string name="chaxun_dangriweituo">当日委托</string>
+    <string name="chaxun_dangrichengjiao">当日成交</string>
+    <string name="chaxun_lishichengjiao">历史成交</string>
+    <string name="chaxun_shenggouchaxun">申购查询</string>
+    <string name="chaxun_tuoguanchaxun">托管查询</string>
+    <string name="chaxun_tihuochaxun">提货查询</string>
+    <string name="chaxun_peihaochaxun">配号查询</string>
+    <string name="chaxun_zhongqianchaxun">中签查询</string>
+
+
+    <string name="pref_config_title">系统设置</string>
+    <string name="pref_reset_data_title">重置系统</string>
+    <string name="pref_reset_data_summary">重置程序中的数据</string>
+    <string name="pref_link_data_summary">站点选择页面</string>
+    <string name="pref_link_data_title">站点选择</string>
+    <string name="home_url">www.puxtech.cn</string>
+
+    <string name="pref_common_notice_title">首页公告</string>
+    <string name="pref_common_notice_summary">显示首页公告</string>
+    <string name="pref_disable_message_service_title">禁用消息中心服务</string>
+    <string name="pref_disable_message_service_summary">是否禁用后台消息中心服务</string>
+    <string name="pref_other_title">其他</string>
+    <string name="pref_update_title">软件升级</string>
+    <string name="pref_update_summary">检测是否有新版本发布</string>
+
+    <string name="pref_evaluation_title">评价反馈</string>
+    <!--<string name="pref_update">软件升级</string>-->
+    <!--<string name="pref_update_summary">检测是否有新版本发布</string>-->
+
+    <string name="pref_flux_title">流量统计</string>
+    <string name="pref_site_select_title">站点选择界面</string>
+    <string name="pref_site_select_summary">站点选择</string>
+    <string name="pref_help_key">pref_help_key</string>
+    <string name="pref_help_title">帮助说明</string>
+    <string name="pref_help_summary">帮助您更好的使用本软件</string>
+    <string name="pref_about_summary">关于本软件</string>
+    <string name="pref_about_title">关于</string>
+    <string name="pref_system_text_size_title">系统字体大小设置</string>
+    <string name="pref_system_text_size_summary">设置系统字体大小</string>
+    <string name="pref_content_text_size_title">资讯内容字体大小</string>
+    <string name="pref_content_text_size_summary">设置资讯内容字体大小</string>
+    <string name="pref_query_flux_title">查询流量</string>
+    <string name="pref_query_flux_summary">查询本次与历史访问已使用的流量</string>
+    <string name="pref_reset_flux_title">重置流量</string>
+    <string name="pref_reset_flux_summary">重置已使用流量的统计</string>
+    <string name="pref_trade_lock_time_text">交易锁屏时间(分钟)</string>
+    <string name="pref_trade_lock_time_summary">设置交易锁屏时间</string>
+    <string name="pref_trade_lock_time_title">交易锁屏时间</string>
+    <string name="pref_recommend_title">好友推荐</string>
+    <string name="pref_recommend_summary">将此软件推荐给您的好友</string>
+    <string name="pref_register_summary">注册登录</string>
+    <string name="pref_register_title">注册登录</string>
+    <string name="pref_system_text_size_key">pref_system_text_size_key</string>
+
+
+    <string name="bank_to_trade">银行转交易中心</string>
+    <string name="trade_to_bank">交易中心转银行</string>
+    <string name="transfer_history">历史转账流水</string>
+
+    <string name="winner_none">--</string>
+    <string name="buy1_label">买一</string>
+    <string name="buy2_label">买二</string>
+    <string name="buy3_label">买三</string>
+    <string name="buy4_label">买四</string>
+    <string name="buy5_label">买五</string>
+    <string name="sell1_label">卖一</string>
+    <string name="sell2_label">卖二</string>
+    <string name="sell3_label">卖三</string>
+    <string name="sell4_label">卖四</string>
+    <string name="sell5_label">卖五</string>
+
+</resources>

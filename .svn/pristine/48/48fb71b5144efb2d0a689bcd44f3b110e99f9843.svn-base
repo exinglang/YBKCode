@@ -1,0 +1,64 @@
+package com.puxtech.ybk.hangqing;
+
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.puxtech.ybk.R;
+import com.puxtech.ybk.hangqing.exception.SessionErrorException;
+import com.puxtech.ybk.hangqing.jsondata.getmarkets.GetMarketsRepBody;
+import com.puxtech.ybk.hangqing.jsondata.RepData;
+import com.puxtech.ybk.hangqing.protocol.RequestManager;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+/**
+ * Created by fanshuo on 16/4/20.
+ */
+public class HangQingMainFragment extends BaseHangQingFragment {
+
+    public static Fragment getFragment(){
+        HangQingMainFragment fragment = new HangQingMainFragment();
+        return fragment;
+    }
+
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.hangqing_fragment_main,container,false);
+        request();
+        return view;
+    }
+
+    private void request(){
+        putAsyncTask(new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                RequestManager requestManager = new RequestManager();
+                try {
+                    JSONObject repJson = requestManager.getMarkets(myApplication);
+                    Gson gson = new Gson();
+                    TypeToken typeToken = new TypeToken<RepData<GetMarketsRepBody>>(){};
+                    RepData<GetMarketsRepBody> repData = gson.fromJson(repJson.toString(),typeToken.getType());
+                    repData.getMmts().getRepBody().getMarketList().get(0).getMarketId();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    return false;
+                } catch (SessionErrorException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+                return true;
+            }
+        });
+    }
+
+}

@@ -1,0 +1,120 @@
+package com.puxtech.ybk.jiaoyi.page;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import com.puxtech.ybk.BaseActivity;
+import com.puxtech.ybk.R;
+import com.puxtech.ybk.helper.TextSizeHelper;
+import com.puxtech.ybk.jiaoyi.TradeHelper;
+import com.puxtech.ybk.util.ActivityUtils;
+
+public class MoreTrade extends BaseTradeActivity {
+
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        TextSizeHelper.setTextSize(context);
+        setContentView(R.layout.activity_more_trade);
+        TradeHelper.initToolBarWithSubTitleAndFinishIcon(this, "更多交易", (Toolbar) findViewById(R.id.toolbar), (TextView) findViewById(R.id.tv_toolbar));
+
+        ((Toolbar) findViewById(R.id.toolbar)).setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+
+                switch (item.getItemId()) {
+                    case R.id.action_more:
+
+                        finish();
+                        break;
+                }
+                return true;
+            }
+        });
+        initWidget();
+
+    }
+
+    TextView tv_id;
+    Button bt_change, bt_quit;
+    LinearLayout ll_bank, ll_pwd;
+
+    private void initWidget() {
+        tv_id = (TextView) findViewById(R.id.tv_id);
+        bt_change = (Button) findViewById(R.id.bt_change);
+        bt_quit = (Button) findViewById(R.id.bt_quit);
+        ll_bank = (LinearLayout) findViewById(R.id.ll_bank);
+        ll_pwd = (LinearLayout) findViewById(R.id.ll_pwd);
+        String firmId = myApplication.getTradeEntity().getOtherData().getFirmId();
+        String s = firmId.substring(firmId.length() - 5, firmId.length());
+        tv_id.setText("****" + s);
+
+        bt_change.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(context, ChangeAccount.class);
+                startActivity(intent);
+            }
+        });
+        bt_quit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ActivityUtils.showAlertWithConfirmText(context, "是否注销当前账号?", "确定", new Runnable() {
+                    @Override
+                    public void run() {
+
+
+                    }
+                });
+
+            }
+        });
+        ll_bank.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(context, Bank.class);
+                startActivity(intent);
+            }
+        });
+        ll_pwd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(context, ChangePassword.class);
+                startActivity(intent);
+            }
+        });
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_more_trade, menu);
+
+        return true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+
+    }
+
+
+    //    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+//        inflater.inflate(R.menu.menu_home, menu);
+//        super.onCreateOptionsMenu(menu);
+//    }
+
+}

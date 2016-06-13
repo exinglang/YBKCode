@@ -1,0 +1,154 @@
+package com.puxtech.ybk.jiaoyi.responsedata;
+
+import com.puxtech.ybk.Constant;
+import com.puxtech.ybk.jiaoyi.entitydata.HeartBeatData;
+import com.puxtech.ybk.jiaoyi.entitydata.TodayDealData;
+import com.puxtech.ybk.util.ActivityUtils;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+
+/**
+ * Created by mac on 15/11/5.
+ */
+public class HeartBeatResponseData extends BaseResponseDataTrade {
+
+
+    private static final String TAG_TRADE_NO = "TRADE_NO";
+    private static final String TAG_COMMODITY_NAME = "COMMODITY_NAME";
+    private static final String TAG_QUANTITY = "QUANTITY";
+    private static final String TAG_PRICE = "PRICE";
+    private static final String TAG_TRADE_FEE = "TRADE_FEE";
+    private static final String TAG_HOLD_TIME = "HOLD_TIME";
+    private static final String TAG_BS_FLAG = "BS_FLAG";
+    private static final String TAG_TR_T = "TR_T";
+    private static final String TAG_TRADE_FUNDS = "TRADE_FUNDS";
+
+
+    private static final String TAG_CLEAR_DATE = "CLEAR_DATE";
+    private static final String TAG_LASTNEW_ID = "LASTNEW_ID";
+    private static final String TAG_NEW_TRADES = "NEW_TRADES";
+    private static final String TAG_SYSTEM_STATUS = "SYSTEM_STATUS";
+    private static final String TAG_SYSTEM_TIME = "SYSTEM_TIME";
+    private static final String TAG_TRADE_CNT = "TRADE_CNT";
+
+
+    ArrayList<TodayDealData> dataArrayList;
+
+    HeartBeatData heartBeatData;
+    public void parseXML(String jsString,String rName) {
+        try {
+            JSONObject root = checkFail(jsString,rName);
+            if (retCode != 0) {
+                return;
+            }
+            JSONObject body = root.getJSONObject(TAG_MMTS)
+                    .getJSONObject(TAG_REP_BODY);
+
+
+            heartBeatData=new HeartBeatData();
+            heartBeatData.setCLEAR_DATE(body.getString(TAG_CLEAR_DATE));
+            heartBeatData.setLASTNEW_ID(body.getLong(TAG_LASTNEW_ID));
+//            heartBeatData.setNEW_TRADES(body.getString(TAG_NEW_TRADES));
+            heartBeatData.setSYSTEM_STATUS(body.getInt(TAG_SYSTEM_STATUS));
+            heartBeatData.setSYSTEM_TIME(body.getString(TAG_SYSTEM_TIME));
+            heartBeatData.setTRADE_CNT(body.getLong(TAG_TRADE_CNT));
+
+
+
+            int recordNumber;
+            try {
+                recordNumber = body.getJSONArray(TAG_NEW_TRADES).length();
+            } catch (JSONException e) {
+                e.printStackTrace();
+                recordNumber = 0;
+            }
+            dataArrayList = new ArrayList<>();
+            for (int j = 0; j < recordNumber; j++) {
+
+                JSONObject rec = body.getJSONArray(TAG_NEW_TRADES)
+                        .getJSONObject(j);
+
+
+                TodayDealData data = new TodayDealData();
+//                private static final String TAG_CLEAR_DATE="CLEAR_DATE";
+//                private static final String TAG_TRADE_NO="TRADE_NO";
+//                private static final String TAG_COMMODITY_NAME="COMMODITY_NAME";
+//                private static final String TAG_QUANTITY="QUANTITY";
+//                private static final String TAG_PRICE="PRICE";
+//                private static final String TAG_TRADE_FEE="TRADE_FEE";
+//                private static final String TAG_HOLD_TIME="HOLD_TIME";
+//                private static final String TAG_BS_FLAG="BS_FLAG";
+//                private static final String TAG_TR_T="TR_T";
+
+
+                data.setCLEAR_DATE(rec.getString(TAG_CLEAR_DATE));
+                data.setTRADE_NO(rec.getString(TAG_TRADE_NO));
+                data.setCOMMODITY_NAME(rec.getString(TAG_COMMODITY_NAME));
+                data.setQUANTITY(rec.getString(TAG_QUANTITY));
+                data.setPRICE(rec.getString(TAG_PRICE));
+                data.setTRADE_FEE(rec.getString(TAG_TRADE_FEE));
+                data.setHOLD_TIME(ActivityUtils.getRealData(rec.getString(TAG_HOLD_TIME)));
+                data.setBS_FLAG(rec.getString(TAG_BS_FLAG));
+                data.setBS_FLAG_CH(rec.getString(TAG_BS_FLAG).equals("1") ? Constant.MAI_RU : Constant.MAI_CHU);
+
+//                BS_FLAG 数字 1 - 买 2 - 卖
+//                TR_T 数字 1 - 市价成交，用户下单；2 - 市价成交，电话下单；3 - 市价成交，系统下单；4 - 自动强平，系统下单；5 - 手动强平，系统下单；
+//                6 - 指价成交，系统下单；
+//                7 - 指价成交，电话下单；8 - 指价成交，批量指价下单
+                String type = "";
+                switch (rec.getInt(TAG_TR_T)) {
+
+                    case 1:
+                        type = "市价成交，用户下单";
+                        break;
+                    case 2:
+                        type = "市价成交，电话下单";
+                        break;
+                    case 3:
+                        type = "市价成交，系统下单";
+                        break;
+                    case 4:
+                        type = "自动强平，系统下单";
+                        break;
+                    case 5:
+                        type = "手动强平，系统下单";
+                        break;
+                    case 6:
+                        type = "指价成交，系统下单";
+                        break;
+                    case 7:
+                        type = "指价成交，电话下单";
+                        break;
+                    case 8:
+                        type = "指价成交，批量指价下单";
+                        break;
+                    default:
+                        type = "未知类型";
+                        break;
+                }
+                data.setTR_T_CH(type);
+                data.setTR_T(rec.getString(TAG_TR_T));
+
+                dataArrayList.add(data);
+
+            }
+            heartBeatData.setDataArrayList(dataArrayList);
+//            myApplication.getTradeEntity().getTradeData().setHoldDetailDataList(holdDetailDataList);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            parseError();
+
+        }
+
+
+    }
+
+    public HeartBeatData getHeartBeatData() {
+        return heartBeatData;
+    }
+}

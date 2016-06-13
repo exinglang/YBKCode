@@ -1,0 +1,278 @@
+package com.puxtech.ybk.hangqing.charts;
+
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Path;
+import android.graphics.PorterDuff;
+import android.util.AttributeSet;
+import android.view.View;
+
+import com.puxtech.ybk.R;
+
+import java.util.List;
+
+/**
+ * Created by fanshuo on 16/4/28.
+ */
+public class MiniFenShiView extends View {
+
+
+    private static final int ROW_NUM = 6;//行数
+    private static final int COLUMN_NUM = 4;//列数
+    private Context context;
+    private String[] bottomTimeArray;//底部时间
+    private FenShiPaintFactory paintFactory;//画笔工厂
+    private float frameStartX;// 整个框架左上角x坐标
+    private float frameStartY;// 整个框架左上角y坐标
+    private float frameEndX;// 整个框架右下角x坐标
+    private float frameEndY;// 整个框架右下角y坐标
+    private float fenShiStartY,fenShiEndY;
+    private float volumeStartY,volumeEndY;
+    private float rowHeight;//一行所占高度
+    private float priceSpacing;// 最左边的价钱间隔，根据涨或跌的最大的那个确定间隔价钱数
+    private TradeTimeManager tradeTimeManager;
+    private FenShiChartModel fenShiChartModel;
+
+    public MiniFenShiView(Context context) {
+        super(context);
+        init(context);
+    }
+
+    public MiniFenShiView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init(context);
+    }
+
+    public MiniFenShiView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init(context);
+    }
+
+    /**
+     * 初始化本类需要的信息
+     */
+    private void init(Context mContext){
+        this.context = mContext;
+        paintFactory = new FenShiPaintFactory(context);
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+
+        if(tradeTimeManager == null){
+            tradeTimeManager = new TradeTimeManager(1462237200000l,1462276800000l);
+        }
+        initData();
+        drawFrame(canvas);
+//        drawBottomText(canvas);
+        if(fenShiChartModel != null){
+            drawPrice(canvas);
+            drawAveragePrice(canvas);
+        }
+    }
+
+    private void initData() {
+        frameStartX = 0;
+        frameStartY = 0;
+        frameEndX = getMeasuredWidth();
+        frameEndY = getMeasuredHeight();
+        fenShiStartY = 0;
+        //一行的高度
+        rowHeight = (frameEndY - frameStartY)/(float)ROW_NUM;
+        //分时线区域的底部（交易量固定占两行）
+        fenShiEndY = rowHeight * (float)(ROW_NUM-2);
+        volumeStartY = fenShiEndY;
+        volumeEndY = frameEndY;
+    }
+
+    private void drawFrame(Canvas canvas){
+        float startX, startY, endX, endY;
+        startX = frameStartX;
+        startY = frameStartY;
+        endX = frameEndX;
+        endY = frameEndY;
+        float ySpacing = (endY - startY) / ROW_NUM;// 行间隔
+        float curY = startY;// 画横线时，当前这条线的y坐标
+        // 画横线
+        for (int i = 0; i < (ROW_NUM + 1); i++) {
+            if (i == 0 || i == ROW_NUM) {
+                canvas.drawLine(startX, curY, endX, curY, paintFactory.linePaint);
+            } else {
+                canvas.drawLine(startX, curY, endX, curY, paintFactory.linePaintDashed);
+            }
+            curY = curY + ySpacing;
+        }
+        //画竖线
+        float xSpacing = (endX - startX)/COLUMN_NUM;//列间隔
+        float curX = startX;
+        for (int j = 0; j < (COLUMN_NUM + 1); j++) {
+            if(j == 0 || j == COLUMN_NUM){
+                canvas.drawLine(curX,startY,curX,endY,paintFactory.linePaint);
+            }
+            else{
+                canvas.drawLine(curX,startY,curX,endY,paintFactory.linePaintDashed);
+            }
+            curX = curX + xSpacing;
+        }
+
+    }
+
+    private void drawLeftText(Canvas canvas){
+
+    }
+
+    private void drawBottomText(Canvas canvas){
+        float leftX = 0;
+        float rightX = 0;
+        float lineEndY;
+        leftX = 0;
+        rightX = frameEndX;
+        lineEndY = frameEndY;
+
+        // 画分割线
+        float oneMinX = (rightX - leftX) / tradeTimeManager.getTotalMinutes();
+        String[] BOTTOM_TEXT = tradeTimeManager.getBottomTextArray();
+        int[] BOTTOM_TEXT_IN_MINUTES = tradeTimeManager.getBottomOffsetMinuteArray();
+        String curText = "";
+        for (int i = 0; i < BOTTOM_TEXT.length; i++) {
+            int minutes = BOTTOM_TEXT_IN_MINUTES[i];
+            float x = leftX + minutes * oneMinX;
+            float y = getHeight();
+
+            curText = BOTTOM_TEXT[i];
+
+            if(i == BOTTOM_TEXT.length-1){
+                canvas.drawText(curText, x, y, paintFactory.whiteTextPaint);
+            }
+            else{
+                canvas.drawText(curText, x, y, paintFactory.whiteTextPaintRight);
+            }
+        }
+
+    }
+
+    private void drawPrice(Canvas canvas){
+        // 使用path方法绘制
+        Path path = new Path();// 分时线的填充区域
+        float xPixel = 0, yPixel = 0;
+        FenShiPointModel pointModel;
+        for (int i = 0; i < fenShiChartModel.getPoints().size(); i++) {
+            pointModel = fenShiChartModel.getPoints().get(i);
+            xPixel = pointModel.getPointX();
+            yPixel = pointModel.getPointY();
+            if (i == 0) {
+                path.moveTo(xPixel, yPixel);
+            }
+            else {
+                path.lineTo(xPixel, yPixel);
+            }
+        }
+        path.close();
+        canvas.drawPath(path, paintFactory.pricePaint);
+
+
+    }
+
+    private void drawAveragePrice(Canvas canvas){
+        // 使用path方法绘制
+        Path path = new Path();// 分时线的填充区域
+        float xPixel = 0, yPixel = 0;
+        FenShiPointModel pointModel;
+        for (int i = 0; i < fenShiChartModel.getPoints().size(); i++) {
+            pointModel = fenShiChartModel.getPoints().get(i);
+            xPixel = pointModel.getPointX();
+            yPixel = pointModel.getAverageY();
+            if (i == 0) {
+                path.moveTo(xPixel, yPixel);
+            }
+            else {
+                path.lineTo(xPixel, yPixel);
+            }
+        }
+        path.close();
+        canvas.drawPath(path, paintFactory.averagePricePaint);
+    }
+
+
+    private void calPriceSpacing(){
+        // 计算 最左边的价钱间隔，根据涨或跌的最大的那个确定间隔价钱数
+
+        float highestPrice = fenShiChartModel.getHighestPrice();
+        float lowestPrice = fenShiChartModel.getLowestPrice();
+        float closePrice = fenShiChartModel.getYesterdayClosePrice();
+        if ((highestPrice - closePrice) > (closePrice - lowestPrice)) {
+            priceSpacing = (highestPrice - closePrice) / (ROW_NUM / 2);
+        } else {
+            priceSpacing = (closePrice - lowestPrice) / (ROW_NUM / 2);
+        }
+        if (priceSpacing == 0) {
+            priceSpacing += 1;
+        }
+    }
+
+    /**
+     * 根据当前时间算出X坐标（此方法耗时1ms-2ms）
+     */
+    private float getXPixelByTime(FenShiPointModel fenShiPointModel) {
+        float endX = frameEndX;
+        float startX = 0;
+        float ret = 0;
+        float pixelsOneMinute = (endX - startX) / tradeTimeManager.getTotalMinutes();// 每1分钟时多少像素
+        long currentTime = fenShiPointModel.getTimeLong();
+        long startTime = tradeTimeManager.getStartTime();
+        if (currentTime < startTime) {
+            currentTime -= 1000 * 60 * 60 * 24;
+        }
+        long delta = currentTime - startTime;
+        ret = pixelsOneMinute * (delta / 1000f / 60f);
+        return ret;
+    }
+
+    /**
+     * 根据当前价钱算出Y坐标(此方法耗时小于1ms)
+     */
+    private float getYPixelByPrice(float price, float closePrice) {
+
+        float pixelsInPrice = (fenShiEndY - fenShiStartY)
+                / (fenShiChartModel.getHighestPrice() - fenShiChartModel.getLowestPrice());// 每1块钱是多少像素
+        float ret = 0;
+        float closeY = (fenShiEndY - fenShiStartY) / 2 + frameStartY;
+        if (price > closePrice) {
+            ret = closeY - (price - closePrice) * pixelsInPrice;
+
+        } else {
+            ret = closeY + (closePrice - price) * pixelsInPrice;
+        }
+        return ret;
+    }
+
+
+    //public methods
+
+    public void calPointXY(){
+        calPriceSpacing();
+        List<FenShiPointModel> fenShiPointModelList = fenShiChartModel.getPoints();
+        for (int i = 0; i < fenShiPointModelList.size(); i++) {
+            FenShiPointModel fenShiPointModel = fenShiPointModelList.get(i);
+            float x = getXPixelByTime(fenShiPointModel);
+            float y = getYPixelByPrice(fenShiPointModel.getLastPrice(),fenShiChartModel.getYesterdayClosePrice());
+            float avgY = getYPixelByPrice(fenShiPointModel.getAveragePrice(),fenShiChartModel.getYesterdayClosePrice());
+            fenShiPointModel.setPointX(x);
+            fenShiPointModel.setPointY(y);
+            fenShiPointModel.setAverageY(avgY);
+        }
+    }
+
+
+    //getters and setters
+
+    public void setTradeTimeManager(TradeTimeManager tradeTimeManager) {
+        this.tradeTimeManager = tradeTimeManager;
+    }
+
+    public void setFenShiChartModel(FenShiChartModel fenShiChartModel) {
+        this.fenShiChartModel = fenShiChartModel;
+    }
+}

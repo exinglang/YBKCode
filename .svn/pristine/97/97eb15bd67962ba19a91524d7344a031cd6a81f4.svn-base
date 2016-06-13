@@ -1,0 +1,13 @@
+package com.puxtech.ybk.hangqing.jsondata;
+
+/**
+ * Created by fanshuo on 16/4/21.
+ */
+public class LoginREQBData {
+
+    int EID = 2;
+    String EKEY;
+    String RAND;
+    String RENC;
+
+}

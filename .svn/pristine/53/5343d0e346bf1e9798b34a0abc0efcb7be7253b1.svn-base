@@ -1,0 +1,75 @@
+package com.puxtech.ybk.jiaoyi.responsedata;
+
+import com.puxtech.ybk.MyApplication;
+import com.puxtech.ybk.jiaoyi.entitydata.CommodityData;
+import com.puxtech.ybk.jiaoyi.entitydata.TradeEntity;
+
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+
+/**
+ * Created by mac on 15/11/5.
+ */
+public class CommodityResponseData extends BaseResponseDataTrade {
+
+    private static final String TAG_CO_I = "CO_I";
+    private static final String TAG_CO_N = "CO_N";
+    private static final String TAG_PLATE = "PLATE";
+    private static final String TAG_FACTOR = "FACTOR";
+    private static final String TAG_UNIT = "UNIT";
+    private static final String TAG_STATUS = "STATUS";
+    private static final String TAG_PRICE = "PRICE";
+    private static final String TAG_URL = "URL";
+    private static final String TAG_MIN_PRICE_MOVE = "MIN_PRICE_MOVE";
+    private static final String TAG_ONE_MIN_QTY = "ONE_MIN_QTY";
+    private static final String TAG_ONE_MAX_QTY = "ONE_MAX_QTY";
+
+
+
+
+    public void parseXML(MyApplication myApplication,String jsString) {
+
+        try {
+            JSONObject root = checkFail(jsString);
+            if (retCode != 0) {
+                return;
+            }
+
+            ArrayList<CommodityData> commodityDatas=new ArrayList<>();
+            JSONObject rep = root.getJSONObject(TAG_MMTS).getJSONObject(TAG_REP_BODY);
+
+
+            for (int i = 0; i < rep.getJSONArray(TAG_RESULTLIST)
+                    .length(); i++) {
+                CommodityData cd = new CommodityData();
+                JSONObject rec = rep.getJSONArray(TAG_RESULTLIST)
+                        .getJSONObject(i);
+
+                cd.setCode(rec.getString(TAG_CO_I));
+                cd.setName(rec.getString(TAG_CO_N));
+                cd.setPlate(rec.getString(TAG_PLATE));
+                cd.setFactor(rec.getString(TAG_FACTOR));
+                cd.setUnit(rec.getString(TAG_UNIT));
+                cd.setStatus(rec.getString(TAG_STATUS));
+                cd.setPrice(rec.getString(TAG_PRICE));
+                cd.setUrl(rec.getString(TAG_URL));
+                cd.setMin_price_move(rec.getString(TAG_MIN_PRICE_MOVE));
+                cd.setOne_min_qty(rec.getString(TAG_ONE_MIN_QTY));
+                cd.setOne_max_qty(rec.getString(TAG_ONE_MAX_QTY));
+
+                commodityDatas.add(cd);
+
+            }
+
+            myApplication.getTradeEntity().getTradeData().setCommodityDataList(commodityDatas);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            parseError();
+
+        }
+
+
+    }
+}

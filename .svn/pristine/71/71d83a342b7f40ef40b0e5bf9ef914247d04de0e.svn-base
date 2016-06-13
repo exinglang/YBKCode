@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/layout_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_alignParentBottom="true"
+        app:tabIndicatorColor="@null"
+        app:tabSelectedTextColor="@null"
+        app:tabTextColor="@null"/>
+
+    <android.inputmethodservice.KeyboardView
+        android:id="@+id/keyboard_view"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/keyboard_but_b_selector"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:keyPreviewLayout="@layout/quick_key_preview"
+
+        android:keyBackground="@drawable/keyboard_but_b_selector"
+        android:keyTextColor="@color/white"
+        android:visibility="gone" />
+</RelativeLayout>

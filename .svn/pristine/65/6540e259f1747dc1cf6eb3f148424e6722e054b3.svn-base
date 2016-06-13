@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_login"
+    android:layout_width="match_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout style="@style/titleBar" >
+
+
+
+        <TextView
+            style="@style/titleText"
+            android:text="普通交易" />
+
+        <TextView
+            android:id="@+id/tv_kefu"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:clickable="true"
+            android:gravity="center"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+            android:text="更多交易"
+            android:textColor="@color/white"
+            android:textSize="?attr/small" />
+    </RelativeLayout>
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tl"
+        style="@style/tablayout" />
+    <com.puxtech.ybk.jiaoyi.view.BaseViewPager
+
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+</LinearLayout>

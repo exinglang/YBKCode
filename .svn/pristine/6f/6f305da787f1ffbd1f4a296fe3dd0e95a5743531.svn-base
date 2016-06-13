@@ -1,0 +1,88 @@
+package com.puxtech.ybk.jiaoyi.entitydata;
+
+import java.io.Serializable;
+
+/**
+ * <b>Description:</b>
+ * <p>
+ * 商品持仓明细实体类
+ * </p>
+ *
+ * @Package com.happyinsource.htjy.android.entity
+ */
+public class HoldDetailData implements Serializable {
+
+//    交易商ID	FIRMID
+//    商品代码	COMMODITYID
+//    持仓数量	HOLDQTY
+//    持仓成本	HOLDCOST
+//    持仓均价	EVENPRICE
+//    冻结数量	FROZENQTY
+
+
+
+    String FIRMID;
+    String COMMODITYID;
+    String HOLDQTY;
+    String HOLDCOST;
+    String EVENPRICE;
+    String FROZENQTY;
+
+    String price;
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
+
+    public String getFIRMID() {
+        return FIRMID;
+    }
+
+    public void setFIRMID(String FIRMID) {
+        this.FIRMID = FIRMID;
+    }
+
+    public String getCOMMODITYID() {
+        return COMMODITYID;
+    }
+
+    public void setCOMMODITYID(String COMMODITYID) {
+        this.COMMODITYID = COMMODITYID;
+    }
+
+    public String getHOLDQTY() {
+        return HOLDQTY;
+    }
+
+    public void setHOLDQTY(String HOLDQTY) {
+        this.HOLDQTY = HOLDQTY;
+    }
+
+    public String getHOLDCOST() {
+        return HOLDCOST;
+    }
+
+    public void setHOLDCOST(String HOLDCOST) {
+        this.HOLDCOST = HOLDCOST;
+    }
+
+    public String getEVENPRICE() {
+        return EVENPRICE;
+    }
+
+    public void setEVENPRICE(String EVENPRICE) {
+        this.EVENPRICE = EVENPRICE;
+    }
+
+    public String getFROZENQTY() {
+        return FROZENQTY;
+    }
+
+    public void setFROZENQTY(String FROZENQTY) {
+        this.FROZENQTY = FROZENQTY;
+    }
+}

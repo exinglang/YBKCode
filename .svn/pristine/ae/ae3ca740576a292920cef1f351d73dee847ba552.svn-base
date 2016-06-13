@@ -1,0 +1,141 @@
+package com.puxtech.ybk.hangqing;
+
+import android.graphics.Color;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.puxtech.ybk.R;
+import com.puxtech.ybk.hangqing.controller.HangQingBasicDataController;
+import com.puxtech.ybk.hangqing.controller.HangQingListController;
+import com.puxtech.ybk.hangqing.exception.SessionErrorException;
+import com.puxtech.ybk.hangqing.jsondata.getmarkets.GetMarketsRepBody;
+import com.puxtech.ybk.hangqing.jsondata.RepData;
+import com.puxtech.ybk.hangqing.jsondata.getplates.Plate;
+import com.puxtech.ybk.hangqing.protocol.RequestManager;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Created by fanshuo on 16/4/20.
+ */
+public class HangQingMainFragment extends BaseHangQingFragment {
+
+    private View layoutLoadFailed,layoutLoading;
+    private HangQingBasicDataController basicDataController;//行情基础数据控制器
+    private HangQingListController hangQingListController;//行情列表控制器
+    private LinearLayout layoutPlates;//板块layout
+    private List<TextView> plateTextViews;//板块按钮
+    private TextView tvTitle;//标题栏中间文字
+
+
+    public static Fragment getFragment(){
+        HangQingMainFragment fragment = new HangQingMainFragment();
+        return fragment;
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.hangqing_fragment_main,container,false);
+        initViews(view);
+//        request();
+        return view;
+    }
+
+    private void initViews(View parent){
+        layoutPlates = (LinearLayout) parent.findViewById(R.id.layout_plates);
+        tvTitle = (TextView) parent.findViewById(R.id.tv_title);
+        layoutLoadFailed = parent.findViewById(R.id.layout_load_failed);
+        layoutLoading = parent.findViewById(R.id.layout_loading);
+        layoutLoadFailed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                layoutLoadFailed.setVisibility(View.GONE);
+                layoutLoading.setVisibility(View.VISIBLE);
+                basicDataController.getBasicData();
+            }
+        });
+        hangQingListController = new HangQingListController(getActivity(),parent);
+
+    }
+
+    /**
+     * 添加顶部板块按钮
+     */
+    private void addPlates(){
+        plateTextViews = new ArrayList<>();
+        final List<Plate> plates = myApplication.getHangQingData().getPlates();
+        for (int i = 0; i < plates.size(); i++) {
+            final TextView textView = new TextView(context);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT);
+            params.weight = 1;
+            textView.setLayoutParams(params);
+            textView.setTextColor(Color.WHITE);
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+            textView.setText(plates.get(i).getName());
+            textView.setGravity(Gravity.CENTER);
+            final int finalI = i;
+            textView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    hangQingListController.showListByPlate(plates.get(finalI).getPlat());
+                    tvTitle.setText(plates.get(finalI).getName());
+                    for (int i = 0; i < plateTextViews.size(); i++) {
+                        plateTextViews.get(i).setTextColor(Color.WHITE);
+                    }
+                    textView.setTextColor(context.getResources().getColor(R.color.hangqing_red_text));
+                }
+            });
+            plateTextViews.add(textView);
+            layoutPlates.addView(textView);
+        }
+        //默认选择第一个
+        if(plateTextViews.size() > 0){
+            plateTextViews.get(0).setTextColor(context.getResources().getColor(R.color.hangqing_red_text));
+            tvTitle.setText(plates.get(0).getName());
+        }
+
+    }
+
+    private void request(){
+        layoutLoadFailed.setVisibility(View.GONE);
+        layoutLoading.setVisibility(View.VISIBLE);
+        basicDataController = new HangQingBasicDataController(context, new HangQingBasicDataController.BasicDataCallBack() {
+            @Override
+            public void onSuccess() {
+                layoutLoadFailed.setVisibility(View.GONE);
+                layoutLoading.setVisibility(View.GONE);
+                hangQingListController.initData();
+                addPlates();
+            }
+            @Override
+            public void onFailed() {
+                layoutLoading.setVisibility(View.GONE);
+                layoutLoadFailed.setVisibility(View.VISIBLE);
+            }
+        });
+        basicDataController.getBasicData();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        hangQingListController.onDestroy();
+    }
+}

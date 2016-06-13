@@ -1,0 +1,134 @@
+package com.puxtech.ybk.hangqing.error;
+
+/**
+ * Created by fanshuo on 16/4/28.
+ */
+public class ErrorCode {
+
+
+    /**
+     * json解析错误
+     */
+    public static final String ERROR_JSON_PARSE = "C2000";
+
+    /**
+     * 获取失败，网络原因
+     */
+    public static final String ERROR_NET = "C1001";
+
+    /**
+     * 获取失败，服务器原因
+     */
+    public static final String ERROR_SERVER = "C1002";
+
+    /**
+     * session获取失败，网络原因
+     */
+    public static final String SESSION_ERROR_NET = "C1011";
+
+    /**
+     * session获取失败，服务器原因
+     */
+    public static final String SESSION_ERROR_SERVER = "C1012";
+
+    /**
+     * 交易所信息获取失败，网络原因
+     */
+    public static final String GET_MARKETS_ERROR_NET = "C1021";
+
+    /**
+     * 交易所信息获取失败，服务器原因
+     */
+    public static final String GET_MARKETS_ERROR_SERVER = "C1022";
+
+    /**
+     * 商品列表获取失败，网络原因
+     */
+    public static final String GET_COMMODITIES_ERROR_NET = "C1031";
+
+    /**
+     * 商品列表获取失败，服务器原因
+     */
+    public static final String GET_COMMODITIES_ERROR_SERVER = "C1032";
+
+    /**
+     * 交易时间获取失败，网络原因
+     */
+    public static final String GET_TRADE_TIME_ERROR_NET = "C1041";
+
+    /**
+     * 交易时间获取失败，服务器原因
+     */
+    public static final String GET_TRADE_TIME_ERROR_SERVER = "C1042";
+
+    /**
+     * 板块信息获取失败，网络原因
+     */
+    public static final String GET_PLATES_ERROR_NET = "C1051";
+
+    /**
+     * 板块信息获取失败，服务器原因
+     */
+    public static final String GET_PLATES_ERROR_SERVER = "C1052";
+
+    /**
+     * 交易节获取失败，网络原因
+     */
+    public static final String GET_TRADE_TIMES_ERROR_NET = "C1061";
+
+    /**
+     * 交易节获取失败，服务器原因
+     */
+    public static final String GET_TRADE_TIMES_ERROR_SERVER = "C1062";
+
+    /**
+     * 盘口列表获取失败，网络原因
+     */
+    public static final String GET_PRICE_LIST_ERROR_NET = "C1071";
+
+    /**
+     * 盘口列表获取失败，服务器原因
+     */
+    public static final String GET_PRICE_LIST_ERROR_SERVER = "C1072";
+
+    /**
+     * 盘口获取失败，网络原因
+     */
+    public static final String GET_PRICE_ERROR_NET = "C1081";
+
+    /**
+     * 盘口获取失败，服务器原因
+     */
+    public static final String GET_PRICE_ERROR_SERVER = "C1082";
+
+    /**
+     * 分时获取失败，网络原因
+     */
+    public static final String GET_SHORTTIMELINE_ERROR_NET = "C1091";
+
+    /**
+     *分时获取失败，服务器原因
+     */
+    public static final String GET_SHORTTIMELINE_ERROR_SERVER = "C1092";
+
+    /**
+     * 刷新分笔失败，网络原因
+     */
+    public static final String GET_EVERYPRICEAFTERID_ERROR_NET = "C1101";
+
+    /**
+     * 刷新分笔失败，服务器原因
+     */
+    public static final String GET_EVERYPRICEAFTERID_ERROR_SERVER = "C1102";
+
+    /**
+     * k线获取失败，网络原因
+     */
+    public static final String GET_SHORTKLINE_ERROR_NET = "C1111";
+
+    /**
+     *k线获取失败，服务器原因
+     */
+    public static final String GET_SHORTKLINE_ERROR_SERVER = "C1112";
+
+}

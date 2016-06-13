@@ -1,0 +1,255 @@
+package com.puxtech.ybk.hangqing.jsondata.getpriceforcommodity;
+
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
+import java.util.List;
+
+/**
+ * Created by fanshuo on 16/4/27.
+ */
+public class GetPriceForCommodityRepBody {
+
+    @Expose
+    @SerializedName("MID")
+    private int mid;//交易所标识
+    @Expose
+    @SerializedName("SMID")
+    private int smid;//盘标识
+    @Expose
+    @SerializedName("CID")
+    private int cid;//商品编号
+    @Expose
+    @SerializedName("CTYP")
+    private int ctyp;//商品类型
+    @Expose
+    @SerializedName("MCU")
+    private int mcu;//最小变动单位
+    @Expose
+    @SerializedName("DIVL")
+    private List<FenBi> divl;//分笔列表
+    @Expose
+    @SerializedName("HANN")
+    private int hann;//盘口序号
+    @Expose
+    @SerializedName("LATP")
+    private float latp;//最新价
+    @Expose
+    @SerializedName("BUYP")
+    private float buyp;//买价
+    @Expose
+    @SerializedName("SELP")
+    private float selp;//卖价
+    @Expose
+    @SerializedName("HIGP")
+    private float higp;//最高价
+    @Expose
+    @SerializedName("LOWP")
+    private float lowp;//最低价
+    @Expose
+    @SerializedName("YCLO")
+    private float yclo;//昨收
+    @Expose
+    @SerializedName("YCLE")
+    private float ycle;//昨结
+    @Expose
+    @SerializedName("OPEP")
+    private float opep;//开盘价
+    @Expose
+    @SerializedName("TIME")
+    private long time;//时间long
+    @Expose
+    @SerializedName("BUYA")
+    private int buya;//买挂牌数量
+    @Expose
+    @SerializedName("SLEA")
+    private int slea;//卖挂牌数量
+    @Expose
+    @SerializedName("CURA")
+    private int cura;//现量
+    @Expose
+    @SerializedName("TVOL")
+    private int tvol;//成交量
+    @Expose
+    @SerializedName("TAMT")
+    private int tamt;//成交金额
+    @Expose
+    @SerializedName("EXTD")
+    private Extend extd;//扩充数据
+
+    public int getMid() {
+        return mid;
+    }
+
+    public void setMid(int mid) {
+        this.mid = mid;
+    }
+
+    public int getSmid() {
+        return smid;
+    }
+
+    public void setSmid(int smid) {
+        this.smid = smid;
+    }
+
+    public int getCid() {
+        return cid;
+    }
+
+    public void setCid(int cid) {
+        this.cid = cid;
+    }
+
+    public int getCtyp() {
+        return ctyp;
+    }
+
+    public void setCtyp(int ctyp) {
+        this.ctyp = ctyp;
+    }
+
+    public int getMcu() {
+        return mcu;
+    }
+
+    public void setMcu(int mcu) {
+        this.mcu = mcu;
+    }
+
+    public List<FenBi> getDivl() {
+        return divl;
+    }
+
+    public void setDivl(List<FenBi> divl) {
+        this.divl = divl;
+    }
+
+    public int getHann() {
+        return hann;
+    }
+
+    public void setHann(int hann) {
+        this.hann = hann;
+    }
+
+    public float getLatp() {
+        return latp;
+    }
+
+    public void setLatp(float latp) {
+        this.latp = latp;
+    }
+
+    public float getBuyp() {
+        return buyp;
+    }
+
+    public void setBuyp(float buyp) {
+        this.buyp = buyp;
+    }
+
+    public float getSelp() {
+        return selp;
+    }
+
+    public void setSelp(float selp) {
+        this.selp = selp;
+    }
+
+    public float getHigp() {
+        return higp;
+    }
+
+    public void setHigp(float higp) {
+        this.higp = higp;
+    }
+
+    public float getLowp() {
+        return lowp;
+    }
+
+    public void setLowp(float lowp) {
+        this.lowp = lowp;
+    }
+
+    public float getYclo() {
+        return yclo;
+    }
+
+    public void setYclo(float yclo) {
+        this.yclo = yclo;
+    }
+
+    public float getYcle() {
+        return ycle;
+    }
+
+    public void setYcle(float ycle) {
+        this.ycle = ycle;
+    }
+
+    public float getOpep() {
+        return opep;
+    }
+
+    public void setOpep(float opep) {
+        this.opep = opep;
+    }
+
+    public long getTime() {
+        return time;
+    }
+
+    public void setTime(long time) {
+        this.time = time;
+    }
+
+    public int getBuya() {
+        return buya;
+    }
+
+    public void setBuya(int buya) {
+        this.buya = buya;
+    }
+
+    public int getSlea() {
+        return slea;
+    }
+
+    public void setSlea(int slea) {
+        this.slea = slea;
+    }
+
+    public int getCura() {
+        return cura;
+    }
+
+    public void setCura(int cura) {
+        this.cura = cura;
+    }
+
+    public int getTvol() {
+        return tvol;
+    }
+
+    public void setTvol(int tvol) {
+        this.tvol = tvol;
+    }
+
+    public int getTamt() {
+        return tamt;
+    }
+
+    public void setTamt(int tamt) {
+        this.tamt = tamt;
+    }
+
+    public Extend getExtd() {
+        return extd;
+    }
+
+    public void setExtd(Extend extd) {
+        this.extd = extd;
+    }
+}

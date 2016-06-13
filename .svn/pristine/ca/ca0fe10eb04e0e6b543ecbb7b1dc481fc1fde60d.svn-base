@@ -1,0 +1,16 @@
+package com.puxtech.ybk.hangqing;
+
+import android.content.Context;
+
+/**
+ * Created by fanshuo on 16/4/21.
+ */
+public class HangQingData {
+
+    public static String HANGQING_SERVER_URL = "http://172.31.100.234:8180/quotation_query/jsonQuery.do";
+
+    public void init(Context context){
+
+    }
+
+}

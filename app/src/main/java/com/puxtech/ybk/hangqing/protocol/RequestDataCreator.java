@@ -1,0 +1,253 @@
+package com.puxtech.ybk.hangqing.protocol;
+
+import com.puxtech.ybk.MyApplication;
+import com.puxtech.ybk.hangqing.util.AlgorithmUtil;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Random;
+
+/**
+ * Created by fanshuo on 16/4/21.
+ */
+public class RequestDataCreator {
+
+    private JSONObject createREQH(String pid,String sid) throws JSONException{
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("PID",pid);
+        if (sid != null){
+            jsonObject.put("SID",sid);
+        }
+        return jsonObject;
+    }
+
+
+    public JSONObject createLoginRequestData() throws JSONException{
+        JSONObject mmts = new JSONObject();
+        mmts.put("REQH",createREQH("login",null));
+        JSONObject reqb = new JSONObject();
+        reqb.put("EID", 2);
+        byte[] ekeyBytes= new byte[10];
+        byte[] randBytes= new byte[10];
+        byte[] rencBytes = new byte[10];
+        for (int i = 0;i<10;i++){
+            ekeyBytes[i] = (byte) (Math.random()*100+1);
+            randBytes[i] = (byte) (Math.random()*100+1);
+            switch (i % 5){
+                case 0:
+                    rencBytes[i] = (byte) ((ekeyBytes[i]+randBytes[i])%128);
+                    break;
+                case 1:
+                    rencBytes[i] = (byte) ((ekeyBytes[i]-randBytes[i])%128);
+                    break;
+                case 2:
+                    rencBytes[i] = (byte) ((ekeyBytes[i]*randBytes[i])%128);
+                    break;
+                case 3:
+                    rencBytes[i] = (byte) ((ekeyBytes[i]/randBytes[i])%128);
+                    break;
+                case 4:
+                    rencBytes[i] = (byte) ((ekeyBytes[i]%randBytes[i])%128);
+                    break;
+            }
+        }
+        String ekey = AlgorithmUtil.encodeBase64(ekeyBytes);
+        reqb.put("EKEY", ekey);
+        String rand = AlgorithmUtil.encodeBase64(randBytes);
+        reqb.put("RAND",rand);
+        String renc = AlgorithmUtil.encodeBase64(rencBytes);
+        reqb.put("RENC",renc);
+        mmts.put("REQB",reqb);
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("MMTS",mmts);
+
+        return jsonObject;
+    }
+
+    public JSONObject createGetMarketsRequestData(MyApplication myApplication) throws JSONException{
+        JSONObject mmts = new JSONObject();
+        String sid = myApplication.getHangQingData().getSessionId();
+        mmts.put("REQH",createREQH("getMarkets",sid));
+        JSONObject reqb = new JSONObject();
+        mmts.put("REQB",reqb);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("MMTS",mmts);
+        return jsonObject;
+    }
+
+    public JSONObject createGetCommoditiesRequestData(MyApplication myApplication, int marketId, int panId) throws JSONException{
+        JSONObject mmts = new JSONObject();
+        String sid = myApplication.getHangQingData().getSessionId();
+        mmts.put("REQH",createREQH("getCommodities",sid));
+        JSONObject reqb = new JSONObject();
+        reqb.put("MID",marketId);
+        reqb.put("SMID",marketId);
+        mmts.put("REQB",reqb);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("MMTS",mmts);
+        return jsonObject;
+    }
+
+    public JSONObject createGetTradeTimeRequestData(MyApplication myApplication, int marketId, int panId) throws JSONException{
+        JSONObject mmts = new JSONObject();
+        String sid = myApplication.getHangQingData().getSessionId();
+        mmts.put("REQH",createREQH("getTradeTime",sid));
+        JSONObject reqb = new JSONObject();
+        reqb.put("MID",marketId);
+        reqb.put("SMID",marketId);
+        mmts.put("REQB",reqb);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("MMTS",mmts);
+        return jsonObject;
+    }
+
+    public JSONObject createGetPlatesRequestData(MyApplication myApplication) throws JSONException{
+        JSONObject mmts = new JSONObject();
+        String sid = myApplication.getHangQingData().getSessionId();
+        mmts.put("REQH",createREQH("getPlates",sid));
+        JSONObject reqb = new JSONObject();
+        mmts.put("REQB",reqb);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("MMTS",mmts);
+        return jsonObject;
+    }
+
+    /**
+     * 查询交易节
+     */
+    public JSONObject createGetTradeTimesRequestData(MyApplication myApplication) throws JSONException{
+        JSONObject mmts = new JSONObject();
+        String sid = myApplication.getHangQingData().getSessionId();
+        mmts.put("REQH",createREQH("getTradeTimes",sid));
+        JSONObject reqb = new JSONObject();
+        mmts.put("REQB",reqb);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("MMTS",mmts);
+        return jsonObject;
+    }
+
+    /**
+     * 盘口按盘查询
+     */
+    public JSONObject createGetPriceForMarketRequestData(MyApplication myApplication, int marketId, int panId) throws JSONException{
+        JSONObject mmts = new JSONObject();
+        String sid = myApplication.getHangQingData().getSessionId();
+        mmts.put("REQH",createREQH("getPriceForMarket",sid));
+        JSONObject reqb = new JSONObject();
+        reqb.put("MID",marketId);
+        reqb.put("SMID",marketId);
+        mmts.put("REQB",reqb);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("MMTS",mmts);
+        return jsonObject;
+    }
+
+    /**
+     * 盘口多商品查询
+     */
+    public JSONObject createGetPriceForMCommoditiesRequestData(MyApplication myApplication, int marketId, int panId, int[] cids) throws JSONException{
+        JSONObject mmts = new JSONObject();
+        String sid = myApplication.getHangQingData().getSessionId();
+        mmts.put("REQH",createREQH("getPriceForMCommodities",sid));
+        JSONObject reqb = new JSONObject();
+        reqb.put("MID",marketId);
+        reqb.put("SMID",marketId);
+        JSONArray coms = new JSONArray();
+        for (int i = 0;i<cids.length;i++){
+            JSONObject com = new JSONObject();
+            com.put("CID",cids[i]);
+            coms.put(com);
+        }
+        reqb.put("COMS",coms);
+        mmts.put("REQB",reqb);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("MMTS",mmts);
+        return jsonObject;
+    }
+
+    /**
+     * 盘口按单商品查询
+     */
+    public JSONObject createGetPriceForCommodityRequestData(MyApplication myApplication, int marketId, int panId, int cid, int divn, int fivn, int hann, int prin) throws JSONException{
+        JSONObject mmts = new JSONObject();
+        String sid = myApplication.getHangQingData().getSessionId();
+        mmts.put("REQH",createREQH("getPriceForCommodity",sid));
+        JSONObject reqb = new JSONObject();
+        reqb.put("MID",marketId);
+        reqb.put("SMID",marketId);
+        reqb.put("CID",cid);
+        reqb.put("DIVN",divn);
+        reqb.put("FIVN",fivn);
+        reqb.put("HANN",hann);
+        reqb.put("PRIN",prin);
+        mmts.put("REQB",reqb);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("MMTS",mmts);
+        return jsonObject;
+    }
+
+    /**
+     * 按数量查询分时
+     */
+    public JSONObject createGetShortTimeLineRequestData(MyApplication myApplication, int marketId, int panId, int commodityId,long ast,int dir) throws JSONException{
+        JSONObject mmts = new JSONObject();
+        String sid = myApplication.getHangQingData().getSessionId();
+        mmts.put("REQH",createREQH("getShortTimeLine",sid));
+        JSONObject reqb = new JSONObject();
+        reqb.put("MID",marketId);
+        reqb.put("SMID",marketId);
+        reqb.put("CID",commodityId);
+        reqb.put("PER",1);
+        reqb.put("AST",-1);
+        reqb.put("DIR",0);
+        reqb.put("REQN",3000);
+        mmts.put("REQB",reqb);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("MMTS",mmts);
+        return jsonObject;
+    }
+
+    /**
+     * 按数量查询k线
+     */
+    public JSONObject createGetShortKLineRequestData(MyApplication myApplication, int marketId, int panId, int commodityId, int period, long ast, int dir, int reqn) throws JSONException{
+        JSONObject mmts = new JSONObject();
+        String sid = myApplication.getHangQingData().getSessionId();
+        mmts.put("REQH",createREQH("getShortKLine",sid));
+        JSONObject reqb = new JSONObject();
+        reqb.put("MID",marketId);
+        reqb.put("SMID",marketId);
+        reqb.put("CID",commodityId);
+        reqb.put("PER",period);
+        reqb.put("AST",ast);
+        reqb.put("DIR",dir);
+        reqb.put("REQN",reqn);
+        mmts.put("REQB",reqb);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("MMTS",mmts);
+        return jsonObject;
+    }
+
+    /**
+     *  获取某个商品某个序号以后的分笔
+     */
+    public JSONObject createGetEveryPriceAfterIdRequestData(MyApplication myApplication, int marketId, int panId, int cid, int divn, int reqn) throws JSONException{
+        JSONObject mmts = new JSONObject();
+        String sid = myApplication.getHangQingData().getSessionId();
+        mmts.put("REQH",createREQH("getEveryPriceAfterId",sid));
+        JSONObject reqb = new JSONObject();
+        reqb.put("MID",marketId);
+        reqb.put("SMID",marketId);
+        reqb.put("CID",cid);
+        reqb.put("DIVN",divn);
+        reqb.put("REQN",reqn);
+        mmts.put("REQB",reqb);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("MMTS",mmts);
+        return jsonObject;
+    }
+
+}

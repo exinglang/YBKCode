@@ -1,0 +1,355 @@
+package com.puxtech.ybk.jiaoyi.httpmanager;
+
+import android.content.Context;
+
+import com.puxtech.ybk.jiaoyi.entitydata.ShengGouListData;
+import com.puxtech.ybk.jiaoyi.entitydata.TuoGuanListData;
+import com.puxtech.ybk.jiaoyi.network.HttpSender;
+import com.puxtech.ybk.jiaoyi.responsedata.BaseResponseDataTrade;
+import com.puxtech.ybk.jiaoyi.responsedata.InOutHistoryResponseData;
+import com.puxtech.ybk.jiaoyi.responsedata.UserBankResponseData;
+
+import java.util.HashMap;
+
+/**
+ * Created by mac on 16/4/21.
+ */
+public class HttpManagerTrade extends HttpManagerBase {
+
+    private static final String URL_TYPE = "trade";
+
+
+    public HttpManagerTrade(Context context) {
+        super(context);
+
+
+    }
+
+
+    //下订单
+    public BaseResponseDataTrade requestOrder(String type, String number, String price, String commodityId) {
+        BaseResponseDataTrade responseData = new BaseResponseDataTrade();
+        String requestData;
+        String rName = "order";
+        try {
+//            TIME	数字	毫秒值
+//            BSFLAG	数字	1-买 2-卖
+//            QUANTITY	数字
+//            PRICE	数字
+//            COMMODITY_ID	字符串
+
+
+            HashMap<String, String> map = new HashMap<>();
+            map.put("TIME", System.currentTimeMillis() + "");
+            map.put("BSFLAG", type);
+            map.put("QUANTITY", number);
+            map.put("PRICE", price);
+            map.put("COMMODITY_ID", commodityId);
+
+            requestData = getRequestData(map, rName);
+            outPutRequestLog(requestData);
+        } catch (Exception e) {
+            createError(responseData, e);
+            return responseData;
+        }
+        HttpSender httpSender = new HttpSender();
+        String responseStr;
+        try {
+            responseStr = httpSender.requestJson(requestData.getBytes(), getPublicUrl(), URL_TYPE, rName);
+        } catch (Exception e) {
+            networkError(responseData, e);
+            return responseData;
+        }
+        try {
+            responseData.checkFail(responseStr);
+        } catch (Exception e) {
+            e.printStackTrace();
+            responseData.parseError();
+
+        }
+        return responseData;
+    }
+
+
+    //撤销订单
+    public BaseResponseDataTrade requestCheDan(String orderId, String commodityId) {
+        BaseResponseDataTrade responseData = new BaseResponseDataTrade();
+        String requestData;
+        String rName = "cancel_order";
+        try {
+
+            HashMap<String, String> map = new HashMap<>();
+            map.put("FIRM_ID", myapp.getTradeEntity().getOtherData().getFirmId());
+            map.put("ORDER_NO", orderId);
+            map.put("COMMODITY_ID", commodityId);
+
+            requestData = getRequestData(map, rName);
+            outPutRequestLog(requestData);
+        } catch (Exception e) {
+            createError(responseData, e);
+            return responseData;
+        }
+        HttpSender httpSender = new HttpSender();
+        String responseStr;
+        try {
+            responseStr = httpSender.requestJson(requestData.getBytes(), getPublicUrl(), URL_TYPE, rName);
+        } catch (Exception e) {
+            networkError(responseData, e);
+            return responseData;
+        }
+        try {
+            responseData.checkFail(responseStr);
+        } catch (Exception e) {
+            e.printStackTrace();
+            responseData.parseError();
+
+        }
+        return responseData;
+    }
+
+    //请求申购
+    public BaseResponseDataTrade requestShengGou(ShengGouListData shengGouListData) {
+        BaseResponseDataTrade responseData = new BaseResponseDataTrade();
+        String requestData;
+        String rName = "purchase";
+        try {
+
+//            请求时间	TIME	数字	毫秒值
+//            商品ID	COMMODITY_ID	字符串
+//            申购计划NO	PLAN_NO	字符串	从商品申购查询协议中获得
+//            申购数量	QUANTITY	数字
+//            申购价格	PRICE	数字
+
+            HashMap<String, String> map = new HashMap<>();
+            map.put("TIME", System.currentTimeMillis() + "");
+            map.put("COMMODITY_ID", shengGouListData.getCOMMODITY_ID());
+            map.put("PLAN_NO", shengGouListData.getPLAN_NO());
+            map.put("QUANTITY", shengGouListData.getNumber());
+            map.put("PRICE", shengGouListData.getPRICE());
+
+            requestData = getRequestData(map, rName);
+            outPutRequestLog(requestData);
+        } catch (Exception e) {
+            createError(responseData, e);
+            return responseData;
+        }
+        HttpSender httpSender = new HttpSender();
+        String responseStr;
+        try {
+            responseStr = httpSender.requestJson(requestData.getBytes(), getPublicUrl(), URL_TYPE, rName);
+        } catch (Exception e) {
+            networkError(responseData, e);
+            return responseData;
+        }
+        try {
+            responseData.checkFail(responseStr);
+        } catch (Exception e) {
+            e.printStackTrace();
+            responseData.parseError();
+
+        }
+        return responseData;
+    }
+
+    //请求托管
+    public BaseResponseDataTrade requestTuoGuan(TuoGuanListData shengGouListData) {
+        BaseResponseDataTrade responseData = new BaseResponseDataTrade();
+        String requestData;
+        String rName = "entrust";
+        try {
+
+//            请求时间	TIME	数字	毫秒值
+//            商品ID	COMMODITY_ID	字符串
+//            申购计划NO	PLAN_NO	字符串	从商品申购查询协议中获得
+//            申购数量	QUANTITY	数字
+//            申购价格	PRICE	数字
+
+            HashMap<String, String> map = new HashMap<>();
+            map.put("TIME", System.currentTimeMillis() + "");
+
+            map.put("PLAN_NO", shengGouListData.getPLAN_NO());
+            map.put("QUANTITY", shengGouListData.getNumber());
+            map.put("HOUSE_ID", "1");
+
+            requestData = getRequestData(map, rName);
+            outPutRequestLog(requestData);
+        } catch (Exception e) {
+            createError(responseData, e);
+            return responseData;
+        }
+        HttpSender httpSender = new HttpSender();
+        String responseStr;
+        try {
+            responseStr = httpSender.requestJson(requestData.getBytes(), getPublicUrl(), URL_TYPE, rName);
+        } catch (Exception e) {
+            networkError(responseData, e);
+            return responseData;
+        }
+        try {
+            responseData.checkFail(responseStr);
+        } catch (Exception e) {
+            e.printStackTrace();
+            responseData.parseError();
+
+        }
+        return responseData;
+    }
+
+    //请求提货
+    public BaseResponseDataTrade requestTiHuo(String commodityId, String number, String time) {
+        BaseResponseDataTrade responseData = new BaseResponseDataTrade();
+        String requestData;
+//        提货商品ID	COMMOIDTY_ID
+//        提货数量	QTY
+//        提货仓库ID	HOUSE_ID
+//        提货时间	TIME
+
+        String rName = "deliver";
+        try {
+
+
+            HashMap<String, String> map = new HashMap<>();
+            map.put("TIME", time);
+
+            map.put("COMMODITY_ID", commodityId);
+            map.put("QTY", number);
+            map.put("HOUSE_ID", "1");
+
+            requestData = getRequestData(map, rName);
+            outPutRequestLog(requestData);
+        } catch (Exception e) {
+            createError(responseData, e);
+            return responseData;
+        }
+        HttpSender httpSender = new HttpSender();
+        String responseStr;
+        try {
+            responseStr = httpSender.requestJson(requestData.getBytes(), getPublicUrl(), URL_TYPE, rName);
+        } catch (Exception e) {
+            networkError(responseData, e);
+            return responseData;
+        }
+        try {
+            responseData.checkFail(responseStr);
+        } catch (Exception e) {
+            e.printStackTrace();
+            responseData.parseError();
+
+        }
+        return responseData;
+    }
+    //撤销申购
+    public BaseResponseDataTrade requestShengGouOrderCancel(String orderId) {
+
+        BaseResponseDataTrade responseData = new BaseResponseDataTrade();
+        String requestData;
+
+
+        String rName = "cancel_purchase";
+        try {
+
+
+            HashMap<String, String> map = new HashMap<>();
+            map.put("ORDER_NO", orderId);
+
+
+            requestData = getRequestData(map, rName);
+            outPutRequestLog(requestData);
+        } catch (Exception e) {
+            createError(responseData, e);
+            return responseData;
+        }
+        HttpSender httpSender = new HttpSender();
+        String responseStr;
+        try {
+            responseStr = httpSender.requestJson(requestData.getBytes(), getPublicUrl(), URL_TYPE, rName);
+        } catch (Exception e) {
+            networkError(responseData, e);
+            return responseData;
+        }
+        try {
+            responseData.checkFail(responseStr);
+        } catch (Exception e) {
+            e.printStackTrace();
+            responseData.parseError();
+
+        }
+        return responseData;
+    }
+    //撤销托管
+    public BaseResponseDataTrade requestTuoGuanOrderCancel(String applyId) {
+
+        BaseResponseDataTrade responseData = new BaseResponseDataTrade();
+        String requestData;
+
+
+        String rName = "cancel_entrust";
+        try {
+
+
+            HashMap<String, String> map = new HashMap<>();
+            map.put("APPLY_ID", applyId);
+
+
+            requestData = getRequestData(map, rName);
+            outPutRequestLog(requestData);
+        } catch (Exception e) {
+            createError(responseData, e);
+            return responseData;
+        }
+        HttpSender httpSender = new HttpSender();
+        String responseStr;
+        try {
+            responseStr = httpSender.requestJson(requestData.getBytes(), getPublicUrl(), URL_TYPE, rName);
+        } catch (Exception e) {
+            networkError(responseData, e);
+            return responseData;
+        }
+        try {
+            responseData.checkFail(responseStr);
+        } catch (Exception e) {
+            e.printStackTrace();
+            responseData.parseError();
+
+        }
+        return responseData;
+    }
+    //撤销提货
+    public BaseResponseDataTrade requestTiHuoOrderCancel(String applyId) {
+
+        BaseResponseDataTrade responseData = new BaseResponseDataTrade();
+        String requestData;
+
+
+        String rName = "cancel_deliver";
+        try {
+
+
+            HashMap<String, String> map = new HashMap<>();
+            map.put("ORDER _NO", applyId);
+
+
+            requestData = getRequestData(map, rName);
+            outPutRequestLog(requestData);
+        } catch (Exception e) {
+            createError(responseData, e);
+            return responseData;
+        }
+        HttpSender httpSender = new HttpSender();
+        String responseStr;
+        try {
+            responseStr = httpSender.requestJson(requestData.getBytes(), getPublicUrl(), URL_TYPE, rName);
+        } catch (Exception e) {
+            networkError(responseData, e);
+            return responseData;
+        }
+        try {
+            responseData.checkFail(responseStr);
+        } catch (Exception e) {
+            e.printStackTrace();
+            responseData.parseError();
+
+        }
+        return responseData;
+    }
+}

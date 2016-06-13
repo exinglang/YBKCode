@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar" />
+
+    <include layout="@layout/time_widget" />
+
+    <LinearLayout style="@style/listview_title_ll">
+
+        <TextView
+            style="@style/listview_ll_tv_title_left"
+            android:text="流水号/类型" />
+
+        <TextView
+            style="@style/listview_ll_tv_title_center"
+            android:text="操作时间/银行名称" />
+
+        <TextView
+            style="@style/listview_ll_tv_title_right"
+            android:text="金额/状态" />
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+
+        />
+
+</LinearLayout>

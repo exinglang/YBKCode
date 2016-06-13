@@ -1,0 +1,80 @@
+package com.puxtech.ybk.jiaoyi.responsedata;
+
+import com.puxtech.ybk.MyApplication;
+import com.puxtech.ybk.jiaoyi.entitydata.CommodityFeeData;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+
+/**
+ * Created by mac on 15/11/5.
+ */
+public class CommodityFeeResponseData extends BaseResponseDataTrade {
+    private static final String TAG_COMMODITY_ID = "COMMODITY_ID";
+    private static final String TAG_GROUP_ID = "GROUP_ID";
+    private static final String TAG_FEE_ITEM = "FEE_ITEM";
+    private static final String TAG_BUY_FEERATE = "BUY_FEERATE";
+    private static final String TAG_SELL_FEERATE = "SELL_FEERATE";
+    private static final String TAG_MKT_FEERATE = "MKT_FEERATE";
+    private static final String TAG_FEE_ALGR = "FEE_ALGR";
+
+
+
+    ArrayList<CommodityFeeData> CommodityFeeDataList;
+
+    public void parseXML(MyApplication myApplication, String jsString, String rName) {
+        try {
+            JSONObject root = checkFail(jsString, rName);
+            if (retCode != 0) {
+                return;
+            }
+            JSONObject body = root.getJSONObject(TAG_MMTS)
+                    .getJSONObject(TAG_REP_BODY);
+
+            int CommodityFeeRecordNumber;
+            try {
+                CommodityFeeRecordNumber = body.getJSONArray(TAG_RESULTLIST).length();
+            } catch (JSONException e) {
+                e.printStackTrace();
+                CommodityFeeRecordNumber = 0;
+            }
+            CommodityFeeDataList = new ArrayList<>();
+            for (int j = 0; j < CommodityFeeRecordNumber; j++) {
+
+                JSONObject rec = body.getJSONArray(TAG_RESULTLIST)
+                        .getJSONObject(j);
+//                商品ID	COMMODITY_ID
+//                分组ID	GROUP_ID
+//                费用项目	FEE_ITEM
+//                买费用系数	BUY_FEERATE
+//                卖费用系数	SELL_FEERATE
+//                市场留存系数	MKT_FEERATE
+//                手续费算法		FEE_ALGR
+
+
+
+                CommodityFeeData CommodityFeeData = new CommodityFeeData();
+                CommodityFeeData.setCOMMODITY_ID(rec.getString(TAG_COMMODITY_ID));
+                CommodityFeeData.setGROUP_ID(rec.getString(TAG_GROUP_ID));
+                CommodityFeeData.setFEE_ITEM(rec.getString(TAG_FEE_ITEM));
+                CommodityFeeData.setBUY_FEERATE(rec.getString(TAG_BUY_FEERATE));
+                CommodityFeeData.setSELL_FEERATE(rec.getString(TAG_SELL_FEERATE));
+                CommodityFeeData.setMKT_FEERATE(rec.getString(TAG_MKT_FEERATE));
+                CommodityFeeData.setFEE_ALGR(rec.getString(TAG_FEE_ALGR));
+
+                CommodityFeeDataList.add(CommodityFeeData);
+            }
+            myApplication.getTradeEntity().getTradeData().setCommodityFeeDataList(CommodityFeeDataList);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            parseError();
+
+        }
+
+
+    }
+}

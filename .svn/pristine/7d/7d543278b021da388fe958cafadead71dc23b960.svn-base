@@ -1,0 +1,80 @@
+package com.puxtech.ybk.qidong;
+
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+/**
+ * <b>Description:</b>
+ * <p>
+ * 自定义http请求类
+ * </p>
+ * 
+ * @Company 北京乐赢索思软件科技有限责任公司
+ * @author fanshuo
+ * @date 2014-4-9 下午1:07:32
+ * @version V1.0
+ */
+public class ContentsServerHttpSender {
+	private static final String ENCODE = "UTF-8";
+	/** 注册通讯访问方式，以及UI工具类处理地址时使用 */
+	private static final String HTTP = "http";
+	/** 注册通讯访问方式，以及UI工具类处理地址时使用 */
+	private static final String HTTPS = "https";
+	/** 设置链接池 */
+	private static final int CONN_PER_ROUTE_BEAN = 12;
+	/** 设置最大连接数 */
+	private static final int MAX_TOTAL_CONNECTIONS = 20;
+	/** 设置链接超时时间 */
+	private static final int CONNECTION_TIME_OUT = 10 * 1000;
+	/** 设置socket超时时间 */
+	private static final int SOCKET_TIME_OUT = 20 * 1000;
+	/** 设置sokect缓存最大字节数 */
+	private static final int SOCKET_BUFFER_SIZE = 8 * 1024;;
+	/** http协议代理端口 */
+	private static final int HTTP_PROXY_PORT = 80;
+	/** https协议代理端口 */
+	private static final int HTTPS_PROXY_PORT = 443;
+
+	public InputStream requestBinary(byte[] requestData, String urlStr) {
+
+			return requestBinaryApi9(requestData, urlStr);
+
+	}
+
+	// 2.3及以上使用，因为2.2及以下使用HttpURLConnection会出现exception
+	private InputStream requestBinaryApi9(byte[] requestData, String urlStr) {
+		try {
+			URL url = new URL(urlStr);
+			// 利用HttpURLConnection对象,我们可以从网络中获取网页数据.
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			// 单位是毫秒，设置超时时间为10秒
+			conn.setConnectTimeout(CONNECTION_TIME_OUT);
+			conn.setReadTimeout(SOCKET_TIME_OUT);
+			conn.setRequestProperty("Content-Length",
+					String.valueOf(requestData.length));
+			conn.setRequestProperty("Content-Type", "binary");
+			// HttpURLConnection是通过HTTP协议请求path路径的，所以需要设置请求方式,可以不设置，因为默认为GET
+			conn.setRequestMethod("POST");
+			conn.setRequestProperty("Connection", "Keep-Alive");
+			conn.setDoOutput(true);// 准备写出数据
+			conn.setDoInput(true);
+			conn.getOutputStream().write(requestData);
+			conn.getOutputStream().flush();
+			conn.getOutputStream().close();
+			if (conn.getResponseCode() == 200) {
+				InputStream is = conn.getInputStream();
+				return is;
+			} else {
+				PriceLogger.e("requestBinary faild, ResponseCode:"
+						+ conn.getResponseCode());
+				return null;
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+}

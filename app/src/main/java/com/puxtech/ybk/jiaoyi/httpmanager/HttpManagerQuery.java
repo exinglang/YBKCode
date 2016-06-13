@@ -1,0 +1,357 @@
+package com.puxtech.ybk.jiaoyi.httpmanager;
+
+import android.content.Context;
+
+import com.puxtech.ybk.jiaoyi.Logger;
+import com.puxtech.ybk.jiaoyi.network.HttpSender;
+import com.puxtech.ybk.jiaoyi.responsedata.CommodityFeeResponseData;
+import com.puxtech.ybk.jiaoyi.responsedata.CommodityResponseData;
+import com.puxtech.ybk.jiaoyi.responsedata.FundQueryResponseData;
+import com.puxtech.ybk.jiaoyi.responsedata.HoldQueryResponseData;
+import com.puxtech.ybk.jiaoyi.responsedata.ShengGouListResponseData;
+import com.puxtech.ybk.jiaoyi.responsedata.ShengGouOrderResponseData;
+import com.puxtech.ybk.jiaoyi.responsedata.TiHuoOrderResponseData;
+import com.puxtech.ybk.jiaoyi.responsedata.TodayDealResponseData;
+import com.puxtech.ybk.jiaoyi.responsedata.TodayOrderResponseData;
+import com.puxtech.ybk.jiaoyi.responsedata.TuoGuanListResponseData;
+import com.puxtech.ybk.jiaoyi.responsedata.TuoGuanOrderResponseData;
+
+import java.util.HashMap;
+
+/**
+ * Created by mac on 16/4/21.
+ */
+public class HttpManagerQuery extends HttpManagerBase {
+
+    private static final String URL_TYPE = "query";
+
+
+    public HttpManagerQuery(Context context) {
+        super(context);
+
+
+    }
+
+    //商品信息
+    public CommodityResponseData requestCommodity(String commodityId) {
+        CommodityResponseData responseData = new CommodityResponseData();
+        String requestData;
+        String rName = "commodity_query";
+        try {
+
+            HashMap<String, String> map = new HashMap<>();
+            map.put("COMMODITY_ID", commodityId);
+            requestData = getRequestData(map, rName);
+            outPutRequestLog(requestData);
+        } catch (Exception e) {
+            createError(responseData, e);
+            return responseData;
+        }
+        HttpSender httpSender = new HttpSender();
+        String responseStr;
+        try {
+            responseStr = httpSender.requestJson(requestData.getBytes(), getPublicUrl(), URL_TYPE, rName);
+        } catch (Exception e) {
+            networkError(responseData, e);
+            return responseData;
+        }
+        responseData.parseXML(myapp, responseStr, rName);
+        return responseData;
+    }
+
+
+    //持仓列表
+    public HoldQueryResponseData requestHoldQuery() {
+        HoldQueryResponseData responseData = new HoldQueryResponseData();
+        String requestData;
+        String rName = "day_hold_query";
+        try {
+
+            HashMap<String, String> map = new HashMap<>();
+            map.put("FIRM_ID", myapp.getTradeEntity().getOtherData().getFirmId());
+            map.put("STARTNUM", "0");
+            map.put("RECCNT", "1000");
+            map.put("SORTFLD", "");
+            map.put("ISDESC", "0");
+
+            requestData = getRequestData(map, rName);
+            outPutRequestLog(requestData);
+        } catch (Exception e) {
+            createError(responseData, e);
+            return responseData;
+        }
+        HttpSender httpSender = new HttpSender();
+        String responseStr;
+        try {
+            responseStr = httpSender.requestJson(requestData.getBytes(), getPublicUrl(), URL_TYPE, rName);
+        } catch (Exception e) {
+            networkError(responseData, e);
+            return responseData;
+        }
+        responseData.parseXML(myapp, responseStr, rName);
+        return responseData;
+    }
+
+    //费用商品
+    public CommodityFeeResponseData requestCommodityFee() {
+        CommodityFeeResponseData responseData = new CommodityFeeResponseData();
+        String requestData;
+        String rName = "commodity_fee_query";
+        try {
+
+            HashMap<String, String> map = new HashMap<>();
+            map.put("COMMODITY_ID", "");
+
+            requestData = getRequestData(map, rName);
+            outPutRequestLog(requestData);
+        } catch (Exception e) {
+            createError(responseData, e);
+            return responseData;
+        }
+        HttpSender httpSender = new HttpSender();
+        String responseStr;
+        try {
+            responseStr = httpSender.requestJson(requestData.getBytes(), getPublicUrl(), URL_TYPE, rName);
+        } catch (Exception e) {
+            networkError(responseData, e);
+            return responseData;
+        }
+        responseData.parseXML(myapp, responseStr, rName);
+        return responseData;
+    }
+    //订单查询
+    public TodayOrderResponseData requestTodayOrder() {
+        TodayOrderResponseData responseData = new TodayOrderResponseData();
+        String requestData;
+        String rName = "day_order_query";
+        try {
+
+            HashMap<String, String> map = new HashMap<>();
+
+
+            map.put("FIRM_ID", myapp.getTradeEntity().getOtherData().getFirmId());
+            map.put("STARTNUM", "0");
+            map.put("RECCNT", "1000");
+            map.put("SORTFLD", "");
+            map.put("ISDESC", "0");
+
+            requestData = getRequestData(map, rName);
+            outPutRequestLog(requestData);
+        } catch (Exception e) {
+            createError(responseData, e);
+            return responseData;
+        }
+        HttpSender httpSender = new HttpSender();
+        String responseStr;
+        try {
+            responseStr = httpSender.requestJson(requestData.getBytes(), getPublicUrl(), URL_TYPE, rName);
+        } catch (Exception e) {
+            networkError(responseData, e);
+            return responseData;
+        }
+        responseData.parseXML(responseStr);
+        return responseData;
+    }
+
+    //订单查询
+    public TodayDealResponseData requestTodayDeal() {
+        TodayDealResponseData responseData = new TodayDealResponseData();
+        String requestData;
+        String rName = "day_trade_query";
+        try {
+
+            HashMap<String, String> map = new HashMap<>();
+
+
+            map.put("FIRM_ID", myapp.getTradeEntity().getOtherData().getFirmId());
+            map.put("STARTNUM", "1");
+            map.put("RECCNT", "1000");
+            map.put("SORTFLD", "");
+            map.put("ISDESC", "0");
+
+            requestData = getRequestData(map, rName);
+            outPutRequestLog(requestData);
+        } catch (Exception e) {
+            createError(responseData, e);
+            return responseData;
+        }
+        HttpSender httpSender = new HttpSender();
+        String responseStr;
+        try {
+            responseStr = httpSender.requestJson(requestData.getBytes(), getPublicUrl(), URL_TYPE, rName);
+        } catch (Exception e) {
+            networkError(responseData, e);
+            return responseData;
+        }
+        responseData.parseXML(responseStr);
+        return responseData;
+    }
+
+    //申购订单查询(已有)
+    public ShengGouOrderResponseData requestShengGouOrder() {
+        ShengGouOrderResponseData responseData = new ShengGouOrderResponseData();
+        String requestData;
+        String rName = "purchase_order_query";
+        try {
+
+            HashMap<String, String> map = new HashMap<>();
+            map.put("COMMODITY_ID", "");
+            requestData = getRequestData(map, rName);
+            outPutRequestLog(requestData);
+        } catch (Exception e) {
+            createError(responseData, e);
+            return responseData;
+        }
+        HttpSender httpSender = new HttpSender();
+        String responseStr;
+        try {
+            responseStr = httpSender.requestJson(requestData.getBytes(), getPublicUrl(), URL_TYPE, rName);
+        } catch (Exception e) {
+            networkError(responseData, e);
+            return responseData;
+        }
+        responseData.parseXML(responseStr);
+        return responseData;
+    }
+
+    //托管订单查询(已有)
+    public TuoGuanOrderResponseData requestTuoGuanOrder() {
+        TuoGuanOrderResponseData responseData = new TuoGuanOrderResponseData();
+        String requestData;
+        String rName = "entrust_order_query";
+        try {
+
+            HashMap<String, String> map = new HashMap<>();
+            map.put("COMMODITY_ID", "");
+            requestData = getRequestData(map, rName);
+            outPutRequestLog(requestData);
+        } catch (Exception e) {
+            createError(responseData, e);
+            return responseData;
+        }
+        HttpSender httpSender = new HttpSender();
+        String responseStr;
+        try {
+            responseStr = httpSender.requestJson(requestData.getBytes(), getPublicUrl(), URL_TYPE, rName);
+        } catch (Exception e) {
+            networkError(responseData, e);
+            return responseData;
+        }
+        responseData.parseXML(responseStr);
+        return responseData;
+    }
+
+    //提货订单查询(已有)
+    public TiHuoOrderResponseData requestTiHuoOrder() {
+        TiHuoOrderResponseData responseData = new TiHuoOrderResponseData();
+        String requestData;
+        String rName = "deliver_order_query";
+        try {
+
+            HashMap<String, String> map = new HashMap<>();
+            map.put("COMMODITY_ID", "");
+            requestData = getRequestData(map, rName);
+            outPutRequestLog(requestData);
+        } catch (Exception e) {
+            createError(responseData, e);
+            return responseData;
+        }
+        HttpSender httpSender = new HttpSender();
+        String responseStr;
+        try {
+            responseStr = httpSender.requestJson(requestData.getBytes(), getPublicUrl(), URL_TYPE, rName);
+        } catch (Exception e) {
+            networkError(responseData, e);
+            return responseData;
+        }
+        responseData.parseXML(responseStr);
+        return responseData;
+    }
+
+    //申购查询
+    public ShengGouListResponseData requestShengGouList() {
+        ShengGouListResponseData responseData = new ShengGouListResponseData();
+        String requestData;
+        String rName = "commodity_purchase_query";
+        try {
+
+            HashMap<String, String> map = new HashMap<>();
+
+            map.put("COMMODITY_ID", "");
+            requestData = getRequestData(map, rName);
+            outPutRequestLog(requestData);
+        } catch (Exception e) {
+            createError(responseData, e);
+            return responseData;
+        }
+        HttpSender httpSender = new HttpSender();
+        String responseStr;
+        try {
+            responseStr = httpSender.requestJson(requestData.getBytes(), getPublicUrl(), URL_TYPE, rName);
+//            responseStr = "{\"MMTS\":{\"REP_HEADER\":{\"SRV_VERSION\":\"1.0.0\",\"SRV_TIMESTAMP\":\"10000000\",\"RETCODE\":0,\"MESSAGE\":\"success\"},\"REP_BODY\":{\"TTLREC\":\"\",\"RESULTLIST\":[{\"ORDERNO\":\"123123123\",\"FIRMID\":\"123123\",\"SUB_M_FIRMID\":\"123123\",\"B_FIRMID\":\"123\",\"COMMODITYID\":\"612007\",\"BS_FLAG\":1,\"ORDERTYPE\":1,\"STATUS\":1,\"QUANTITY\":100,\"UNTRADEQTY\":0,\"ORDERTIME\":123,\"PRICE\":123,\"TRADERID\":\"\",\"WITHDRAWTIME\":123,\"WITHDRAWTYPE\":1,\"CONSIGNERID\":\"\",\"WITHDRAWERID\":\"\"},{\"ORDERNO\":\"123123123\",\"FIRMID\":\"123123\",\"SUB_M_FIRMID\":\"123123\",\"B_FIRMID\":\"123\",\"COMMODITYID\":\"612007\",\"BS_FLAG\":1,\"ORDERTYPE\":1,\"STATUS\":1,\"QUANTITY\":100,\"UNTRADEQTY\":0,\"ORDERTIME\":123,\"PRICE\":123,\"TRADERID\":\"\",\"WITHDRAWTIME\":123,\"WITHDRAWTYPE\":1,\"CONSIGNERID\":\"\",\"WITHDRAWERID\":\"\"}]}}}";
+
+        } catch (Exception e) {
+            networkError(responseData, e);
+            return responseData;
+        }
+        responseData.parseXML(responseStr);
+        return responseData;
+    }
+
+    //托管查询
+    public TuoGuanListResponseData requestTuoGuanList() {
+        TuoGuanListResponseData responseData = new TuoGuanListResponseData();
+        String requestData;
+        String rName = "commodity_entrust_query";
+        try {
+            HashMap<String, String> map = new HashMap<>();
+            map.put("COMMODITY_ID", "");
+            requestData = getRequestData(map, rName);
+            outPutRequestLog(requestData);
+        } catch (Exception e) {
+            createError(responseData, e);
+            return responseData;
+        }
+        HttpSender httpSender = new HttpSender();
+        String responseStr;
+        try {
+            responseStr = httpSender.requestJson(requestData.getBytes(), getPublicUrl(), URL_TYPE, rName);
+//            responseStr = "{\"MMTS\":{\"REP_HEADER\":{\"SRV_VERSION\":\"1.0.0\",\"SRV_TIMESTAMP\":\"10000000\",\"RETCODE\":0,\"MESSAGE\":\"success\"},\"REP_BODY\":{\"TTLREC\":\"\",\"RESULTLIST\":[{\"ORDERNO\":\"123123123\",\"FIRMID\":\"123123\",\"SUB_M_FIRMID\":\"123123\",\"B_FIRMID\":\"123\",\"COMMODITYID\":\"612007\",\"BS_FLAG\":1,\"ORDERTYPE\":1,\"STATUS\":1,\"QUANTITY\":100,\"UNTRADEQTY\":0,\"ORDERTIME\":123,\"PRICE\":123,\"TRADERID\":\"\",\"WITHDRAWTIME\":123,\"WITHDRAWTYPE\":1,\"CONSIGNERID\":\"\",\"WITHDRAWERID\":\"\"},{\"ORDERNO\":\"123123123\",\"FIRMID\":\"123123\",\"SUB_M_FIRMID\":\"123123\",\"B_FIRMID\":\"123\",\"COMMODITYID\":\"612007\",\"BS_FLAG\":1,\"ORDERTYPE\":1,\"STATUS\":1,\"QUANTITY\":100,\"UNTRADEQTY\":0,\"ORDERTIME\":123,\"PRICE\":123,\"TRADERID\":\"\",\"WITHDRAWTIME\":123,\"WITHDRAWTYPE\":1,\"CONSIGNERID\":\"\",\"WITHDRAWERID\":\"\"}]}}}";
+//            responseStr="{\"MMTS\":{\"REP_HEADER\":{\"SRV_VERSION\":\"1.0.0\",\"SRV_TIMESTAMP\":1449382966247,\"RETCODE\":0,\"MESSAGE\":\"Success\"},\"REP_BODY\":{\"TTLREC\":1,\"RESULTLIST\":[{\"COMMODITY_ID\":\"601001\",\"COMMODITY_NAME\":\"大团结\",\"PLAN_NO\":\"2343\",\"STATUS\":1,\"PRICE\":10000,\"PURCHASE_ST\":12123123,\"PURCHASE_END\":12123123,\"LOTTERY_TIME\":1231231},{\"COMMODITY_ID\":\"601001\",\"COMMODITY_NAME\":\"大团结\",\"PLAN_NO\":\"2343\",\"STATUS\":1,\"PRICE\":10000,\"PURCHASE_ST\":12123123,\"PURCHASE_END\":12123123,\"LOTTERY_TIME\":1231231}]}}}";
+
+        } catch (Exception e) {
+            networkError(responseData, e);
+            return responseData;
+        }
+        responseData.parseXML(responseStr);
+        return responseData;
+    }
+
+    //账号信息
+    public FundQueryResponseData requestFundQuery() {
+        FundQueryResponseData responseData = new FundQueryResponseData();
+        String requestData;
+        String rName = "fund_query";
+        try {
+
+            HashMap<String, String> map = new HashMap<>();
+            requestData = getRequestData(map, rName);
+            if (Logger.is_time_show) {
+                outPutRequestLog(requestData);
+            }
+        } catch (Exception e) {
+            createError(responseData, e);
+            return responseData;
+        }
+        HttpSender httpSender = new HttpSender();
+        String responseStr;
+        try {
+            responseStr = httpSender.requestJson(requestData.getBytes(), getPublicUrl(), URL_TYPE, rName);
+        } catch (Exception e) {
+            networkError(responseData, e);
+            return responseData;
+        }
+        responseData.parseXML(myapp, responseStr, rName);
+        return responseData;
+    }
+}

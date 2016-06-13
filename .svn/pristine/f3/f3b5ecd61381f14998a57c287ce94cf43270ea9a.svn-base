@@ -1,0 +1,15 @@
+package com.puxtech.ybk.hangqing.detail;
+
+import com.puxtech.ybk.hangqing.BaseHangQingFragment;
+
+/**
+ * Created by fanshuo on 16/5/5.
+ */
+public class KXianFragment extends BaseHangQingFragment {
+
+    public static KXianFragment getFragment(){
+        KXianFragment fragment = new KXianFragment();
+        return fragment;
+    }
+
+}

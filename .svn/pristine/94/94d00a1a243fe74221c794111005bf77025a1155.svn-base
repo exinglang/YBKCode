@@ -1,0 +1,55 @@
+package com.puxtech.ybk.hangqing;
+
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import com.puxtech.ybk.BaseFragment;
+import com.puxtech.ybk.R;
+import com.puxtech.ybk.hangqing.protocol.HangQingHttpSender;
+import com.puxtech.ybk.hangqing.protocol.RequestDataCreator;
+import com.puxtech.ybk.hangqing.protocol.RequestManager;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+/**
+ * Created by fanshuo on 16/4/20.
+ */
+public class HangQingMainFragment extends BaseHangQingFragment {
+
+    public static Fragment getFragment(){
+        HangQingMainFragment fragment = new HangQingMainFragment();
+        return fragment;
+    }
+
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.hangqing_fragment_main,container,false);
+        request();
+        return view;
+    }
+
+    private void request(){
+        putAsyncTask(new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                RequestManager requestManager = new RequestManager();
+                try {
+                    requestManager.requestLogin();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+                return true;
+            }
+        });
+    }
+
+}

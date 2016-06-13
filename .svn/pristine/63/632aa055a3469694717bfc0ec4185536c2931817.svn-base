@@ -1,0 +1,62 @@
+package com.puxtech.ybk.hangqing.charts;
+
+import java.io.Serializable;
+import java.util.List;
+
+/**
+ * Created by fanshuo on 16/5/3.
+ */
+public class FenShiChartModel implements Serializable{
+
+    private float yesterdayClosePrice;
+    private float openPrice;
+    private float highestPrice;
+    private float lowestPrice;
+    private List<FenShiPointModel> points;
+
+    public float getYesterdayClosePrice() {
+        return yesterdayClosePrice;
+    }
+
+    public void setYesterdayClosePrice(float yesterdayClosePrice) {
+        this.yesterdayClosePrice = yesterdayClosePrice;
+    }
+
+    public float getOpenPrice() {
+        return openPrice;
+    }
+
+    public void setOpenPrice(float openPrice) {
+        this.openPrice = openPrice;
+    }
+
+    public float getHighestPrice() {
+        if(highestPrice == 0){
+            highestPrice = yesterdayClosePrice * 1.02f;
+        }
+        return highestPrice;
+    }
+
+    public void setHighestPrice(float highestPrice) {
+        this.highestPrice = highestPrice;
+    }
+
+    public float getLowestPrice() {
+        if(lowestPrice == 0){
+            lowestPrice = yesterdayClosePrice * 0.98f;
+        }
+        return lowestPrice;
+    }
+
+    public void setLowestPrice(float lowestPrice) {
+        this.lowestPrice = lowestPrice;
+    }
+
+    public List<FenShiPointModel> getPoints() {
+        return points;
+    }
+
+    public void setPoints(List<FenShiPointModel> points) {
+        this.points = points;
+    }
+}

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="app_bg">#fff3f3f4</color>
+    <color name="black">#ff000000</color>
+    <color name="white">#ffffff</color>
+
+    <color name="transparent">#00000000</color>
+    <color name="ybk_red">#ffc80d17</color>
+    <color name="_fafafa">#fffafafa</color>
+    <color name="_d2d2d2">#ffd2d2d2</color>
+    <color name="listview_title_bg">#f2f4f3</color>
+
+
+</resources>

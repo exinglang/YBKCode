@@ -1,0 +1,57 @@
+package com.puxtech.ybk.jiaoyi.httpmanager;
+
+import android.content.Context;
+
+import com.puxtech.ybk.Constant;
+import com.puxtech.ybk.MyApplication;
+import com.puxtech.ybk.jiaoyi.Logger;
+import com.puxtech.ybk.jiaoyi.responsedata.BaseResponseData;
+
+
+/**
+ * Created by mac on 15/11/6.
+ */
+public class HttpManagerBase {
+    protected static final  String TAG_MMTS = "MMTS";
+
+    protected static final  String TAG_REQ_HEADER = "REQ_HEADER";
+    protected static final  String TAG_CLT_VERSION = "CLT_VERSION";
+    protected static final  String TAG_CLT_TIMESTAMP = "CLT_TIMESTAMP";
+    protected static final  String TAG_CLT_SEQ = "CLT_SEQ";
+    protected static final  String TAG_REQ_BODY = "REQ_BODY";
+
+
+
+    protected Context context;
+    MyApplication myapp;
+
+
+    public HttpManagerBase(Context context){
+        this.context = context;
+        myapp = (MyApplication) context.getApplicationContext();
+        //currentTradeEntity=myapp.getCurrentTradeEntity();
+
+
+    }
+    public HttpManagerBase(){
+
+    }
+    void outPutRequestLog(String requestData) {
+        Logger.d("requestStr = " + requestData);
+    }
+    protected void createError(BaseResponseData responseData,Exception e) {
+        e.printStackTrace();
+        responseData.setRetCode(Constant.CODE_ERROR_CERATE);
+        responseData.setRetMessage(Constant.MESSAGE_ERROR_CERATE);
+    }
+    protected void networkError(BaseResponseData responseData,Exception e) {
+        e.printStackTrace();
+        responseData.setRetCode(Constant.CODE_ERROR_INTERNET);
+        responseData.setRetMessage(Constant.MESSAGE_ERROR_INTERNET);
+    }
+    protected void unknowError(BaseResponseData responseData,Exception e) {
+        e.printStackTrace();
+        responseData.setRetCode(Constant.CODE_ERROR_UNKNOW);
+        responseData.setRetMessage(Constant.MESSAGE_ERROR_UNKNOW);
+    }
+}

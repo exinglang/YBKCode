@@ -1,0 +1,98 @@
+package com.puxtech.ybk.hangqing.detail;
+
+import android.os.AsyncTask;
+import android.os.Bundle;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.puxtech.ybk.MyApplication;
+import com.puxtech.ybk.R;
+import com.puxtech.ybk.hangqing.BaseHangQingActivity;
+import com.puxtech.ybk.hangqing.exception.SessionErrorException;
+import com.puxtech.ybk.hangqing.jsondata.RepData;
+import com.puxtech.ybk.hangqing.jsondata.getpriceforcommodity.GetPriceForCommodityRepBody;
+import com.puxtech.ybk.hangqing.jsondata.getpriceformcommodities.CommodityPrice;
+import com.puxtech.ybk.hangqing.protocol.RequestManager;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.List;
+
+/**
+ * Created by fanshuo on 16/4/27.
+ */
+public class HangQingDetailActivity extends BaseHangQingActivity {
+
+    public static final String BUNDLE_KEY_CID = "HangQingDetailActivity.BUNDLE_KEY_CID";
+
+    private int cid;//商品编号
+
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.hangqing_activity_detail);
+        init();
+
+    }
+
+    private void init() {
+        cid = getIntent().getIntExtra(BUNDLE_KEY_CID,-1);
+        requestPriceForCommodity();
+
+    }
+
+    private void requestPriceForCommodity() {
+
+        new AsyncTask<Void, Void, Boolean>() {
+
+            List<CommodityPrice> commodityPriceList;
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                try {
+                    MyApplication mApplication = (MyApplication) context.getApplicationContext();
+                    RequestManager requestManager = new RequestManager();
+                    int marketId = mApplication.getHangQingData().getMarketId();
+                    int panId = mApplication.getHangQingData().getPanId();
+                    if (cid == -1){
+                        return false;
+                    }
+                    JSONObject repJson = requestManager.getPriceForCommodity(mApplication, marketId, panId, cid, 0, 0,0,5);
+                    Gson gson = new Gson();
+                    TypeToken typeToken = new TypeToken<RepData<GetPriceForCommodityRepBody>>(){};
+                    RepData<GetPriceForCommodityRepBody> repData = gson.fromJson(repJson.toString(),typeToken.getType());
+                    int ret = repData.getMmts().getRepHeader().getRet();
+                    if(ret == 0){
+                        return true;
+                    }
+                    else{
+                        return false;
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    return false;
+                } catch (SessionErrorException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                super.onPostExecute(aBoolean);
+                if(aBoolean){
+                    //刷新行情列表
+
+                }
+                else{
+                    //TODO 提示获取盘口失败
+                }
+            }
+        }.execute();
+
+    }
+
+
+
+}

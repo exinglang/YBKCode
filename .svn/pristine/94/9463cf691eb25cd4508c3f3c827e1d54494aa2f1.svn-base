@@ -1,0 +1,246 @@
+package com.puxtech.ybk.jiaoyi.page;
+
+import android.app.Dialog;
+import android.app.Fragment;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.puxtech.ybk.BaseFragment;
+import com.puxtech.ybk.Constant;
+import com.puxtech.ybk.R;
+import com.puxtech.ybk.jiaoyi.TradeHelper;
+import com.puxtech.ybk.jiaoyi.adapter.ActCodeAdapter;
+import com.puxtech.ybk.jiaoyi.adapter.ThreeRowAdapter;
+import com.puxtech.ybk.jiaoyi.entitydata.CommodityData;
+import com.puxtech.ybk.jiaoyi.entitydata.HoldDetailData;
+import com.puxtech.ybk.jiaoyi.entitydata.ThreeRowData;
+import com.puxtech.ybk.jiaoyi.entitydata.UserBankData;
+import com.puxtech.ybk.jiaoyi.httpmanager.HttpManagerMoney;
+import com.puxtech.ybk.jiaoyi.httpmanager.HttpManagerTrade;
+import com.puxtech.ybk.jiaoyi.responsedata.BaseResponseDataTrade;
+import com.puxtech.ybk.util.ActivityUtils;
+
+import java.util.ArrayList;
+import java.util.Stack;
+
+
+public class TradeMai extends BaseFragment {
+    View view;
+    protected static final int MAI_RU = 1;
+    protected static final int MAI_CHU = 2;
+    protected int MAI_TYPE;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        view = inflater.inflate(R.layout.fragment_trade_mai_ru, container, false);
+        initWidget();
+        initListView();
+        return view;
+    }
+
+    EditText et_price, et_number;
+    AutoCompleteTextView act_code;
+    ImageView img_code_clear, img_jian, img_jia;
+    TextView tv_name, tv_kemai, tv_number_1, tv_number_2, tv_number_3, tv_number_4;
+    Button bt_commit;
+
+    protected void initWidget() {
+        act_code = (AutoCompleteTextView) view.findViewById(R.id.act_code);
+        et_price = (EditText) view.findViewById(R.id.et_price);
+        et_number = (EditText) view.findViewById(R.id.et_number);
+        img_code_clear = (ImageView) view.findViewById(R.id.img_code_clear);
+        img_jian = (ImageView) view.findViewById(R.id.img_jian);
+        img_jia = (ImageView) view.findViewById(R.id.img_jia);
+        tv_name = (TextView) view.findViewById(R.id.tv_name);
+        tv_kemai = (TextView) view.findViewById(R.id.tv_kemai);
+        bt_commit = (Button) view.findViewById(R.id.bt_commit);
+        tv_number_1 = (TextView) view.findViewById(R.id.tv_number_1);
+        tv_number_2 = (TextView) view.findViewById(R.id.tv_number_2);
+        tv_number_3 = (TextView) view.findViewById(R.id.tv_number_3);
+        tv_number_4 = (TextView) view.findViewById(R.id.tv_number_4);
+        bt_commit.setText(MAI_TYPE == MAI_RU ? "买入" : "卖出");
+
+        img_code_clear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                act_code.setText("");
+
+            }
+        });
+        img_jian.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                try {
+                    et_price.setText(ActivityUtils.changeDouble(String.valueOf(Double.valueOf(et_price.getText().toString()) - 0.01)));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        img_jia.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                try {
+                    et_price.setText(ActivityUtils.changeDouble(String.valueOf(Double.valueOf(et_price.getText().toString()) + 0.01)));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        bt_commit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (act_code.getText().toString().equals("") || et_number.getText().toString().equals("") || et_price.getText().toString().equals("")) {
+                    ActivityUtils.showCenterToast(context, "请检查数据", Toast.LENGTH_SHORT);
+                    return;
+
+                }
+                request();
+            }
+        });
+        initACTCode();
+
+    }
+
+    private void request() {
+        putAsyncTask(new AsyncTask<Void, Void, Boolean>() {
+            BaseResponseDataTrade responseData;
+            Dialog dialog;
+
+            protected void onPreExecute() {
+
+                dialog = ActivityUtils.showLoadingProgressDialog(context);
+
+
+                super.onPreExecute();
+            }
+
+            @SuppressWarnings("ResourceType")
+            protected Boolean doInBackground(Void... params) {
+                try {
+                    HttpManagerTrade httpManagerTrade = new HttpManagerTrade(context);
+//                    tring type,String number ,String price,String commodityId
+                    responseData = httpManagerTrade.requestOrder(String.valueOf(MAI_TYPE), et_number.getText().toString(), et_price.getText().toString(), act_code.getText().toString());
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    responseData.setRetCode(Constant.CODE_ERROR_UNKNOW);
+                    responseData.setRetMessage(Constant.MESSAGE_ERROR_UNKNOW);
+
+                }
+                return true;
+            }
+
+            protected void onPostExecute(Boolean result) {
+                super.onPostExecute(result);
+
+                dialog.dismiss();
+                if (Constant.CODE_SUCCESS == responseData.getRetCode()) {
+//                    String type = getIntent().getAction().equals(Bank.BANK_TO_TRADE) ?"入金":"出金";
+
+                    ActivityUtils.showCenterToast(context, "交易成功", Toast.LENGTH_SHORT);
+                } else {
+                    ActivityUtils.showAlert(context, responseData.getRetMessage() + "(" + responseData.getRetCode() + ")");
+                }
+            }
+
+
+        });
+
+    }
+
+    private void initACTCode() {
+        final ActCodeAdapter arrayAdapter = new ActCodeAdapter(context, myApplication.getTradeEntity().getTradeData().getCommodityDataList());
+        act_code.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                TradeHelper tradeHelper = new TradeHelper(context);
+                if (tradeHelper.getCommodityDataByCode(act_code.getText().toString()) == null||act_code.getText().toString().equals("")) {
+                    clearWidget();
+                } else {
+                    selectedCommodity(tradeHelper.getCommodityDataByCode(act_code.getText().toString()));
+
+                }
+
+            }
+        });
+        act_code.setAdapter(arrayAdapter);
+        act_code.setAdapter(arrayAdapter);
+        act_code.setThreshold(0);
+        act_code.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                act_code.setText(arrayAdapter.getList().get(position).getCode());
+                selectedCommodity(arrayAdapter.getList().get(position));
+            }
+        });
+
+    }
+
+    private void initListView() {
+        ArrayList<HoldDetailData> holdDetailDataArrayList = myApplication.getTradeEntity().getTradeData().getHoldDetailDataList();
+        TradeHelper tradeHelper = new TradeHelper(context);
+        ArrayList<ThreeRowData> threeRowDatas = new ArrayList<>();
+        for (HoldDetailData holdDetailData : holdDetailDataArrayList) {
+            ThreeRowData threeRowData = new ThreeRowData();
+
+            threeRowData.setS1(tradeHelper.getCommodityDataByCode(holdDetailData.getCOMMODITYID()).getName());
+            threeRowData.setS2(holdDetailData.getCOMMODITYID());
+            threeRowData.setS3(holdDetailData.getHOLDQTY());
+            threeRowData.setS4("" + (Double.valueOf(holdDetailData.getHOLDQTY()) - Double.valueOf(holdDetailData.getFROZENQTY())));
+            threeRowData.setS5(holdDetailData.getHOLDCOST());
+            threeRowData.setS6("--");
+
+            threeRowDatas.add(threeRowData);
+
+        }
+
+        ListView listView = (ListView)view.findViewById(R.id.listview);
+
+        ThreeRowAdapter threeRowAdapter = new ThreeRowAdapter(context,threeRowDatas);
+        listView.setAdapter(threeRowAdapter);
+    }
+    private void clearWidget() {
+
+        tv_name.setText("");
+        et_price.setText("");
+
+    }
+
+    private void selectedCommodity(CommodityData commodityData) {
+
+
+        tv_name.setText(commodityData.getName());
+        et_price.setText("12.34");
+
+    }
+}

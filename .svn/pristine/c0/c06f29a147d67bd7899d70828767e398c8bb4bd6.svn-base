@@ -1,0 +1,48 @@
+package com.puxtech.ybk.jiaoyi.responsedata;
+
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+
+/**
+ * Created by mac on 15/11/5.
+ */
+public class CheckCodeResponseData extends BaseResponseDataTrade {
+    protected static final String TAG_IMG = "IMG";
+    protected static final String TAG_IMGID = "IMGID";
+
+
+    String imgData;
+    String checkCodeId;
+    public void parseXML(String jsString) {
+        try {
+            JSONObject root = checkFail(jsString);
+            if (retCode != 0) {
+                return;
+            }
+            JSONObject body = root.getJSONObject(TAG_MMTS)
+                    .getJSONObject(TAG_REP_BODY);
+
+            imgData=body.getString(TAG_IMG);
+
+            checkCodeId=body.getString(TAG_IMGID);
+        } catch (Exception e) {
+            e.printStackTrace();
+            parseError();
+
+        }
+
+
+    }
+
+    public String getImgData() {
+        return imgData;
+    }
+
+    public String getCheckCodeId() {
+        return checkCodeId;
+    }
+}

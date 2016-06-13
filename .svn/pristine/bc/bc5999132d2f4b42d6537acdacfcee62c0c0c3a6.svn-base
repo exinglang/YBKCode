@@ -1,0 +1,139 @@
+package com.puxtech.ybk.jiaoyi.page;
+
+import android.app.Dialog;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.puxtech.ybk.BaseFragment;
+import com.puxtech.ybk.Constant;
+import com.puxtech.ybk.R;
+import com.puxtech.ybk.jiaoyi.TradeHelper;
+import com.puxtech.ybk.jiaoyi.adapter.ThreeRowActionShengGouAdapter;
+import com.puxtech.ybk.jiaoyi.adapter.TiHuoCommodityNameAdapter;
+import com.puxtech.ybk.jiaoyi.entitydata.CommodityData;
+import com.puxtech.ybk.jiaoyi.entitydata.HoldDetailData;
+import com.puxtech.ybk.jiaoyi.entitydata.ShengGouListData;
+import com.puxtech.ybk.jiaoyi.httpmanager.HttpManagerQuery;
+import com.puxtech.ybk.jiaoyi.httpmanager.HttpManagerTrade;
+import com.puxtech.ybk.jiaoyi.responsedata.BaseResponseDataTrade;
+import com.puxtech.ybk.jiaoyi.responsedata.ShengGouListResponseData;
+import com.puxtech.ybk.util.ActivityUtils;
+
+import java.util.ArrayList;
+
+
+public class TradeTiHuo extends BaseTradeFragment {
+    View view;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        view = inflater.inflate(R.layout.fragment_trade_ti_huo, container, false);
+        initWidget();
+
+
+        return view;
+    }
+
+    TextView tv_chicangliang, tv_date;
+    Spinner sp_commodity;
+    EditText et_tihuoshuliang;
+    Button bt_commit;
+
+    private void initWidget() {
+        tv_chicangliang = (TextView) view.findViewById(R.id.tv_chicangliang);
+        tv_date = (TextView) view.findViewById(R.id.tv_date);
+        sp_commodity = (Spinner) view.findViewById(R.id.sp_commodity);
+        et_tihuoshuliang = (EditText) view.findViewById(R.id.et_tihuoshuliang);
+        ActivityUtils.setEditTextSoftInputType(getActivity(), context, et_tihuoshuliang,2);
+
+        bt_commit= (Button) view.findViewById(R.id.bt_commit);
+        String date = ActivityUtils.getYYYYMMDDforTimeMillis(System.currentTimeMillis());
+        final TiHuoCommodityNameAdapter adapter = new TiHuoCommodityNameAdapter(context, myApplication.getTradeEntity().getTradeData().getHoldDetailDataList());
+        sp_commodity.setAdapter(adapter);
+        sp_commodity.setOnItemSelectedListener(
+
+
+                new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        tv_chicangliang.setText(adapter.getItem(position).getHOLDQTY());
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                }
+        );
+
+
+        tv_date.setText(date);
+        tv_date.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TradeHelper.selectData(context, v, false);
+            }
+        });
+        bt_commit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if(tv_chicangliang.getText().toString().equals("")){
+                    ActivityUtils.showCenterToast(context,"请检查数据",Toast.LENGTH_SHORT);
+
+                }
+                request();
+
+
+            }
+        });
+    }
+
+    //tijoao
+    public void request() {
+        putAsyncTask(new AsyncTask<Void, Void, Boolean>() {
+            BaseResponseDataTrade responseData;
+            Dialog dialog;
+            protected void onPreExecute() {
+                dialog = ActivityUtils.showLoadingProgressDialog(context);
+                super.onPreExecute();
+            }
+            protected Boolean doInBackground(Void... params) {
+                try {
+                    HttpManagerTrade httpManagerTrade = new HttpManagerTrade(context);
+                    responseData = httpManagerTrade.requestTiHuo(((HoldDetailData) sp_commodity.getSelectedItem()).getCOMMODITYID(), et_tihuoshuliang.getText().toString(), ActivityUtils.getTimeMillisFromYYYYMMDD(tv_date.getText().toString()));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    responseData.setRetCode(Constant.CODE_ERROR_UNKNOW);
+                    responseData.setRetMessage(Constant.MESSAGE_ERROR_UNKNOW);
+                }
+                return true;
+            }
+            protected void onPostExecute(Boolean result) {
+                super.onPostExecute(result);
+                dialog.dismiss();
+                if (0 == responseData.getRetCode()) {
+                    ActivityUtils.showAlert(context, "操作成功");
+                } else {
+                    ActivityUtils.showCenterToast(context, responseData.getRetMessage() + "(" + responseData.getRetCode() + ")", Toast.LENGTH_SHORT);
+                }
+            }
+        });
+    }
+}

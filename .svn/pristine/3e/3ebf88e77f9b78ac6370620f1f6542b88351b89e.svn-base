@@ -1,0 +1,29 @@
+<resources>
+
+
+    <style name="trade_login_tabrow_style">
+        <item name="android:gravity">center</item>
+        <item name="android:padding">0.0dip</item>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_marginBottom">10.0dip</item>
+    </style>
+    <style name="trade_login_label_style">
+        <item name="android:textSize">16.0sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:gravity">right|center</item>
+        <item name="android:paddingRight">6.0dip</item>
+        <item name="android:layout_width">80.0dip</item>
+        <item name="android:layout_height">fill_parent</item>
+    </style>
+    <style name="trade_check_style" parent="@android:style/Widget.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/btn_checkbox_bg</item>
+    </style>
+    <style name="Dialog_Transparent">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+</resources>

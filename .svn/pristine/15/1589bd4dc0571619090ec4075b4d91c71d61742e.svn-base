@@ -1,0 +1,83 @@
+package com.puxtech.ybk.jiaoyi.page;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ListView;
+
+import com.puxtech.ybk.BaseFragment;
+import com.puxtech.ybk.R;
+import com.puxtech.ybk.jiaoyi.TradeHelper;
+import com.puxtech.ybk.jiaoyi.adapter.ThreeRowAdapter;
+import com.puxtech.ybk.jiaoyi.entitydata.HoldDetailData;
+import com.puxtech.ybk.jiaoyi.entitydata.ThreeRowData;
+
+import java.util.ArrayList;
+
+
+public class TradeChiCang extends BaseFragment {
+    ListView listView;
+    View view;
+    Button bt_bank;
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        view = inflater.inflate(R.layout.fragment_trade_chi_cang, container, false);
+        initWidget();
+
+        initListView();
+        return view;
+
+    }
+
+    private void initListView() {
+        ArrayList<HoldDetailData> holdDetailDataArrayList = myApplication.getTradeEntity().getTradeData().getHoldDetailDataList();
+        TradeHelper tradeHelper = new TradeHelper(context);
+        ArrayList<ThreeRowData> threeRowDatas = new ArrayList<>();
+        for (HoldDetailData holdDetailData : holdDetailDataArrayList) {
+            ThreeRowData threeRowData = new ThreeRowData();
+
+            threeRowData.setS1(tradeHelper.getCommodityDataByCode(holdDetailData.getCOMMODITYID()).getName());
+            threeRowData.setS2(holdDetailData.getCOMMODITYID());
+            threeRowData.setS3(holdDetailData.getHOLDQTY());
+            threeRowData.setS4("" + (Double.valueOf(holdDetailData.getHOLDQTY()) - Double.valueOf(holdDetailData.getFROZENQTY())));
+            threeRowData.setS5(holdDetailData.getHOLDCOST());
+            threeRowData.setS6("--");
+
+            threeRowDatas.add(threeRowData);
+
+        }
+
+
+        ThreeRowAdapter threeRowAdapter = new ThreeRowAdapter(context,threeRowDatas);
+        listView.setAdapter(threeRowAdapter);
+    }
+
+    private void initWidget() {
+        bt_bank = (Button) view.findViewById(R.id.bt_bank);
+        listView = (ListView) view.findViewById(R.id.listview);
+
+        bt_bank.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                startActivity(new Intent(context,Bank.class));
+            }
+        });
+    }
+
+
+}

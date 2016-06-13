@@ -1,0 +1,150 @@
+package com.puxtech.ybk.hangqing.model;
+
+/**
+ * Created by fanshuo on 16/4/26.
+ */
+public class ListRightModel {
+
+    private String name;//商品名称
+    private int id;//商品编号
+    private String code;//商品编码
+    private int plateId;//板块id
+    private String xianJia = "--";
+    private String zhangDie = "--";
+    private String zhangFu = "--";
+    private String zuoShou = "--";
+    private String chengJiaoLiang = "--";
+    private String chengJiaoE = "--";
+    private String zuiGao = "--";
+    private String zuiDi = "--";
+    private String zhenFu = "--";
+    private String huanShou = "--";
+    private String liangBi = "--";
+
+    public ListRightModel(String name, int id, String code, int plateId) {
+        this.name = name;
+        this.id = id;
+        this.code = code;
+        this.plateId = plateId;
+    }
+
+    public int getPlateId() {
+        return plateId;
+    }
+
+    public void setPlateId(int plateId) {
+        this.plateId = plateId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getXianJia() {
+        return xianJia;
+    }
+
+    public void setXianJia(String xianJia) {
+        this.xianJia = xianJia;
+    }
+
+    public String getZhangDie() {
+        return zhangDie;
+    }
+
+    public void setZhangDie(String zhangDie) {
+        this.zhangDie = zhangDie;
+    }
+
+    public String getZhangFu() {
+        return zhangFu;
+    }
+
+    public void setZhangFu(String zhangFu) {
+        this.zhangFu = zhangFu;
+    }
+
+    public String getZuoShou() {
+        return zuoShou;
+    }
+
+    public void setZuoShou(String zuoShou) {
+        this.zuoShou = zuoShou;
+    }
+
+    public String getChengJiaoLiang() {
+        return chengJiaoLiang;
+    }
+
+    public void setChengJiaoLiang(String chengJiaoLiang) {
+        this.chengJiaoLiang = chengJiaoLiang;
+    }
+
+    public String getChengJiaoE() {
+        return chengJiaoE;
+    }
+
+    public void setChengJiaoE(String chengJiaoE) {
+        this.chengJiaoE = chengJiaoE;
+    }
+
+    public String getZuiGao() {
+        return zuiGao;
+    }
+
+    public void setZuiGao(String zuiGao) {
+        this.zuiGao = zuiGao;
+    }
+
+    public String getZuiDi() {
+        return zuiDi;
+    }
+
+    public void setZuiDi(String zuiDi) {
+        this.zuiDi = zuiDi;
+    }
+
+    public String getZhenFu() {
+        return zhenFu;
+    }
+
+    public void setZhenFu(String zhenFu) {
+        this.zhenFu = zhenFu;
+    }
+
+    public String getHuanShou() {
+        return huanShou;
+    }
+
+    public void setHuanShou(String huanShou) {
+        this.huanShou = huanShou;
+    }
+
+    public String getLiangBi() {
+        return liangBi;
+    }
+
+    public void setLiangBi(String liangBi) {
+        this.liangBi = liangBi;
+    }
+}

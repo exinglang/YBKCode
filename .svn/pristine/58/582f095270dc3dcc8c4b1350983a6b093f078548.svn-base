@@ -1,0 +1,101 @@
+package com.puxtech.ybk.hangqing.charts;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.List;
+
+/**
+ * Created by fanshuo on 16/5/3.
+ */
+public class FenShiChartModel implements Serializable{
+
+    private float yesterdayClosePrice;
+    private float openPrice;
+    private float highestPrice;
+    private float lowestPrice;
+    private int mcu;//最小变动价位
+    private List<FenShiPointModel> points;
+
+    public int searchHightestVolume(){
+        int highestVolume=-1;
+        for (int i = 0; i < points.size(); i++) {
+            int volume = points.get(i).getVolume();
+            if (volume > highestVolume) {
+                highestVolume = volume;
+            }
+        }
+        return highestVolume;
+    }
+
+    public float getYesterdayClosePrice() {
+        return yesterdayClosePrice;
+    }
+
+    public void setYesterdayClosePrice(float yesterdayClosePrice) {
+        this.yesterdayClosePrice = yesterdayClosePrice;
+    }
+
+    public float getOpenPrice() {
+        return openPrice;
+    }
+
+    public void setOpenPrice(float openPrice) {
+        this.openPrice = openPrice;
+    }
+
+    public float getHighestPrice() {
+        if(highestPrice == 0){
+            highestPrice = yesterdayClosePrice * 1.02f;
+        }
+        return highestPrice;
+    }
+
+    public void setHighestPrice(float highestPrice) {
+        this.highestPrice = highestPrice;
+    }
+
+    public float getLowestPrice() {
+        if(lowestPrice == 0){
+            lowestPrice = yesterdayClosePrice * 0.98f;
+        }
+        return lowestPrice;
+    }
+
+    public void setLowestPrice(float lowestPrice) {
+        this.lowestPrice = lowestPrice;
+    }
+
+    public List<FenShiPointModel> getPoints() {
+        return points;
+    }
+
+    public void setPoints(List<FenShiPointModel> points) {
+        this.points = points;
+    }
+
+    public int getMcu() {
+        return mcu;
+    }
+
+    public void setMcu(int mcu) {
+        this.mcu = mcu;
+    }
+
+    /**
+     * 通过序列化和反序列化进行深拷贝
+     */
+    public Object deepCopy() throws Exception
+    {
+        // 将该对象序列化成流,因为写在流里的是对象的一个拷贝，而原对象仍然存在于JVM里面。所以利用这个特性可以实现对象的深拷贝
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(bos);
+        oos.writeObject(this);
+        // 将流序列化成对象
+        ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+        ObjectInputStream ois = new ObjectInputStream(bis);
+        return ois.readObject();
+    }
+}

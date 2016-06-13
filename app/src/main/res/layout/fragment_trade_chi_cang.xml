@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/total_layout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/_fafafa"
+    android:orientation="vertical"
+    android:paddingBottom="2.0dip">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10.0dip">
+
+        <TextView
+            android:id="@+id/money_total_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16.0dip"
+            android:text="总资产(人民币):"
+            android:textColor="#ff7a7a7a"
+            android:textSize="?attr/middle" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/money_total_label"
+            android:layout_centerHorizontal="true">
+
+            <TextView
+                android:id="@+id/tv_zongzichan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="4.0dip"
+                android:text=""
+                android:textColor="#fff70f30"
+                android:textSize="40sp" />
+
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/bt_bank"
+            android:layout_width="20dip"
+            android:layout_height="20dip"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@+id/money_total_label"
+            android:layout_marginRight="10.0dip"
+            android:background="@drawable/bank_switch" />
+    </RelativeLayout>
+
+    <TableLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="5.0dip">
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="0.0dip">
+
+            <LinearLayout
+                android:layout_width="0.0dip"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:layout_weight="1.0"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="资金余额"
+                    android:textColor="#ff7a7a7a"
+                    android:textSize="?attr/middle"/>
+
+                <TextView
+                    android:id="@+id/tv_yue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2.0dip"
+                    android:paddingLeft="2.0dip"
+                    android:paddingRight="2.0dip"
+                    android:text="0.000"
+                    android:textColor="#ff666666"
+                    android:textSize="?attr/middle"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="1.0px"
+                android:layout_height="fill_parent"
+                android:layout_marginBottom="5.0dip"
+                android:layout_marginTop="5.0dip"
+                android:background="@color/_d2d2d2" />
+
+            <LinearLayout
+                android:layout_width="0.0dip"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:layout_weight="1.0"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="市值"
+                    android:textColor="#ff7a7a7a"
+                    android:textSize="?attr/middle" />
+
+                <TextView
+                    android:id="@+id/tv_shizhi"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2.0dip"
+                    android:paddingLeft="2.0dip"
+                    android:paddingRight="2.0dip"
+                    android:text="0.00"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:textColor="#ff666666"
+                    android:textSize="?attr/middle"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="1.0px"
+                android:layout_height="fill_parent"
+                android:layout_marginBottom="5.0dip"
+                android:layout_marginTop="5.0dip"
+                android:background="@color/_d2d2d2" />
+
+            <LinearLayout
+                android:layout_width="0.0dip"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:layout_weight="1.0"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="资金可取"
+                    android:textColor="#ff7a7a7a"
+                    android:textSize="?attr/middle"/>
+
+                <TextView
+                    android:id="@+id/tv_kequ"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2.0dip"
+                    android:paddingLeft="2.0dip"
+                    android:paddingRight="2.0dip"
+                    android:text="0.000"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:textColor="#ff666666"
+                    android:textSize="?attr/middle"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </TableRow>
+    </TableLayout>
+
+
+    <include layout="@layout/listview_title_shangpingchicang"/>
+
+
+</LinearLayout>

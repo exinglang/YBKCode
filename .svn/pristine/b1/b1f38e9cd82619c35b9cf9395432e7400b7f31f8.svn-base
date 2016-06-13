@@ -1,0 +1,63 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.puxtech.ybk.jiaoyi.page.TradeChiCang">
+
+    <TextView
+        android:id="@+id/tv_zijinchaxun"
+        style="@style/row_text"
+        android:drawableLeft="@drawable/li_trade_bank2stock"
+        android:text="@string/chaxun_zijinchaxun" />
+
+    <View style="@style/devider_orizontal" />
+
+    <TextView
+        android:id="@+id/tv_shangpinchicang"
+        style="@style/row_text"
+        android:drawableLeft="@drawable/li_trade_stock2bank"
+        android:text="@string/chaxun_shangpinchicang" />
+
+    <View style="@style/devider_orizontal" />
+
+    <TextView
+        android:id="@+id/tv_dangriweituo"
+        style="@style/row_text"
+        android:drawableLeft="@drawable/li_trade_historicaloftransfer"
+        android:text="@string/chaxun_dangriweituo" />
+
+    <View style="@style/devider_orizontal" />
+
+    <TextView
+        android:id="@+id/tv_dangrichengjiao"
+        style="@style/row_text"
+        android:drawableLeft="@drawable/li_trade_historicaloftransfer"
+        android:text="@string/chaxun_dangrichengjiao" />
+
+    <View style="@style/devider_orizontal" />
+
+    <TextView
+        android:id="@+id/tv_lishichengjiao"
+        style="@style/row_text"
+        android:drawableLeft="@drawable/li_trade_historicaloftransfer"
+        android:text="@string/chaxun_lishichengjiao" />
+
+    <View style="@style/devider_orizontal" />
+
+    <TextView
+        android:id="@+id/tv_peihaochaxun"
+        style="@style/row_text"
+        android:drawableLeft="@drawable/li_trade_historicaloftransfer"
+        android:text="@string/chaxun_peihaochaxun" />
+
+    <View style="@style/devider_orizontal" />
+
+    <TextView
+        android:id="@+id/tv_zhongqianchaxun"
+        style="@style/row_text"
+        android:drawableLeft="@drawable/li_trade_historicaloftransfer"
+        android:text="@string/chaxun_zhongqianchaxun" />
+
+    <View style="@style/devider_orizontal" />
+</LinearLayout>

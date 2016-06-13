@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="hangqing_list_row_header_text_blue">#75b5e3</color>
+    <color name="hangqing_red_text">#e00e20</color>
+    <color name="hangqing_list_row_header_bg">#251f21</color>
+    <color name="hangqing_list_bg">#212121</color>
+</resources>

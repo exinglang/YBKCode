@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <PreferenceCategory
+        android:key="category_system_setting"
+        android:title="@string/pref_config_title">
+
+        <com.puxtech.ybk.shezhi.SettingsBarPreference
+            android:key="@string/pref_system_text_size_key"
+            android:layout="@layout/custom_preferece_layout"
+            android:summary="@string/pref_system_text_size_summary"
+            android:title="@string/pref_system_text_size_title" />
+
+
+
+        <EditTextPreference
+            android:dialogIcon="@android:drawable/ic_dialog_info"
+            android:dialogTitle="@string/pref_trade_lock_time_text"
+            android:inputType="phone"
+            android:key="@string/pref_trade_lock_time_key"
+            android:layout="@layout/custom_preferece_layout"
+            android:defaultValue="10"
+            android:summary="@string/pref_trade_lock_time_summary"
+            android:title="@string/pref_trade_lock_time_title" />
+
+        <Preference
+            android:key="@string/pref_reset_data_key"
+
+            android:layout="@layout/custom_preferece_layout"
+            android:summary="@string/pref_reset_data_summary"
+            android:title="@string/pref_reset_data_title" />
+
+
+        <Preference
+            android:key="@string/pref_link_data_key"
+
+            android:layout="@layout/custom_preferece_layout"
+            android:summary="@string/pref_link_data_summary"
+            android:title="@string/pref_link_data_title" />
+        <!--<CheckBoxPreference-->
+            <!--android:visibility="gone"-->
+            <!--android:key="pref_common_notice_key"-->
+            <!--android:layout="@layout/custom_preferece_layout"-->
+            <!--android:summary="@string/pref_common_notice_summary"-->
+            <!--android:title="@string/pref_common_notice_title" />-->
+    </PreferenceCategory>
+
+    <PreferenceCategory
+
+        android:title="@string/pref_flux_title">
+
+        <Preference
+            android:key="@string/pref_query_flux_key"
+            android:layout="@layout/custom_preferece_layout"
+            android:summary="@string/pref_query_flux_summary"
+            android:title="@string/pref_query_flux_title" />
+
+        <Preference
+            android:key="@string/pref_reset_flux_key"
+            android:layout="@layout/custom_preferece_layout"
+            android:summary="@string/pref_reset_flux_summary"
+            android:title="@string/pref_reset_flux_title" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="pref_other_key"
+        android:title="@string/pref_other_title">
+
+
+        <Preference
+            android:key="pref_evaluation_key"
+            android:layout="@layout/custom_preferece_layout"
+            android:summary="@string/pref_update_summary"
+            android:title="@string/pref_update_title" />
+
+
+        <Preference
+            android:key="@string/pref_reset_about_key"
+            android:layout="@layout/custom_preferece_layout"
+            android:title="@string/pref_about_title" />
+    </PreferenceCategory>
+</PreferenceScreen>

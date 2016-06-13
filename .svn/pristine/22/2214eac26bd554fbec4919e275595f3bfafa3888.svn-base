@@ -1,0 +1,77 @@
+package com.puxtech.ybk.hangqing;
+
+import android.content.Context;
+
+import com.puxtech.ybk.hangqing.jsondata.getcommodities.Commodity;
+import com.puxtech.ybk.hangqing.jsondata.getmarkets.Market;
+import com.puxtech.ybk.hangqing.jsondata.getplates.Plate;
+import com.puxtech.ybk.hangqing.jsondata.getpriceformcommodities.CommodityPrice;
+
+import java.util.List;
+
+/**
+ * Created by fanshuo on 16/4/21.
+ */
+public class HangQingData {
+
+    public static String HANGQING_SERVER_URL = "http://172.31.100.234:8180/quotation_query/jsonQuery.do";
+
+    private String sessionId;
+    private int marketId;
+    private int panId;
+    private List<Plate> plates;
+    private List<Commodity> commodities;
+    private List<CommodityPrice> commoditiesPrice;
+
+    public void init(Context context){
+
+    }
+
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
+
+    public int getMarketId() {
+        return marketId;
+    }
+
+    public void setMarketId(int marketId) {
+        this.marketId = marketId;
+    }
+
+    public int getPanId() {
+        return panId;
+    }
+
+    public void setPanId(int panId) {
+        this.panId = panId;
+    }
+
+    public List<Plate> getPlates() {
+        return plates;
+    }
+
+    public void setPlates(List<Plate> plates) {
+        this.plates = plates;
+    }
+
+    public List<Commodity> getCommodities() {
+        return commodities;
+    }
+
+    public void setCommodities(List<Commodity> commodities) {
+        this.commodities = commodities;
+    }
+
+    public List<CommodityPrice> getCommoditiesPrice() {
+        return commoditiesPrice;
+    }
+
+    public void setCommoditiesPrice(List<CommodityPrice> commoditiesPrice) {
+        this.commoditiesPrice = commoditiesPrice;
+    }
+}

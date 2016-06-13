@@ -1,0 +1,83 @@
+package com.puxtech.ybk.hangqing;
+
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ListView;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.puxtech.ybk.R;
+import com.puxtech.ybk.hangqing.controller.HangQingBasicDataController;
+import com.puxtech.ybk.hangqing.exception.SessionErrorException;
+import com.puxtech.ybk.hangqing.jsondata.getmarkets.GetMarketsRepBody;
+import com.puxtech.ybk.hangqing.jsondata.RepData;
+import com.puxtech.ybk.hangqing.protocol.RequestManager;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+/**
+ * Created by fanshuo on 16/4/20.
+ */
+public class HangQingMainFragment extends BaseHangQingFragment {
+
+    private View layoutLoadFailed,layoutLoading;
+    private HangQingBasicDataController basicDataController;
+    private ListView listView;
+
+
+    public static Fragment getFragment(){
+        HangQingMainFragment fragment = new HangQingMainFragment();
+        return fragment;
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.hangqing_fragment_main,container,false);
+        initViews(view);
+        request();
+        return view;
+    }
+
+    private void initViews(View parent){
+        layoutLoadFailed = parent.findViewById(R.id.layout_load_failed);
+        layoutLoading = parent.findViewById(R.id.layout_loading);
+        listView = (ListView) parent.findViewById(R.id.listview);
+        layoutLoadFailed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                layoutLoadFailed.setVisibility(View.GONE);
+                layoutLoading.setVisibility(View.VISIBLE);
+                basicDataController.getBasicData();
+            }
+        });
+    }
+
+    private void request(){
+        layoutLoadFailed.setVisibility(View.GONE);
+        layoutLoading.setVisibility(View.VISIBLE);
+        basicDataController = new HangQingBasicDataController(context, new HangQingBasicDataController.BasicDataCallBack() {
+            @Override
+            public void onSuccess() {
+                layoutLoadFailed.setVisibility(View.GONE);
+                layoutLoading.setVisibility(View.GONE);
+                listView.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onFailed() {
+                layoutLoading.setVisibility(View.GONE);
+                layoutLoadFailed.setVisibility(View.VISIBLE);
+                listView.setVisibility(View.GONE);
+            }
+        });
+        basicDataController.getBasicData();
+    }
+
+}

@@ -1,0 +1,26 @@
+package com.puxtech.ybk.hangqing.protocol;
+
+import com.puxtech.ybk.hangqing.HangQingData;
+import com.puxtech.ybk.hangqing.HangQingLogger;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.InputStream;
+
+/**
+ * Created by fanshuo on 16/4/21.
+ */
+public class RequestManager {
+
+    public String requestLogin() throws JSONException {
+        RequestDataCreator requestDataCreator = new RequestDataCreator();
+        JSONObject jsonObject = requestDataCreator.createLoginRequestData();
+        HangQingLogger.d("行情登录请求："+jsonObject.toString(4));
+        HangQingHttpSender sender = new HangQingHttpSender();
+        String responseStr = sender.requestJson(jsonObject.toString().getBytes(), HangQingData.HANGQING_SERVER_URL);
+        HangQingLogger.d("行情登录返回："+responseStr);
+        return responseStr;
+    }
+
+}

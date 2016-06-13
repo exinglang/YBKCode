@@ -1,0 +1,607 @@
+package com.puxtech.ybk.qidong;
+
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
+import java.nio.ByteBuffer;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Random;
+import java.util.UUID;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xmlpull.v1.XmlSerializer;
+
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
+import android.text.TextUtils;
+import android.util.Xml;
+
+
+
+/**
+ * <b>Description:</b>
+ * <p>
+ * 目录服务器管理类
+ * </p>
+ * 
+ * @Company 北京乐赢索思软件科技有限责任公司
+ * @author fanshuo
+ * @date 2014-4-18 下午6:10:11
+ * @version V1.0
+ */
+public class ContentsServerManager {
+
+	// 请求内容的TAG
+	public static final String TAG_LYSS = "LYSS";// 消息头
+	public static final String TAG_REQ = "REQ";// 请求内容
+	public static final String TAG_FUNC = "FUNC";
+	public static final String TAG_VERSIONCODE = "VERSIONCODE";
+	public static final String TAG_TKNA = "TKNA";
+	public static final String TAG_APPK = "APPK";
+	public static final String TAG_DEVID = "DEVID";
+	public static final String TAG_SALT = "SALT";
+	public static final String TAG_DATE = "DATE";
+	public static final String TAG_SIGN = "SIGN";
+
+	Context context;
+	private ContentsServerParser parser;
+
+	public ContentsServerManager(Context context) {
+		super();
+		this.context = context;
+		parser = new ContentsServerParser(context);
+	}
+
+	/**
+	 * 生成请求目录服务器的xml字符串
+	 */
+	public String createGetInfoRequestData(Context context) throws Exception {
+		TokenBManager tokenBManager = new TokenBManager(context);
+		String s = tokenBManager.getTokenB();
+		if (TextUtils.isEmpty(s)) {
+			// 没有tokenB
+			return createGetInfoRequestDataWhithTokenA(context);
+		} else {
+			// 有tokenB
+			return createGetInfoRequestDataWhithTokenB(context);
+		}
+
+	}
+
+	/**
+	 * 插入TokenB
+	 */
+	private void insertTokenB(XmlSerializer xmlSerializer,
+			StringWriter xmlWriter) throws Exception {
+		// 插入tokenB
+		xmlSerializer.flush();
+		TokenBManager tokenBManager = new TokenBManager(context);
+		xmlWriter.append(tokenBManager.getTokenB());
+	}
+
+	/**
+	 * 从InputStream获取RootElement
+	 */
+	private Element getRootElement(InputStream is) throws Exception {
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		Document document = builder.parse(is);
+		Element rootElement = document.getDocumentElement();
+		return rootElement;
+	}
+
+	/**
+	 * 使用tokenB生成目录服务器请求数据
+	 */
+	private String createGetInfoRequestDataWhithTokenB(Context context)
+			throws Exception {
+		StringWriter xmlWriter = new StringWriter();
+		XmlSerializer xmlSerializer = Xml.newSerializer();
+		xmlSerializer.setOutput(xmlWriter);
+		xmlSerializer.startDocument("UTF-8", true);
+		xmlSerializer.startTag("", TAG_LYSS);
+		xmlSerializer.startTag("", TAG_REQ);
+
+		xmlSerializer.startTag("", TAG_FUNC);
+		xmlSerializer.text("getDir6");
+		xmlSerializer.endTag("", TAG_FUNC);
+
+		xmlSerializer.startTag("", TAG_VERSIONCODE);
+		xmlSerializer.text(ApplicationUtil.getVersionCode(context) + "");
+		xmlSerializer.endTag("", TAG_VERSIONCODE);
+
+		// 插入tokenB
+		insertTokenB(xmlSerializer, xmlWriter);
+
+		xmlSerializer.endTag("", TAG_REQ);
+		xmlSerializer.endTag("", TAG_LYSS);
+
+		xmlSerializer.flush();
+		return xmlWriter.toString();
+	}
+
+	/**
+	 * 使用tokenB生成消息请求数据
+	 */
+	private String createGetHotMessageRequestDataWhithTokenB(Context context)
+			throws Exception {
+		StringWriter xmlWriter = new StringWriter();
+		XmlSerializer xmlSerializer = Xml.newSerializer();
+		xmlSerializer.setOutput(xmlWriter);
+		xmlSerializer.startDocument("UTF-8", true);
+		xmlSerializer.startTag("", TAG_LYSS);
+		xmlSerializer.startTag("", TAG_REQ);
+		xmlSerializer.startTag("", TAG_FUNC);
+		xmlSerializer.text("getMessage");
+		xmlSerializer.endTag("", TAG_FUNC);
+		insertTokenB(xmlSerializer, xmlWriter);
+		xmlSerializer.endTag("", TAG_REQ);
+		xmlSerializer.endTag("", TAG_LYSS);
+		xmlSerializer.flush();
+		return xmlWriter.toString();
+	}
+
+	/**
+	 * 使用tokenA生成目录服务器请求数据
+	 */
+	private String createGetInfoRequestDataWhithTokenA(Context context)
+			throws Exception {
+		byte[] salt = getSalt();
+		String devid = getDEVID(context);
+
+		StringWriter xmlWriter = new StringWriter();
+		XmlSerializer xmlSerializer = Xml.newSerializer();
+		xmlSerializer.setOutput(xmlWriter);
+		xmlSerializer.startDocument("UTF-8", true);
+		xmlSerializer.startTag("", TAG_LYSS);
+		xmlSerializer.startTag("", TAG_REQ);
+
+		xmlSerializer.startTag("", TAG_FUNC);
+		xmlSerializer.text("getDir5");
+		xmlSerializer.endTag("", TAG_FUNC);
+
+		xmlSerializer.startTag("", TAG_VERSIONCODE);
+		xmlSerializer.text(ApplicationUtil.getVersionCode(context) + "");
+		xmlSerializer.endTag("", TAG_VERSIONCODE);
+
+		xmlSerializer.startTag("", TAG_TKNA);
+
+		xmlSerializer.startTag("", TAG_APPK);
+		xmlSerializer.text(QiDongData.APP_KEY);
+		xmlSerializer.endTag("", TAG_APPK);
+
+		xmlSerializer.startTag("", TAG_SALT);
+		xmlSerializer.text(Base64.encode(salt));
+		xmlSerializer.endTag("", TAG_SALT);
+
+		xmlSerializer.startTag("", TAG_DEVID);
+		xmlSerializer.text(devid);
+		xmlSerializer.endTag("", TAG_DEVID);
+
+		xmlSerializer.startTag("", TAG_DATE);
+		xmlSerializer.text(getDate());
+		xmlSerializer.endTag("", TAG_DATE);
+
+		xmlSerializer.startTag("", TAG_SIGN);
+		xmlSerializer.text(getSign(QiDongData.APP_KEY, devid, salt));
+		xmlSerializer.endTag("", TAG_SIGN);
+
+		xmlSerializer.endTag("", TAG_TKNA);
+
+		xmlSerializer.endTag("", TAG_REQ);
+		xmlSerializer.endTag("", TAG_LYSS);
+
+		xmlSerializer.flush();
+		return xmlWriter.toString();
+	}
+
+	/**
+	 * 服务-检查更新的请求数据
+	 * 
+	 * @param context
+	 * @return
+	 * @throws Exception
+	 */
+	public String createCheckNewVersionRequestData(Context context)
+			throws Exception {
+		byte[] salt = getSalt();
+		String devid = getDEVID(context);
+
+		StringWriter xmlWriter = new StringWriter();
+		XmlSerializer xmlSerializer = Xml.newSerializer();
+		xmlSerializer.setOutput(xmlWriter);
+		xmlSerializer.startDocument("UTF-8", true);
+		xmlSerializer.startTag("", TAG_LYSS);
+		xmlSerializer.startTag("", TAG_REQ);
+
+		xmlSerializer.startTag("", TAG_FUNC);
+		xmlSerializer.text("3");
+		xmlSerializer.endTag("", TAG_FUNC);
+
+		xmlSerializer.startTag("", TAG_VERSIONCODE);
+		xmlSerializer.text(ApplicationUtil.getVersionCode(context) + "");
+		xmlSerializer.endTag("", TAG_VERSIONCODE);
+
+		xmlSerializer.startTag("", TAG_TKNA);
+
+		xmlSerializer.startTag("", TAG_APPK);
+		xmlSerializer.text(QiDongData.APP_KEY);
+		xmlSerializer.endTag("", TAG_APPK);
+
+		xmlSerializer.startTag("", TAG_SALT);
+		xmlSerializer.text(Base64.encode(salt));
+		xmlSerializer.endTag("", TAG_SALT);
+
+		xmlSerializer.startTag("", TAG_DEVID);
+		xmlSerializer.text(devid);
+		xmlSerializer.endTag("", TAG_DEVID);
+
+		xmlSerializer.startTag("", TAG_DATE);
+		xmlSerializer.text(getDate());
+		xmlSerializer.endTag("", TAG_DATE);
+
+		xmlSerializer.startTag("", TAG_SIGN);
+		xmlSerializer.text(getSign(QiDongData.APP_KEY, devid, salt));
+		xmlSerializer.endTag("", TAG_SIGN);
+
+		xmlSerializer.endTag("", TAG_TKNA);
+
+		xmlSerializer.endTag("", TAG_REQ);
+		xmlSerializer.endTag("", TAG_LYSS);
+
+		xmlSerializer.flush();
+		return xmlWriter.toString();
+	}
+
+	/**
+	 * 用户管理服务器地址请求数据(xml)
+	 */
+	private String createYHGLUrlRequestData() throws Exception {
+		StringWriter xmlWriter = new StringWriter();
+		XmlSerializer xmlSerializer = Xml.newSerializer();
+		xmlSerializer.setOutput(xmlWriter);
+		xmlSerializer.startDocument("UTF-8", true);
+		xmlSerializer.startTag("", TAG_LYSS);
+		xmlSerializer.startTag("", TAG_REQ);
+
+		xmlSerializer.startTag("", TAG_FUNC);
+		xmlSerializer.text("getUserManagerService");
+		xmlSerializer.endTag("", TAG_FUNC);
+
+		insertTokenB(xmlSerializer, xmlWriter);
+
+		xmlSerializer.endTag("", TAG_REQ);
+		xmlSerializer.endTag("", TAG_LYSS);
+
+		xmlSerializer.flush();
+		return xmlWriter.toString();
+	}
+
+
+
+	public String createAppKeyPropertyRequestData(String type) throws Exception {
+		StringWriter xmlWriter = new StringWriter();
+		XmlSerializer xmlSerializer = Xml.newSerializer();
+		xmlSerializer.setOutput(xmlWriter);
+		xmlSerializer.startDocument("UTF-8", true);
+		xmlSerializer.startTag("", TAG_LYSS);
+		xmlSerializer.startTag("", TAG_REQ);
+
+		xmlSerializer.startTag("", TAG_FUNC);
+		xmlSerializer.text("getAppkeyProperty");
+		xmlSerializer.endTag("", TAG_FUNC);
+
+		xmlSerializer.startTag("", "TYPE");
+		xmlSerializer.text(type);
+		xmlSerializer.endTag("", "TYPE");
+
+		insertTokenB(xmlSerializer, xmlWriter);
+
+		xmlSerializer.endTag("", TAG_REQ);
+		xmlSerializer.endTag("", TAG_LYSS);
+
+		xmlSerializer.flush();
+		return xmlWriter.toString();
+	}
+
+
+	/**
+	 * 请求普通AppKey属性
+	 */
+
+	public HashMap<String, Object> sendNormalAppKeyPropertyRequest()
+			throws Exception {
+		String requestData = createAppKeyPropertyRequestData("1");
+		PriceLogger.d("sendAppKeyPropertyRequest...requestData..."
+				+ requestData);
+		HttpSender httpSender = new HttpSender();
+		InputStream is = httpSender.requestBinary(requestData.getBytes(),
+				QiDongData.CONTENTS_SERVER_URL_1);
+//		InputStream is2 = is;
+//		ManagerData data = new ManagerData(context);
+//		byte[] result = readStream(is2);
+//		Log.i("resultaes", "pre");
+//		Element e = (Element) data.getRootElement(result);
+//		Log.i("resultaes", "lag");
+//		new Data(context).getRootElement(is);
+
+		Element rootElement = getRootElement(is);
+		
+		
+		
+		// 把整个xml保存到本地
+		saveAppKeyPropertyEntity(context, rootElement, false);
+		return parser.parseNormalAppKeyProperty(rootElement);
+	}
+
+
+	protected byte[] readStream(InputStream is) {
+		ByteArrayOutputStream bout = null;
+		try {
+			bout = new ByteArrayOutputStream();
+			byte[] buffer = new byte[1024];
+			int len = 0;
+			while ((len = is.read(buffer)) != -1) {
+				bout.write(buffer, 0, len);
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return bout.toByteArray();
+	}
+	// ////////////////////////////////辅助工具类
+	/**
+	 * MD5加密
+	 * 
+	 * @param plainText
+	 * @return
+	 */
+	private byte[] Md5(byte[] plainText) {
+		try {
+			MessageDigest md = MessageDigest.getInstance("md5");
+			md.update(plainText);
+			byte b[] = md.digest();
+			return b;
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		return plainText;
+
+	}
+
+	/**
+	 * 使用uuid生成16byte
+	 */
+	private byte[] getBytesByUUID(UUID uuid) {
+		ByteBuffer bb = ByteBuffer.wrap(new byte[16]);
+		bb.putLong(uuid.getMostSignificantBits());
+		bb.putLong(uuid.getLeastSignificantBits());
+		return bb.array();
+	}
+
+	/**
+	 * 取出前16个byte
+	 * 
+	 * @param strKey
+	 * @return
+	 */
+	private byte[] getKey(String strKey) {
+		try {
+			byte[] arrBTmp = strKey.getBytes();
+			byte[] arrB = new byte[16]; // 创建一个空的16位字节数组（默认值为0）
+
+			for (int i = 0; i < arrBTmp.length && i < arrB.length; i++) {
+				arrB[i] = arrBTmp[i];
+			}
+			return arrB;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * 生成sign
+	 * 
+	 * @param appkey
+	 * @param devid
+	 * @param salt
+	 * @return
+	 */
+	private String getSign(String appkey, String devid, byte[] salt) {
+		UUID appkeyU = UUID.fromString(appkey);
+		UUID devidU = UUID.fromString(devid);
+		byte[] appkeyBytes = getBytesByUUID(appkeyU);
+		byte[] devidBytes = getBytesByUUID(devidU);
+		ByteBuffer bf = ByteBuffer.allocate(40);
+		bf.put(appkeyBytes);
+		bf.put(devidBytes);
+		bf.put(salt);
+		byte[] data = bf.array();
+		try {
+			byte[] md5 = Md5(data);
+			byte[] password = getKey(appkey);
+			data = AES.encrypt(md5, password);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		String base64Data = Base64.encode(data);
+		return base64Data;
+	}
+
+	/**
+	 * 8byte随机数
+	 * 
+	 * @return
+	 */
+	private byte[] getSalt() {
+		byte[] b = new byte[8];
+		Random random = new Random();
+		random.nextBytes(b);
+		return b;
+	}
+
+	/**
+	 * 用mac地址生成uuid
+	 * 
+	 * @param context
+	 * @return
+	 */
+	private String getDEVID(Context context) {
+		WifiManager wifi = (WifiManager) context
+				.getSystemService(Context.WIFI_SERVICE);
+		WifiInfo info = wifi.getConnectionInfo();
+		String macAdd = info.getMacAddress();
+		if (macAdd == null || macAdd.equals("")) {
+			macAdd = "defaultMacAdd";
+		}
+		UUID uuid = UUID.nameUUIDFromBytes(macAdd.getBytes());
+		return uuid.toString();
+	}
+
+	@SuppressLint("SimpleDateFormat")
+	private String getDate() {
+		Date date = new Date(System.currentTimeMillis());
+		SimpleDateFormat dateFormat = new SimpleDateFormat(
+				"yyyy-MM-dd HH:mm:ss");
+		String dateStr = dateFormat.format(date);
+		return dateStr;
+	}
+
+	public void saveContentServerEntity(Context context, Element rootElement) {
+		if (rootElement == null) {
+			return;
+		}
+		// 保存到本地
+		File cacheDir = context.getCacheDir();
+		File fileDir = new File(cacheDir.getPath() + "/contentServer");
+		if (!fileDir.exists()) {
+			fileDir.mkdirs();
+		}
+		try {
+			TransformerFactory xformFactory = TransformerFactory.newInstance();
+
+			Transformer idTransform = xformFactory.newTransformer();
+			idTransform.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+			idTransform.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,
+					"yes");
+
+			Source input = new DOMSource(rootElement);
+
+			Result output = new StreamResult(new FileOutputStream(
+					fileDir.getPath() + "/contentServerEntity"));
+			idTransform.transform(input, output);
+
+			// 保存此次更新时间
+			SharedPreferenceManager spMgr = new SharedPreferenceManager(
+					context, SharedPreferenceManager.FILE_NAME_PRICE_SETTING);
+			spMgr.putLong(context,
+					SharedPreferenceManager.KEY_CONTENT_SERVER_REFRESH_TIME,
+					System.currentTimeMillis());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void saveAppKeyPropertyEntity(Context context, Element rootElement,
+			boolean jsAppKey) {
+		if (rootElement == null) {
+			return;
+		}
+		String fileName = "";
+		if (jsAppKey) {
+			fileName = "appKeyPropertyEntity";
+		} else {
+			fileName = "normalAppKeyPropertyEntity";
+		}
+		// 保存到本地
+		File cacheDir = context.getCacheDir();
+		File fileDir = new File(cacheDir.getPath() + "/contentServer");
+		if (!fileDir.exists()) {
+			fileDir.mkdirs();
+		}
+		try {
+			TransformerFactory xformFactory = TransformerFactory.newInstance();
+
+			Transformer idTransform = xformFactory.newTransformer();
+			idTransform.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+			idTransform.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,
+					"yes");
+
+			Source input = new DOMSource(rootElement);
+
+			Result output = new StreamResult(new FileOutputStream(
+					fileDir.getPath() + "/" + fileName));
+			idTransform.transform(input, output);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void saveDataCollectionUrl(Context context, String url) {
+		// 保存到本地
+		File cacheDir = context.getCacheDir();
+		File fileDir = new File(cacheDir.getPath() + "/contentServer");
+		if (!fileDir.exists()) {
+			fileDir.mkdirs();
+		}
+		try {
+			FileOutputStream fos = new FileOutputStream(fileDir.getPath()
+					+ "/dataCollectionUrl");
+			fos.write(url.getBytes());
+			fos.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public String getDataCollectionUrl(Context context) {
+		// 保存到本地
+		File cacheDir = context.getCacheDir();
+		File fileDir = new File(cacheDir.getPath() + "/contentServer");
+		if (!fileDir.exists()) {
+			fileDir.mkdirs();
+		}
+		try {
+			InputStreamReader read = new InputStreamReader(new FileInputStream(
+					fileDir.getPath() + "/dataCollectionUrl"));// 考虑到编码格式
+			BufferedReader bufferedReader = new BufferedReader(read);
+			String lineTxt = null;
+			StringBuffer strBuffer = new StringBuffer();
+			while ((lineTxt = bufferedReader.readLine()) != null) {
+				strBuffer.append(lineTxt);
+			}
+			read.close();
+			return strBuffer.toString();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "";
+		}
+
+	}
+
+}

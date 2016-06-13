@@ -1,0 +1,67 @@
+package com.puxtech.ybk.hangqing.protocol;
+
+import com.puxtech.ybk.hangqing.util.AlgorithmUtil;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Random;
+
+/**
+ * Created by fanshuo on 16/4/21.
+ */
+public class RequestDataCreator {
+
+    private JSONObject createREQH(String pid,String sid) throws JSONException{
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("PID",pid);
+        if (sid != null){
+            jsonObject.put("SID",sid);
+        }
+        return jsonObject;
+    }
+
+    public JSONObject createLoginRequestData() throws JSONException{
+        JSONObject mmts = new JSONObject();
+        mmts.put("REQH",createREQH("login",null));
+        JSONObject reqb = new JSONObject();
+        reqb.put("EID", 2);
+        byte[] ekeyBytes= new byte[10];
+        byte[] randBytes= new byte[10];
+        byte[] rencBytes = new byte[10];
+        for (int i = 0;i<10;i++){
+            ekeyBytes[i] = (byte) (Math.random()*100+1);
+            randBytes[i] = (byte) (Math.random()*100+1);
+            switch (i % 5){
+                case 0:
+                    rencBytes[i] = (byte) ((ekeyBytes[i]+randBytes[i])%128);
+                    break;
+                case 1:
+                    rencBytes[i] = (byte) ((ekeyBytes[i]-randBytes[i])%128);
+                    break;
+                case 2:
+                    rencBytes[i] = (byte) ((ekeyBytes[i]*randBytes[i])%128);
+                    break;
+                case 3:
+                    rencBytes[i] = (byte) ((ekeyBytes[i]/randBytes[i])%128);
+                    break;
+                case 4:
+                    rencBytes[i] = (byte) ((ekeyBytes[i]%randBytes[i])%128);
+                    break;
+            }
+        }
+        String ekey = AlgorithmUtil.encodeBase64(ekeyBytes);
+        reqb.put("EKEY", ekey);
+        String rand = AlgorithmUtil.encodeBase64(randBytes);
+        reqb.put("RAND",rand);
+        String renc = AlgorithmUtil.encodeBase64(rencBytes);
+        reqb.put("RENC",renc);
+        mmts.put("REQB",reqb);
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("MMTS",mmts);
+
+        return jsonObject;
+    }
+
+}

@@ -1,0 +1,31 @@
+package com.puxtech.ybk.qidong;
+
+import android.os.Bundle;
+import android.os.PersistableBundle;
+
+import com.puxtech.ybk.BaseActivity;
+
+/**
+ * Created by fanshuo on 16/4/20.
+ */
+public class WelcomeActivity extends BaseActivity {
+
+
+    private AbstractWelcomeController welcomeController;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        welcomeController = new WelcomeController(this);
+        setContentView(welcomeController.createContentView());
+        welcomeController.startTaskQueue();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(welcomeController != null){
+            welcomeController.onDestroy();
+        }
+    }
+}

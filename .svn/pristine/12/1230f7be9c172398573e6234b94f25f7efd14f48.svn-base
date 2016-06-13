@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    android:fitsSystemWindows="false">
+
+
+    <include layout="@layout/toolbar" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <TextView
+            android:id="@+id/tv_banktotrade"
+            style="@style/row_text"
+            android:drawableLeft="@drawable/li_trade_bank2stock"
+            android:text="@string/bank_to_trade" />
+
+        <View style="@style/devider_orizontal" />
+
+        <TextView
+            android:id="@+id/tv_tradetobank"
+            style="@style/row_text"
+            android:drawableLeft="@drawable/li_trade_stock2bank"
+            android:text="@string/trade_to_bank" />
+
+        <View style="@style/devider_orizontal" />
+
+        <TextView
+            android:id="@+id/tv_history"
+            style="@style/row_text"
+            android:drawableLeft="@drawable/li_trade_historicaloftransfer"
+            android:text="@string/transfer_history" />
+
+        <View style="@style/devider_orizontal" />
+    </LinearLayout>
+
+
+</android.support.design.widget.CoordinatorLayout>

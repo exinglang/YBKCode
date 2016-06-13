@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal" >
+
+    <TextView
+        android:id="@+id/right_item_xianjia"
+        style="@style/hangqing_list_row_right_text"
+        android:text="现价" />
+
+    <TextView
+        android:id="@+id/right_item_zhangdie"
+        style="@style/hangqing_list_row_right_text"
+        android:text="涨跌" />
+
+    <TextView
+        android:id="@+id/right_item_zhangfu"
+        android:text="涨幅"
+        style="@style/hangqing_list_row_right_text"
+        />
+
+    <TextView
+        android:id="@+id/right_item_zuoshou"
+        android:text="昨收"
+        style="@style/hangqing_list_row_right_text"
+        android:textColor="@color/hangqing_white_text"
+        />
+
+    <TextView
+        android:id="@+id/right_item_chengjiaoliang"
+        android:text="成交量"
+        style="@style/hangqing_list_row_right_text"
+        android:textColor="@color/hangqing_yellow_text"
+        />
+
+    <TextView
+        android:id="@+id/right_item_chengjiaoe"
+        style="@style/hangqing_list_row_right_text"
+        android:textColor="@color/hangqing_yellow_text"
+        android:text="成交额"
+        />
+
+    <TextView
+        android:id="@+id/right_item_zuigao"
+        style="@style/hangqing_list_row_right_text"
+        android:text="最高"
+        />
+    <TextView
+        android:id="@+id/right_item_zuidi"
+        style="@style/hangqing_list_row_right_text"
+        android:text="最低"
+        />
+    <TextView
+        android:id="@+id/right_item_zhenfu"
+        style="@style/hangqing_list_row_right_text"
+        android:textColor="@color/hangqing_yellow_text"
+        android:text="振幅"
+        />
+    <TextView
+        android:id="@+id/right_item_huanshou"
+        style="@style/hangqing_list_row_right_text"
+        android:textColor="@color/hangqing_yellow_text"
+        android:text="换手"
+        />
+    <TextView
+        android:id="@+id/right_item_liangbi"
+        style="@style/hangqing_list_row_right_text"
+        android:textColor="@color/hangqing_yellow_text"
+        android:text="量比"
+        />
+
+</LinearLayout>

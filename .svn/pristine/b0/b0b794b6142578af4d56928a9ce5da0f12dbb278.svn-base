@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_root"
+    style="@style/listview_ll"
+    android:descendantFocusability="blocksDescendants"
+
+
+    android:orientation="horizontal">
+
+   <include layout="@layout/threerowadapter_item_inner"
+       />
+    <Button
+        android:id="@+id/bt_commit"
+        android:layout_width="45dip"
+        android:layout_height="30dip"
+        android:text=""
+        android:layout_margin="3dip"
+        android:background="@drawable/login_confirm_btn_bg"
+        android:textSize="?attr/middle"
+        android:focusable="false"
+        android:textColor="@color/white"
+        />
+
+</LinearLayout>

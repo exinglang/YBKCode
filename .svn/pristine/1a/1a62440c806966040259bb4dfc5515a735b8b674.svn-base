@@ -1,0 +1,209 @@
+package com.puxtech.ybk.hangqing.protocol;
+
+import com.puxtech.ybk.MyApplication;
+import com.puxtech.ybk.hangqing.HangQingData;
+import com.puxtech.ybk.hangqing.HangQingLogger;
+import com.puxtech.ybk.hangqing.error.ErrorCode;
+import com.puxtech.ybk.hangqing.exception.HangQingBasicDataErrorException;
+import com.puxtech.ybk.hangqing.exception.ServerException;
+import com.puxtech.ybk.hangqing.exception.SessionErrorException;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+
+/**
+ * Created by fanshuo on 16/4/21.
+ */
+public class RequestManager {
+
+    private void checkSessionId(MyApplication myApplication) throws JSONException, SessionErrorException {
+        String sid = myApplication.getHangQingData().getSessionId();
+        if(sid == null){
+            JSONObject rep = null;
+            try {
+                rep = requestLogin();
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new SessionErrorException("（"+ ErrorCode.SESSION_ERROR_NET +"）");
+            } catch (ServerException e) {
+                e.printStackTrace();
+                throw new SessionErrorException("（"+ ErrorCode.SESSION_ERROR_SERVER +"）");
+            }
+            JSONObject mmts = rep.getJSONObject("MMTS");
+            JSONObject reph = mmts.getJSONObject("REPH");
+            int ret = reph.getInt("RET");
+            String msg = reph.getString("MSG");
+            if(ret == 0){
+                JSONObject repb = mmts.getJSONObject("REPB");
+                String sidNew = repb.getString("SID");
+                myApplication.getHangQingData().setSessionId(sidNew);
+            }
+            else{
+                throw new SessionErrorException("session获取失败（c"+ret+"）");
+            }
+        }
+    }
+
+    private JSONObject sendRequest(JSONObject requestData) throws JSONException, IOException, ServerException {
+        HangQingLogger.i(requestData.toString(2));
+        HangQingHttpSender sender = new HangQingHttpSender();
+        String responseStr = null;
+        responseStr = sender.requestJson(requestData.toString().getBytes(), HangQingData.HANGQING_SERVER_URL);
+        JSONObject repJsonObject = new JSONObject(responseStr);
+        HangQingLogger.i(repJsonObject.toString(2));
+        return repJsonObject;
+    }
+
+    /**
+     * 行情登录
+     */
+    public JSONObject requestLogin() throws JSONException, IOException, ServerException {
+        RequestDataCreator requestDataCreator = new RequestDataCreator();
+        JSONObject requestJsonObject = requestDataCreator.createLoginRequestData();
+        JSONObject repJsonObject = sendRequest(requestJsonObject);
+        return repJsonObject;
+    }
+
+    /**
+     * 获取交易所信息
+     */
+    public JSONObject getMarkets(MyApplication myApplication) throws JSONException, SessionErrorException, HangQingBasicDataErrorException {
+        checkSessionId(myApplication);
+        RequestDataCreator requestDataCreator = new RequestDataCreator();
+        JSONObject requestJsonObject = requestDataCreator.createGetMarketsRequestData(myApplication);
+        JSONObject repJsonObject = null;
+        try {
+            repJsonObject = sendRequest(requestJsonObject);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new HangQingBasicDataErrorException("（"+ ErrorCode.GET_MARKETS_ERROR_NET +"）");
+        } catch (ServerException e) {
+            e.printStackTrace();
+            throw new HangQingBasicDataErrorException("（"+ ErrorCode.GET_MARKETS_ERROR_SERVER +"）");
+        }
+        return repJsonObject;
+    }
+
+    /**
+     * 获取商品列表
+     */
+    public JSONObject getCommodities(MyApplication myApplication, int marketId, int panId) throws JSONException, SessionErrorException, HangQingBasicDataErrorException {
+        checkSessionId(myApplication);
+        RequestDataCreator requestDataCreator = new RequestDataCreator();
+        JSONObject requestJsonObject = requestDataCreator.createGetCommoditiesRequestData(myApplication, marketId, panId);
+        JSONObject repJsonObject = null;
+        try {
+            repJsonObject = sendRequest(requestJsonObject);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new HangQingBasicDataErrorException("（"+ ErrorCode.GET_COMMODITIES_ERROR_NET +"）");
+        } catch (ServerException e) {
+            e.printStackTrace();
+            throw new HangQingBasicDataErrorException("（"+ ErrorCode.GET_COMMODITIES_ERROR_SERVER +"）");
+        }
+        return repJsonObject;
+    }
+
+    /**
+     * 获取交易时间
+     */
+    public JSONObject getTradeTime(MyApplication myApplication, int marketId, int panId) throws JSONException, SessionErrorException, HangQingBasicDataErrorException {
+        checkSessionId(myApplication);
+        RequestDataCreator requestDataCreator = new RequestDataCreator();
+        JSONObject requestJsonObject = requestDataCreator.createGetTradeTimeRequestData(myApplication, marketId, panId);
+        JSONObject repJsonObject = null;
+        try {
+            repJsonObject = sendRequest(requestJsonObject);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new HangQingBasicDataErrorException("（"+ ErrorCode.GET_TRADE_TIME_ERROR_NET +"）");
+        } catch (ServerException e) {
+            e.printStackTrace();
+            throw new HangQingBasicDataErrorException("（"+ ErrorCode.GET_TRADE_TIME_ERROR_SERVER +"）");
+        }
+        return repJsonObject;
+    }
+
+    /**
+     * 商品板块查询
+     */
+    public JSONObject getPlates(MyApplication myApplication) throws JSONException, SessionErrorException, HangQingBasicDataErrorException {
+        checkSessionId(myApplication);
+        RequestDataCreator requestDataCreator = new RequestDataCreator();
+        JSONObject requestJsonObject = requestDataCreator.createGetPlatesRequestData(myApplication);
+        JSONObject repJsonObject = null;
+        try {
+            repJsonObject = sendRequest(requestJsonObject);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new HangQingBasicDataErrorException("（"+ ErrorCode.GET_PLATES_ERROR_NET +"）");
+        } catch (ServerException e) {
+            e.printStackTrace();
+            throw new HangQingBasicDataErrorException("（"+ ErrorCode.GET_PLATES_ERROR_SERVER +"）");
+        }
+        return repJsonObject;
+    }
+
+    /**
+     * 交易节查询
+     */
+    public JSONObject getTradeTimes(MyApplication myApplication) throws JSONException, SessionErrorException, HangQingBasicDataErrorException {
+        checkSessionId(myApplication);
+        RequestDataCreator requestDataCreator = new RequestDataCreator();
+        JSONObject requestJsonObject = requestDataCreator.createGetTradeTimesRequestData(myApplication);
+        JSONObject repJsonObject = null;
+        try {
+            repJsonObject = sendRequest(requestJsonObject);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new HangQingBasicDataErrorException("（"+ ErrorCode.GET_TRADE_TIMES_ERROR_NET +"）");
+        } catch (ServerException e) {
+            e.printStackTrace();
+            throw new HangQingBasicDataErrorException("（"+ ErrorCode.GET_TRADE_TIMES_ERROR_SERVER +"）");
+        }
+        return repJsonObject;
+    }
+
+    /**
+     * 盘口多商品查询
+     */
+    public JSONObject getPriceForMCommodities(MyApplication myApplication, int marketId, int panId, int[]cids) throws JSONException, SessionErrorException, HangQingBasicDataErrorException {
+        checkSessionId(myApplication);
+        RequestDataCreator requestDataCreator = new RequestDataCreator();
+        JSONObject requestJsonObject = requestDataCreator.createGetPriceForMCommoditiesRequestData(myApplication, marketId, panId, cids);
+        JSONObject repJsonObject = null;
+        try {
+            repJsonObject = sendRequest(requestJsonObject);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new HangQingBasicDataErrorException("（"+ ErrorCode.GET_PRICE_LIST_ERROR_NET +"）");
+        } catch (ServerException e) {
+            e.printStackTrace();
+            throw new HangQingBasicDataErrorException("（"+ ErrorCode.GET_PRICE_LIST_ERROR_SERVER +"）");
+        }
+        return repJsonObject;
+    }
+
+    /**
+     * 盘口按单商品查询
+     */
+    public JSONObject getPriceForCommodity(MyApplication myApplication, int marketId, int panId, int cid, int divn, int fivn, int hann, int prin) throws JSONException, SessionErrorException, HangQingBasicDataErrorException {
+        checkSessionId(myApplication);
+        RequestDataCreator requestDataCreator = new RequestDataCreator();
+        JSONObject requestJsonObject = requestDataCreator.createGetPriceForCommodityRequestData(myApplication, marketId, panId, cid, divn,fivn,hann,prin);
+        JSONObject repJsonObject = null;
+        try {
+            repJsonObject = sendRequest(requestJsonObject);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new HangQingBasicDataErrorException("（"+ ErrorCode.GET_PRICE_ERROR_NET +"）");
+        } catch (ServerException e) {
+            e.printStackTrace();
+            throw new HangQingBasicDataErrorException("（"+ ErrorCode.GET_PRICE_ERROR_NET +"）");
+        }
+        return repJsonObject;
+    }
+
+}

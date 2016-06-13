@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+    <LinearLayout
+        android:id="@+id/period_layout"
+        android:layout_width="match_parent"
+        android:layout_height="24dp"
+        android:layout_marginTop="4dp"
+        android:background="#000000" >
+
+        <TextView
+            android:id="@+id/period6"
+            android:text="日"
+            style="@style/hangqing_detail_period_btn" />
+        <TextView
+            android:id="@+id/period7"
+            android:text="周"
+            style="@style/hangqing_detail_period_btn" />
+
+        <TextView
+            android:id="@+id/period8"
+            android:text="月"
+            style="@style/hangqing_detail_period_btn" />
+
+        <TextView
+            android:id="@+id/period9"
+            android:text="年"
+            style="@style/hangqing_detail_period_btn" />
+
+        <TextView
+            android:id="@+id/period1"
+            android:text="1分"
+            style="@style/hangqing_detail_period_btn" />
+
+        <TextView
+            android:id="@+id/period2"
+            android:text="5分"
+            style="@style/hangqing_detail_period_btn" />
+
+        <TextView
+            android:id="@+id/period3"
+            android:text="15分"
+            style="@style/hangqing_detail_period_btn" />
+
+        <TextView
+            android:id="@+id/period4"
+            android:text="30分"
+            style="@style/hangqing_detail_period_btn" />
+
+        <TextView
+            android:id="@+id/period5"
+            android:text="60分"
+            style="@style/hangqing_detail_period_btn" />
+
+
+
+
+
+
+    </LinearLayout>
+    <com.puxtech.ybk.hangqing.charts.KLineView
+        android:id="@+id/kline_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</LinearLayout>

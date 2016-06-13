@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar" />
+
+    <include layout="@layout/time_widget" />
+
+    <LinearLayout style="@style/listview_title_ll">
+
+        <TextView
+            style="@style/listview_ll_tv_title_left"
+            android:text="名称/代码" />
+
+        <TextView
+            style="@style/listview_ll_tv_title_center"
+            android:text="价格/数量" />
+
+        <TextView
+            style="@style/listview_ll_tv_title_right"
+            android:text="类型/方向" />
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+
+        />
+
+</LinearLayout>

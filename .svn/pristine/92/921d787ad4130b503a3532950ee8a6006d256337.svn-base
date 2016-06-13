@@ -1,0 +1,45 @@
+package com.puxtech.ybk.hangqing;
+
+import android.content.Context;
+
+import com.puxtech.ybk.hangqing.jsondata.getmarkets.Market;
+
+/**
+ * Created by fanshuo on 16/4/21.
+ */
+public class HangQingData {
+
+    public static String HANGQING_SERVER_URL = "http://172.31.100.234:8180/quotation_query/jsonQuery.do";
+
+    private String sessionId;
+    private int marketId;
+    private int panId;
+
+    public void init(Context context){
+
+    }
+
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
+
+    public int getMarketId() {
+        return marketId;
+    }
+
+    public void setMarketId(int marketId) {
+        this.marketId = marketId;
+    }
+
+    public int getPanId() {
+        return panId;
+    }
+
+    public void setPanId(int panId) {
+        this.panId = panId;
+    }
+}

@@ -1,0 +1,477 @@
+package com.puxtech.ybk.qidong;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.support.v7.app.AlertDialog;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.puxtech.ybk.MainActivity;
+import com.puxtech.ybk.MyApplication;
+import com.puxtech.ybk.R;
+import com.puxtech.ybk.hangqing.HangQingData;
+import com.puxtech.ybk.qidong.entity.ContentsServerEntity;
+import com.puxtech.ybk.qidong.entity.ContentsServerServiceEntity;
+import com.puxtech.ybk.qidong.entity.ContentsServerZuEntity;
+import com.puxtech.ybk.qidong.entity.NormalAppKeyPropertyEntity;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+/**
+ * Created by fanshuo on 16/4/20.
+ */
+public abstract class AbstractWelcomeController {
+
+    /**
+     * 要控制的activity
+     */
+    protected Activity activity;
+    /**
+     * MyApplication实例
+     */
+    protected MyApplication mApplication;
+
+    private View contentView;
+    private TextView tv_loading_message;
+    private String failedMessage = "网络连接失败";
+    private long startTime;
+
+    protected List<AsyncTask<Void, Void, Boolean>> mAsyncTasks = new ArrayList<AsyncTask<Void, Void, Boolean>>();
+    protected int completedTaskSize = 0;
+
+    /**
+     * 添加任务
+     *
+     * @param task
+     */
+    public void addAsyncTask(AsyncTask<Void, Void, Boolean> task) {
+        mAsyncTasks.add(task);
+    }
+
+    /**
+     * 开始执行所有任务
+     */
+    public void startTaskQueue() {
+        if (mAsyncTasks.size() > 0) {
+            completedTaskSize = 0;
+            mAsyncTasks.get(completedTaskSize).execute();
+        } else {
+            onFinishAllTask();
+        }
+    }
+
+    /**
+     * 执行下一项任务
+     */
+    public void executeNextTask() {
+        completedTaskSize++;
+        if (mAsyncTasks.size() > completedTaskSize) {
+            mAsyncTasks.get(completedTaskSize).execute();
+        } else {
+            onFinishAllTask();
+        }
+    }
+
+    public void onFinishAllTask() {
+        waitingToEnd();
+    }
+
+    /**
+     * 取消所有异步任务
+     */
+    public void clearAsyncTask() {
+        Iterator<AsyncTask<Void, Void, Boolean>> iterator = mAsyncTasks
+                .iterator();
+        while (iterator.hasNext()) {
+            AsyncTask<Void, Void, Boolean> asyncTask = iterator.next();
+            if (asyncTask != null && !asyncTask.isCancelled()) {
+                asyncTask.cancel(true);
+            }
+        }
+        mAsyncTasks.clear();
+    }
+    public AbstractWelcomeController(Activity activity) {
+        this.activity = activity;
+        this.mApplication = (MyApplication) activity.getApplication();
+        startTime = System.currentTimeMillis();
+        initTaskList();
+    }
+    /**
+     * 初始化任务集合
+     */
+    protected abstract void initTaskList();
+    /**
+     * 初始化contentview并返回
+     */
+    public View createContentView() {
+        int id = getContentViewLayoutId();
+        contentView = LayoutInflater.from(activity).inflate(id, null);
+        tv_loading_message = (TextView) contentView
+                .findViewById(R.id.tv_loading_message);
+        tv_loading_message.setText("...");
+        return contentView;
+    }
+
+    /**
+     * 改变正在获取数据...后面小点的个数
+     */
+    private void changeLoadingDot() {
+        addLoadingDot();
+    }
+
+    /**
+     * 增加正在获取数据...后面小点的个数
+     */
+    private void addLoadingDot() {
+        String curText = tv_loading_message.getText().toString();
+        String newText = curText + ".";
+        tv_loading_message.setText(newText);
+    }
+
+    /**
+     * 各个Controller分别实现此方法返回不同的layout
+     */
+    public abstract int getContentViewLayoutId();
+
+    private void faild(String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setTitle("获取失败");
+        builder.setMessage(message + "，请重试或者退出");
+        builder.setPositiveButton("重试", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                tv_loading_message.setText("...");
+                clearAsyncTask();
+                initTaskList();
+                startTaskQueue();
+            }
+        });
+        builder.setNegativeButton("退出", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                activity.finish();
+                System.exit(0);
+            }
+        });
+        builder.setCancelable(false);
+        builder.show();
+    }
+
+    /**
+     * 获取目录服务器，请在主线程调用次方法
+     */
+    public void getContentsServer() {
+        addAsyncTask(new AsyncTask<Void, Void, Boolean>() {
+            ContentsServerEntity csEntity;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                changeLoadingDot();
+            }
+
+            @Override
+            protected Boolean doInBackground(Void... arg0) {
+                try {
+                    // 尝试请求第一个地址
+                    QiDongLogger.i("尝试请求第一个目录服务器地址");
+                    csEntity = getContentServerFromServer(activity,
+                            QiDongData.CONTENTS_SERVER_URL_1);
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                    QiDongLogger.e("请求第一个目录服务器失败");
+                    try {
+                        // 尝试请求第二个地址
+                        QiDongLogger.i("尝试请求第二个目录服务器地址");
+                        csEntity = getContentServerFromServer(activity,
+                                QiDongData.CONTENTS_SERVER_URL_2);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        QiDongLogger.e("请求第二个目录服务器失败");
+                        // 从本地缓存读取
+                        QiDongLogger.i("尝试读取缓存的目录服务器地址");
+                        csEntity = getContentServerFromCache(activity);
+                        // 缓存获取失败
+                        if (csEntity == null) {
+                            return false;
+                        }
+                    }
+                }
+                if (csEntity.getCode() != 0) {
+                    //如果返回码不为0，很大可能是tokenB错误，这里尝试删除tokenB，重新使用tokenA请求一次
+                    TokenBManager tokenBManager = new TokenBManager(activity);
+                    tokenBManager.deleteTokenB();
+                    try {
+                        // 尝试使用tokenA请求目录服务器
+                        QiDongLogger.i("尝试删除tokenB，使用tokenA请求目录服务器地址");
+                        csEntity = getContentServerFromServer(activity,
+                                QiDongData.CONTENTS_SERVER_URL_1);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        QiDongLogger.e("删除tokenB，使用tokenA请求目录服务器地址");
+                    }
+                    if (csEntity.getCode() != 0) {
+                        return false;
+                    }
+                    else{
+                        return true;
+                    }
+                } else {
+                    return true;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Boolean result) {
+                super.onPostExecute(result);
+                if (result) {
+                    try {
+                        mApplication.getQiDongData().setContentsServerEntity(csEntity);
+                        onGetContentServerSuccess();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        faild(failedMessage);
+                    }
+                } else {
+                    // 如果是验证失败，就给出错误信息
+                    if (csEntity != null && csEntity.getCode() != 0) {
+                        faild(failedMessage);
+                        Toast.makeText(mApplication,
+                                csEntity.getMessage(), Toast.LENGTH_SHORT);
+                        return;
+                    } else {
+                        // 否则，就直接提示失败
+                        faild(failedMessage);
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * 从网络获取目录服务器信息，如果获取成功会自动保存到本地。
+     */
+    private ContentsServerEntity getContentServerFromServer(Context context,
+                                                            String url) throws Exception {
+        QiDongLogger.d("本次请求的目录服务器地址是：" + url);
+        ContentsServerHttpSender httpSender = new ContentsServerHttpSender();
+        ContentsServerManager contentServerManager = new ContentsServerManager(
+                context);
+        String s = contentServerManager.createGetInfoRequestData(context);
+        QiDongLogger.d("getContentServerFromServer...RequestData = " + s);
+        InputStream is = httpSender.requestBinary(s.getBytes(), url);
+        byte[] data = readStream(is);
+//		FileUtil.saveIsToFile(context, data, "ContentsServerEntity.txt");
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        InputStream byteIS = new ByteArrayInputStream(data);
+        Document document = builder.parse(byteIS);
+        // 获取根节点
+        Element root = document.getDocumentElement();
+        ContentsServerParser parser = new ContentsServerParser(context);
+        ContentsServerEntity csEntity = parser.parse(root);
+        // 如果请求验证失败就不保存到本地
+        if (csEntity != null && csEntity.getCode() != 0) {
+            return csEntity;
+        }
+        // 分离tknb
+        Element resp = (Element) root.getElementsByTagName("RESP").item(0);
+        Element tknb = (Element) resp.getElementsByTagName("TKNB").item(0);
+        resp.removeChild(tknb);
+
+        // 保存tknb
+        TokenBManager tokenBManager = new TokenBManager(context);
+        tokenBManager.saveTokenB(tknb);
+
+        // 保存contentServer
+        contentServerManager.saveContentServerEntity(context, root);
+
+        return csEntity;
+    }
+
+    /**
+     * 从本地缓存中获取目录服务器信息
+     *
+     * @return 如果失败就返回null
+     */
+    private ContentsServerEntity getContentServerFromCache(Context context) {
+        // 如果连不上服务器，就检查本地有没有7日内的缓存
+        SharedPreferenceManager spMgr = new SharedPreferenceManager(context,
+                SharedPreferenceManager.FILE_NAME_QIDONG);
+        if (!spMgr
+                .contains(SharedPreferenceManager.KEY_CONTENT_SERVER_REFRESH_TIME)) {
+            QiDongLogger.e("获取目录服务器缓存信息失败，没有缓存");
+            return null;
+        }
+        long preTime = spMgr.getLong(context,
+                SharedPreferenceManager.KEY_CONTENT_SERVER_REFRESH_TIME, 0);
+        long curTime = System.currentTimeMillis();
+        long deltaTime = curTime - preTime;
+        long day7 = 1000 * 3600 * 24 * 7;
+        if (deltaTime < day7) {
+            try {
+                File cacheDir = context.getCacheDir();
+                File fileDir = new File(cacheDir.getPath() + "/contentServer");
+                if (!fileDir.exists()) {
+                    fileDir.mkdirs();
+                }
+                File xmlFile = new File(fileDir.getPath()
+                        + "/contentServerEntity");
+                // 从本地文件读
+                DocumentBuilderFactory factory = DocumentBuilderFactory
+                        .newInstance();
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                Document document = builder.parse(xmlFile);
+                // 获取根节点
+                Element root = document.getDocumentElement();
+                ContentsServerParser parser = new ContentsServerParser(context);
+                ContentsServerEntity entity = parser.parse(root);
+
+                return entity;
+            } catch (Exception e) {
+                QiDongLogger.e("获取目录服务器缓存信息失败", e);
+                return null;
+            }
+        } else {
+            QiDongLogger.e("获取目录服务器缓存信息失败，缓存超过7天");
+            return null;
+        }
+    }
+
+    private void onGetContentServerSuccess() throws Exception {
+        List<ContentsServerServiceEntity> serviceList = mApplication
+                .getQiDongData().getContentsServerEntity().getYwSystemEntity().getServiceList();
+        for (ContentsServerServiceEntity serviceEntity : serviceList) {
+            // 行情服务前置机地址
+            if (serviceEntity.getType() == 1) {
+                if(serviceEntity.getZuList() != null && serviceEntity.getZuList().size() > 0){
+                    ContentsServerZuEntity zuEntity = serviceEntity.getZuList().get(0);
+                    HangQingData.HANGQING_SERVER_URL = zuEntity.getLlList().get(0).getUrl();
+                }
+            }
+        }
+        executeNextTask();
+    }
+
+    /**
+     * 获取普通AppKey属性
+     */
+    protected void getNormalAppKeyProperty() {
+        addAsyncTask(new AsyncTask<Void, Void, Boolean>() {
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                changeLoadingDot();
+            }
+
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                ContentsServerManager csManager = new ContentsServerManager(
+                        activity);
+                try {
+                    HashMap<String, Object> hashMap = csManager
+                            .sendNormalAppKeyPropertyRequest();
+                    if (hashMap == null) {
+                        return false;
+                    }
+                    String code = (String) hashMap.get("code");
+                    String msg = (String) hashMap.get("msg");
+                    // 获取失败
+                    if (!"0".equals(code)) {
+                        failedMessage = failedMessage + "，" + msg;
+                        return false;
+                    }
+                    NormalAppKeyPropertyEntity property = (NormalAppKeyPropertyEntity) hashMap
+                            .get("property");
+                    mApplication.getQiDongData().setNormalAppKeyPropertyEntity(property);
+                    // mApplication.setCommunityUrl((String)
+                    // hashMap.get("url"));
+                    QiDongLogger.d("normal appkeyProperty："
+                            + property.toString());
+                    return true;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return false;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean result) {
+                super.onPostExecute(result);
+                executeNextTask();
+            }
+
+        });
+    }
+
+
+
+    /**
+     * 进入login
+     */
+    public void waitingToEnd() {
+        // 如果本页面显示时间没超过3秒，就等待到3秒再结束
+        long endTime = System.currentTimeMillis();
+        long deltaTime = endTime - startTime;
+        if (deltaTime < 1000 * 3) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    end();
+                }
+            }, 1500 - deltaTime);
+        } else {
+            end();
+        }
+    }
+
+    protected void end() {
+        Intent intent2 = new Intent(activity, MainActivity.class);
+        activity.startActivity(intent2);
+        activity.finish();
+    }
+
+
+
+    protected byte[] readStream(InputStream is) {
+        ByteArrayOutputStream bout = null;
+        try {
+            bout = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int len = 0;
+            while ((len = is.read(buffer)) != -1) {
+                bout.write(buffer, 0, len);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return bout.toByteArray();
+    }
+
+    public void onDestroy() {
+        clearAsyncTask();
+    }
+
+}

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar_only" />
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/iv_icon"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_above="@+id/tv_name"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="15dip"
+            android:src="@drawable/ic_launcher" />
+
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/fw_bbh"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="15dip"
+            android:text="app_name"
+            android:textColor="@color/service_text_s"
+           />
+
+        <TextView
+            android:id="@+id/fw_bbh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerInParent="true"
+            android:text=""
+            android:textColor="@color/service_text_s"
+           />
+
+        <TextView
+            android:id="@+id/tv_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="100dip"
+            android:layout_below="@id/fw_bbh"
+            android:layout_centerHorizontal="true"
+            android:text="欢迎使用者访问本网站:"
+            android:textColor="@color/service_text_s"
+           />
+        <TextView
+            android:id="@+id/tv_url"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_1"
+            android:layout_centerHorizontal="true"
+            android:text="@string/home_url"
+
+            android:textColor="@color/blue"
+          />
+        <TextView
+            android:id="@+id/tv_3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_url"
+            android:layout_centerHorizontal="true"
+            android:text="并提出产品的改进建议,以及获取本产品的最新信息及其他产品信息."
+            android:textColor="@color/service_text_s"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:paddingBottom="15dip"
+            android:text="Copyright © 2013-2016 版权所有"
+            android:textColor="@color/service_text_s"
+           />
+    </RelativeLayout>
+
+
+</LinearLayout>

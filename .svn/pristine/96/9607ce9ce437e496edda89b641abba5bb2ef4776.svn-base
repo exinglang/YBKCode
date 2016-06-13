@@ -1,0 +1,76 @@
+package com.puxtech.ybk.jiaoyi.page;
+
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import com.puxtech.ybk.BaseFragment;
+import com.puxtech.ybk.R;
+import com.puxtech.ybk.jiaoyi.Logger;
+import com.puxtech.ybk.jiaoyi.TradeHelper;
+import com.puxtech.ybk.jiaoyi.entitydata.CommodityData;
+
+
+public class TradeMaiRu extends TradeMai {
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        MAI_TYPE=MAI_RU;
+        return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        Logger.v("MAI_RUisVisibleToUser:"+isVisibleToUser);
+        try {
+            if (isVisibleToUser) {
+                if (TradeHelper.getCommodityDataByCode(context, act_code.getText().toString()) == null || act_code.getText().toString().equals("")) {
+                    clearWidget();
+                    try {
+                        myApplication.getHangQingData().stopRefreshHangQingDetail();
+                    } catch (Exception e) {
+
+                    }
+
+                } else {
+                    CommodityData commodityData = TradeHelper.getCommodityDataByCode(context, act_code.getText().toString());
+                    selectedCommodity(commodityData);
+
+                }
+
+            }
+            else{
+                try {
+                    myApplication.getHangQingData().stopRefreshHangQingDetail();
+                }catch (Exception e){
+
+                }
+
+            }
+        }catch (Exception e) {
+
+        }
+        super.setUserVisibleHint(isVisibleToUser);
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden ) {
+        Logger.v("MAI_RUhidden:"+hidden);
+
+        if (hidden){
+            clearWidget();
+
+
+
+        }
+        super.onHiddenChanged(hidden);
+    }
+}

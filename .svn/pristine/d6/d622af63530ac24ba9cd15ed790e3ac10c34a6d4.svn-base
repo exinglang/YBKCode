@@ -1,0 +1,245 @@
+package com.puxtech.ybk.jiaoyi;
+
+import android.app.DatePickerDialog;
+import android.content.Context;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.DatePicker;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.puxtech.ybk.Constant;
+import com.puxtech.ybk.MyApplication;
+import com.puxtech.ybk.R;
+import com.puxtech.ybk.jiaoyi.entitydata.CommodityData;
+import com.puxtech.ybk.util.AES;
+import com.puxtech.ybk.util.ActivityUtils;
+import com.puxtech.ybk.util.Base64;
+
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
+/**
+ * Created by mac on 16/4/21.
+ */
+public class TradeHelper {
+
+    public static final String SELECTTIME_NOT_BEYOND_TODAY = "选择的时间不得晚于今天";
+    public static final String STARTTIME_MORE_THAN_NOW = "开始日期不得晚于今天";
+    public static final String ENDTIME_MORE_THAN_NOW = "结束日期不得晚于今天";
+    public static final String FABUENDTIME_MORE_THAN_NOW = "发布结束日期不得晚于今天";
+    public static final String START_NOT_EARLY_ONE_YEAR = "开始时间不得早于一年以前的日期";
+    public static final String SELECT_TIME = "选择时间";
+    public static final String CENTER_TIME_SHORT_ONT_MONTHS = "查询日期间隔不能大于三十一天";
+
+    public static final String STARTTIME_MORE_ENDTIME_IN = "发布开始时间不得晚于结束时间";
+    public static final String STARTTIME_MORE_ENDTIME = "开始时间不得晚于结束时间";
+    public static final String STARTTIME_MORE_ENDTIME_UN = "失效开始时间不得晚于结束时间";
+    MyApplication myApplication;
+
+    public TradeHelper(Context context) {
+        myApplication = (MyApplication) context.getApplicationContext();
+    }
+
+
+
+    /**
+     * 初始化TitleBar 有子标题和后退按钮
+     *  @param appCompatActivity  appCompatActivity
+     * @param subTitle 子标题
+     * @param toolbar titlebar
+     */
+    public static void initToolBarWithSubTitleAndFinishIcon(final AppCompatActivity appCompatActivity, String subTitle, Toolbar toolbar,TextView tv_toolbar) {
+        toolbar.setTitle("");
+        tv_toolbar.setText(subTitle);
+//        toolbar.setHorizontalAlignment(SwingConstants.CENTER);
+//        toolbar.setSubtitle(subTitle);
+        toolbar.setNavigationIcon(R.drawable.ic_back);
+        appCompatActivity.setSupportActionBar(toolbar);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                appCompatActivity.setResult(Constant.CODE_FAIL);
+                appCompatActivity.finish();
+            }
+        });
+    }
+
+    //根据商品代码 得到商品名称
+
+    /**
+     * 根据传进来的商品代码得到交易商品实体类s
+     *
+     * @param code 商品代码
+     * @return 商品名称
+     */
+    public  static CommodityData getCommodityDataByCode(Context context,String code) {
+        for (CommodityData cd : ((MyApplication)context.getApplicationContext()).getTradeEntity().getTradeData().getCommodityDataList()) {
+            if (cd.getCode().equals(code)) {
+                return cd;
+            }
+        }
+        return null;
+    }
+
+
+    // 获取token字段。 二进制
+    public static String getToken(long time, String username, String pwd, byte[] logonKey) {
+
+        // 登录加解密密钥，并不上传密码
+        String result = "";
+        try {
+            byte[] data = username.getBytes(Constant.ENCODE);
+            ByteBuffer buffer = ByteBuffer.allocate(data.length + 10);
+            // 小段序，服务器在写入写出字节流时，全部为小段序。客户端需要与服务器统一
+            buffer.order(ByteOrder.LITTLE_ENDIAN);
+            // 明文
+//            if (Double
+//                    .valueOf(myapp.getNyTrade().getSessionData().getVersion()) > 1.5) {
+//                buffer.putShort((short) 0);
+//                buffer.putLong(time);
+//
+//                buffer.putShort((short) data.length);
+//                buffer.put(data);
+//
+//            }
+            buffer.putShort((short) data.length);
+            buffer.put(data);
+            buffer.putLong(time);
+            // 密文，并用base64编码
+            result = Base64.encode(AES.encrypt(buffer.array(), logonKey));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
+
+    public static void selectData(final Context context, final View view, final boolean needPanDuan) {
+//        final int id = view.getId();
+        ActivityUtils mActivityUtils = new ActivityUtils();
+        final Calendar initCalendar = getCalendarOfString(((TextView) view).getText().toString());
+        DatePickerDialog ds = new DatePickerDialog(context,
+                new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker datePicker, int year,
+                                          int monthOfYear, int dayOfMonth) {
+                        GregorianCalendar selectGregorianCalendar = new GregorianCalendar(year, monthOfYear, dayOfMonth);
+                        if (needPanDuan) {
+                            //开始和结束日期都需要判断
+                            if (isBeyondToday(selectGregorianCalendar)) {
+                                //选择的日期是否超过了今天
+                                ActivityUtils.showCenterToast(context,
+                                        SELECTTIME_NOT_BEYOND_TODAY, Toast.LENGTH_LONG);
+                                return;
+                            } else if (isBeyondOneYear(selectGregorianCalendar, new GregorianCalendar())) {
+                                //选择的日期是否超过了一年之前
+                                ActivityUtils.showCenterToast(context,
+                                        START_NOT_EARLY_ONE_YEAR, Toast.LENGTH_LONG);
+                                return;
+                            }
+                        }
+                        ((TextView) view).setText(ActivityUtils.getYYYYMMDDforTimeMillis(selectGregorianCalendar.getTimeInMillis()));
+                    }
+                }, initCalendar.get(Calendar.YEAR), initCalendar.get(Calendar.MONTH), initCalendar.get(Calendar.DAY_OF_MONTH));
+
+
+        ds.setTitle(SELECT_TIME);
+        ds.show();
+    }
+    /**
+     * 判断传入的日期是否晚于今天
+     *
+     * @param selectData
+     * @return
+     */
+    public static boolean isBeyondToday(GregorianCalendar selectData) {
+
+        GregorianCalendar end = new GregorianCalendar();
+        end.add(Calendar.DAY_OF_MONTH, -1);
+        return isDateOneAfterDateTwo(selectData, end);
+
+    }
+    /**
+     * 判断两个日期是否差距超过31天
+     *
+     * @param start
+     * @param end
+     * @return
+     */
+    public static boolean isDateOneBeyongMonthDateTwo(Calendar start, Calendar end) {
+        return isBeyondSpecificDays(start, end, 31);
+    }
+    /**
+     * 判断两个日期是否超过了一年
+     *
+     * @param start
+     * @param end
+     * @return
+     */
+    public static boolean isBeyondOneYear(GregorianCalendar start, GregorianCalendar end) {
+        return isBeyondSpecificDays(start, end, 365);
+    }
+    /**
+     * 判断两个日期是否超过指定的天数
+     *
+     * @param start
+     * @param end
+     * @return
+     */
+    public static boolean isBeyondSpecificDays(Calendar start, Calendar end, int specificDays) {
+        if (start.after(end)) {
+            return false;
+        }
+        long sl = start.getTimeInMillis();
+        long el = end.getTimeInMillis();
+        long days = ((el - sl) / (1000 * 60 * 60 * 24));
+        if (days >= specificDays) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    /**
+     * 判断第一个日期是否超过了第二个日期
+     *
+     * @param start
+     * @param end
+     * @return
+     */
+    public static boolean isDateOneAfterDateTwo(Calendar start, Calendar end) {
+        end.add(Calendar.DAY_OF_MONTH, 1);
+        if (end.after(start)) {
+            return false;
+        } else {
+
+            return true;
+        }
+    }
+    /**
+     * 从yyyy-mm-dd的string格式,转换为calendar
+     *
+     * @return
+     */
+    public static Calendar getCalendarOfString(String date) {
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");// 设置日期格式
+//        String date = df.format(data);
+//        System.out.println(date);
+
+        Long timeMillis1 = null;
+        try {
+            timeMillis1 = df.parse(date).getTime();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timeMillis1);
+
+        return calendar;
+    }
+}

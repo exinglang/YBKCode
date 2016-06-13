@@ -1,0 +1,39 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.puxtech.ybk.jiaoyi.page.TradeChiCang">
+
+    <LinearLayout style="@style/listview_title_ll">
+
+        <TextView
+            style="@style/listview_ll_tv_title_left"
+            android:text="名称/代码" />
+
+        <TextView
+            style="@style/listview_ll_tv_title_center"
+            android:text="编号/状态" />
+
+        <TextView
+            style="@style/listview_ll_tv_title_right"
+            android:text="类型/备注" />
+
+        <TextView
+            style="@style/listview_ll_tv_title_right_action"
+
+            android:text="操作" />
+    </LinearLayout>
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/srl_main"
+        >
+
+        <ListView
+            android:id="@+id/listview"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"></ListView>
+    </android.support.v4.widget.SwipeRefreshLayout>
+</LinearLayout>

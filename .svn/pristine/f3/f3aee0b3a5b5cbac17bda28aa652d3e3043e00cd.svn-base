@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="app_bg">#fff3f3f4</color>
+    <color name="black">#ff000000</color>
+    <color name="white">#ffffff</color>
+
+    <color name="red">#ffe50d22</color>
+
+    <color name="transparent">#00000000</color>
+    <color name="ybk_red">#ffc80d17</color>
+    <color name="_fafafa">#fffafafa</color>
+    <color name="_d2d2d2">#ffd2d2d2</color>
+    <color name="listview_title_bg">#f2f4f3</color>
+    <color name="listview_title_text_color">#4A7EA3</color>
+    <color name="five_price_selected_color">#ff19437d</color>
+    <color name="colligate_detail_text_color">#ff898989</color>
+    <color name="deep_background_yellow">#fff2e400</color>
+    <color name="_cccccc">#ffcccccc</color>
+    <color name="_cbcbcb">#ffcbcbcb</color>
+    <color name="green">#ff00b800</color>
+
+    <color name="xiadan_textview_blue">#ff064192</color>
+
+</resources>

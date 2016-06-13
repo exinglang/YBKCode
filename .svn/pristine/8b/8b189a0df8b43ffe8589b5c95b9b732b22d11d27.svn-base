@@ -1,0 +1,101 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.puxtech.ybk.jiaoyi.page.TradeChiCang">
+
+    <TextView
+        android:id="@+id/tv_zijinchaxun"
+        style="@style/row_text"
+        android:drawableLeft="@drawable/li_trade_bank2stock"
+        android:text="@string/chaxun_gonggao" />
+
+    <View style="@style/devider_orizontal" />
+
+    <TextView
+        android:id="@+id/tv_gonggao"
+        style="@style/row_text"
+        android:drawableLeft="@drawable/li_trade_positioninfo"
+        android:text="@string/chaxun_gonggao" />
+
+    <View style="@style/devider_orizontal" />
+
+    <TextView
+        android:id="@+id/tv_shangpinchicang"
+        style="@style/row_text"
+        android:drawableLeft="@drawable/li_trade_stock2bank"
+        android:text="@string/chaxun_shangpinchicang" />
+
+    <View style="@style/devider_orizontal" />
+
+    <TextView
+        android:id="@+id/tv_dangriweituo"
+        style="@style/row_text"
+        android:drawableLeft="@drawable/li_trade_historicaloftransfer"
+        android:text="@string/chaxun_dangriweituo" />
+
+    <View style="@style/devider_orizontal" />
+
+    <TextView
+        android:id="@+id/tv_dangrichengjiao"
+        style="@style/row_text"
+        android:drawableLeft="@drawable/li_bjhg_history_entrust"
+        android:text="@string/chaxun_dangrichengjiao" />
+
+    <View style="@style/devider_orizontal" />
+
+    <TextView
+        android:id="@+id/tv_lishichengjiao"
+        style="@style/row_text"
+        android:drawableLeft="@drawable/li_bjhg_tiqiangouhui"
+        android:text="@string/chaxun_lishichengjiao" />
+
+    <View style="@style/devider_orizontal" />
+
+    <TextView
+        android:id="@+id/tv_shenggouchaxun"
+        style="@style/row_text"
+        android:drawableLeft="@drawable/li_rr_rqmc"
+        android:text="@string/chaxun_shenggouchaxun" />
+
+    <View style="@style/devider_orizontal" />
+
+    <TextView
+        android:id="@+id/tv_tuoguanchaxun"
+        style="@style/row_text"
+        android:drawableLeft="@drawable/li_rr_zjhk"
+        android:text="@string/chaxun_tuoguanchaxun" />
+
+    <View style="@style/devider_orizontal" />
+
+    <TextView
+        android:id="@+id/tv_tihuochaxun"
+        style="@style/row_text"
+        android:drawableLeft="@drawable/li_trade_adngrizhuanzhang"
+        android:text="@string/chaxun_tihuochaxun" />
+
+    <View style="@style/devider_orizontal" />
+
+    <TextView
+        android:id="@+id/tv_peihaochaxun"
+        style="@style/row_text"
+        android:drawableLeft="@drawable/li_trade_gfhgcc"
+        android:text="@string/chaxun_peihaochaxun"
+        android:visibility="gone" />
+
+    <View
+        style="@style/devider_orizontal"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/tv_zhongqianchaxun"
+        style="@style/row_text"
+        android:drawableLeft="@drawable/li_trade_historicaloftransfer"
+        android:text="@string/chaxun_zhongqianchaxun"
+        android:visibility="gone" />
+
+    <View
+        style="@style/devider_orizontal"
+        android:visibility="gone" />
+</LinearLayout>

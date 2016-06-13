@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:stretchColumns="*">
+
+    <TableRow
+        android:id="@+id/sell5_tr"
+        style="@style/trade_five_sellbuy_table_row">
+
+        <TextView
+            style="@style/Trade_Buy_Table_Name_Text_Style"
+            android:text="@string/sell5_label" />
+
+        <TextView
+            android:id="@+id/sell5_price_tv"
+            style="@style/Trade_Buy_Table_Price_Text_Style"
+            android:text="@string/winner_none" />
+
+        <TextView
+            android:id="@+id/sell5_amount_tv"
+            style="@style/Trade_Buy_Table_Volume_Text_Style"
+            android:text="@string/winner_none" />
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/sell4_tr"
+        style="@style/trade_five_sellbuy_table_row">
+
+        <TextView
+            style="@style/Trade_Buy_Table_Name_Text_Style"
+            android:text="@string/sell4_label" />
+
+        <TextView
+            android:id="@+id/sell4_price_tv"
+            style="@style/Trade_Buy_Table_Price_Text_Style"
+            android:text="@string/winner_none" />
+
+        <TextView
+            android:id="@+id/sell4_amount_tv"
+            style="@style/Trade_Buy_Table_Volume_Text_Style"
+            android:text="@string/winner_none" />
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/sell3_tr"
+        style="@style/trade_five_sellbuy_table_row">
+
+        <TextView
+            style="@style/Trade_Buy_Table_Name_Text_Style"
+            android:text="@string/sell3_label" />
+
+        <TextView
+            android:id="@+id/sell3_price_tv"
+            style="@style/Trade_Buy_Table_Price_Text_Style"
+            android:text="@string/winner_none" />
+
+        <TextView
+            android:id="@+id/sell3_amount_tv"
+            style="@style/Trade_Buy_Table_Volume_Text_Style"
+            android:text="@string/winner_none" />
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/sell2_tr"
+        style="@style/trade_five_sellbuy_table_row">
+
+        <TextView
+            style="@style/Trade_Buy_Table_Name_Text_Style"
+            android:text="@string/sell2_label" />
+
+        <TextView
+            android:id="@+id/sell2_price_tv"
+            style="@style/Trade_Buy_Table_Price_Text_Style"
+            android:text="@string/winner_none" />
+
+        <TextView
+            android:id="@+id/sell2_amount_tv"
+            style="@style/Trade_Buy_Table_Volume_Text_Style"
+            android:text="@string/winner_none" />
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/sell1_tr"
+        style="@style/trade_five_sellbuy_table_row">
+
+        <TextView
+            style="@style/Trade_Buy_Table_Name_Text_Style"
+            android:text="@string/sell1_label" />
+
+        <TextView
+            android:id="@+id/sell1_price_tv"
+            style="@style/Trade_Buy_Table_Price_Text_Style"
+            android:text="@string/winner_none" />
+
+        <TextView
+            android:id="@+id/sell1_amount_tv"
+            style="@style/Trade_Buy_Table_Volume_Text_Style"
+            android:text="@string/winner_none" />
+    </TableRow>
+
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="1.0px"
+        android:layout_marginBottom="2.0dip"
+        android:layout_marginTop="2.0dip"
+        android:background="@color/_cccccc" />
+
+    <TableRow
+        android:id="@+id/buy1_tr"
+        style="@style/trade_five_sellbuy_table_row">
+
+        <TextView
+            style="@style/Trade_Buy_Table_Name_Text_Style"
+            android:text="@string/buy1_label" />
+
+        <TextView
+            android:id="@+id/buy1_price_tv"
+            style="@style/Trade_Buy_Table_Price_Text_Style"
+            android:text="@string/winner_none" />
+
+        <TextView
+            android:id="@+id/buy1_amount_tv"
+            style="@style/Trade_Buy_Table_Volume_Text_Style"
+            android:text="@string/winner_none" />
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/buy2_tr"
+        style="@style/trade_five_sellbuy_table_row">
+
+        <TextView
+            style="@style/Trade_Buy_Table_Name_Text_Style"
+            android:text="@string/buy2_label" />
+
+        <TextView
+            android:id="@+id/buy2_price_tv"
+            style="@style/Trade_Buy_Table_Price_Text_Style"
+            android:text="@string/winner_none" />
+
+        <TextView
+            android:id="@+id/buy2_amount_tv"
+            style="@style/Trade_Buy_Table_Volume_Text_Style"
+            android:text="@string/winner_none" />
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/buy3_tr"
+        style="@style/trade_five_sellbuy_table_row">
+
+        <TextView
+            style="@style/Trade_Buy_Table_Name_Text_Style"
+            android:text="@string/buy3_label" />
+
+        <TextView
+            android:id="@+id/buy3_price_tv"
+            style="@style/Trade_Buy_Table_Price_Text_Style"
+            android:text="@string/winner_none" />
+
+        <TextView
+            android:id="@+id/buy3_amount_tv"
+            style="@style/Trade_Buy_Table_Volume_Text_Style"
+            android:text="@string/winner_none" />
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/buy4_tr"
+        style="@style/trade_five_sellbuy_table_row">
+
+        <TextView
+            style="@style/Trade_Buy_Table_Name_Text_Style"
+            android:text="@string/buy4_label" />
+
+        <TextView
+            android:id="@+id/buy4_price_tv"
+            style="@style/Trade_Buy_Table_Price_Text_Style"
+            android:text="@string/winner_none" />
+
+        <TextView
+            android:id="@+id/buy4_amount_tv"
+            style="@style/Trade_Buy_Table_Volume_Text_Style"
+            android:text="@string/winner_none" />
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/buy5_tr"
+        style="@style/trade_five_sellbuy_table_row">
+
+        <TextView
+            style="@style/Trade_Buy_Table_Name_Text_Style"
+            android:text="@string/buy5_label" />
+
+        <TextView
+            android:id="@+id/buy5_price_tv"
+            style="@style/Trade_Buy_Table_Price_Text_Style"
+            android:text="@string/winner_none" />
+
+        <TextView
+            android:id="@+id/buy5_amount_tv"
+            style="@style/Trade_Buy_Table_Volume_Text_Style"
+            android:text="@string/winner_none" />
+    </TableRow>
+
+    <View
+        android:id="@+id/limit_split"
+        android:layout_width="wrap_content"
+        android:layout_height="1.0px"
+        android:layout_marginBottom="2.0dip"
+        android:layout_marginTop="2.0dip"
+        android:background="@color/_cccccc"
+      />
+
+    <TableRow
+        android:id="@+id/upper_tr"
+        style="@style/trade_five_sellbuy_table_row"
+       >
+
+        <TextView
+            android:id="@+id/upper_price_wenzi_tv"
+            style="@style/Trade_Buy_Table_Name_Text_Style"
+            android:text="涨停价"
+            android:textColor="@color/red" />
+
+        <TextView
+            android:id="@+id/upper_price_tv"
+            style="@style/Trade_Buy_Table_Price_Text_Style"
+            android:text="@string/winner_none"
+            android:textColor="@color/red" />
+
+        <TextView style="@style/Trade_Buy_Table_Volume_Text_Style" />
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/lowwer_tr"
+        style="@style/trade_five_sellbuy_table_row"
+       >
+
+        <TextView
+            android:id="@+id/lowwer_price_wenzi_tv"
+            style="@style/Trade_Buy_Table_Name_Text_Style"
+            android:text="跌停价"
+            android:textColor="@color/green" />
+
+        <TextView
+            android:id="@+id/lowwer_price_tv"
+            style="@style/Trade_Buy_Table_Price_Text_Style"
+            android:text="@string/winner_none"
+            android:textColor="@color/green" />
+
+        <TextView style="@style/Trade_Buy_Table_Volume_Text_Style" />
+    </TableRow>
+</TableLayout>

@@ -1,0 +1,128 @@
+package com.puxtech.ybk.jiaoyi.adapter;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.Filter;
+import android.widget.Filterable;
+import android.widget.SpinnerAdapter;
+import android.widget.TextView;
+
+import com.puxtech.ybk.jiaoyi.entitydata.CommodityData;
+import com.puxtech.ybk.jiaoyi.entitydata.UserBankData;
+
+import java.util.ArrayList;
+
+public class ActCodeAdapter extends BaseAdapter implements Filterable {
+    ArrayList<CommodityData> mList;
+    ArrayList<CommodityData> unFilteruserBankDataArrayList;
+    ArrayList<CommodityData> showList;
+
+    Context context;
+    private ArrayFilter mFilter;
+
+    public ActCodeAdapter(Context context, ArrayList<CommodityData> mList) {
+
+        this.context = context;
+        this.mList = mList;
+
+    }
+
+    @Override
+    public View getDropDownView(int position, View convertView, ViewGroup parent) {
+
+
+        return super.getDropDownView(position, convertView, parent);
+    }
+
+    public int getCount() {
+        return mList.size();
+    }
+
+    @Override
+    public Object getItem(int position) {
+        return mList.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return 0;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+//        TextView text;
+//        text = new TextView(context);
+//        text.setText(userBankDataArrayList.get(position).getBANK_NAME());
+        convertView = LayoutInflater.from(context).inflate(android.R.layout.simple_spinner_dropdown_item, parent, false);
+        TextView text = (TextView) convertView.findViewById(android.R.id.text1);
+        text.setText(mList.get(position).getCode() + "-" + mList.get(position).getName());
+        return convertView;
+    }
+
+
+    public Filter getFilter() {
+        if (mFilter == null) {
+            mFilter = new ArrayFilter();
+        }
+        return mFilter;
+    }
+
+    private class ArrayFilter extends Filter {
+
+        @Override
+        protected FilterResults performFiltering(CharSequence prefix) {
+            FilterResults results = new FilterResults();
+
+            if (unFilteruserBankDataArrayList == null) {
+                unFilteruserBankDataArrayList = new ArrayList<>(mList);
+            } else if (prefix == null || prefix.length() == 0) {
+                ArrayList<CommodityData> list = unFilteruserBankDataArrayList;
+                results.values = list;
+                results.count = list.size();
+            } else {
+                String prefixString = prefix.toString().toLowerCase();
+
+                ArrayList<CommodityData> unfilteredValues = unFilteruserBankDataArrayList;
+                int count = unfilteredValues.size();
+
+                ArrayList<CommodityData> newValues = new ArrayList<>(count);
+
+                for (int i = 0; i < count; i++) {
+                    CommodityData pc = unfilteredValues.get(i);
+                    if (pc != null) {
+
+                        if (pc.getCode() != null && pc.getCode().contains(prefixString)) {
+
+                            newValues.add(pc);
+                        }
+                    }
+                }
+
+                results.values = newValues;
+                results.count = newValues.size();
+                showList=newValues;
+            }
+            return results;
+        }
+
+
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            mList = (ArrayList<CommodityData>) results.values;
+            if (results.count > 0) {
+                notifyDataSetChanged();
+            } else {
+                notifyDataSetInvalidated();
+            }
+
+        }
+    }
+    public ArrayList<CommodityData> getList(){
+        return showList;
+    }
+
+}

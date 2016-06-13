@@ -1,0 +1,181 @@
+package com.puxtech.ybk.jiaoyi.responsedata;
+
+import com.puxtech.ybk.Constant;
+import com.puxtech.ybk.MyApplication;
+import com.puxtech.ybk.jiaoyi.entitydata.HoldDetailData;
+import com.puxtech.ybk.jiaoyi.entitydata.TodayOrderData;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+
+/**
+ * Created by mac on 15/11/5.
+ */
+public class TodayOrderResponseData extends BaseResponseDataTrade {
+
+//    ORDERNO	数字
+//    FIRMID	字符串
+//    SUB_M_FIRMID	字符串
+//    B_FIRMID	数字
+//    COMMODITYID	字符串
+//    BS_FLAG	数字	1-买 2-卖
+//    ORDERTYPE	数字	1-市价委托 2-限价委托
+//    STATUS	数字	1-已委托 2-已成交
+//    3-已撤单 4-部分成交
+//    5-部分成交后撤单
+//    QUANTITY	数字
+//    UNTRADEQTY	数字
+//    ORDERTIME	数字
+//    PRICE	数字
+//    TRADERID	字符串
+//    WITHDRAWTIME
+//    WITHDRAWTYPE	数字	1-手动撤单 2-自动撤单
+//    3-闭市自动撤单
+//    4持仓已评
+//    CONSIGNERID	字符串
+//    WITHDRAWERID	字符串
+
+
+    private static final String TAG_ORDERNO = "ORDERNO";
+    private static final String TAG_FIRMID = "FIRMID";
+    private static final String TAG_SUB_M_FIRMID = "SUB_M_FIRMID";
+    private static final String TAG_B_FIRMID = "B_FIRMID";
+    private static final String TAG_COMMODITYID = "COMMODITYID";
+    private static final String TAG_BS_FLAG = "BS_FLAG";
+    private static final String TAG_ORDERTYPE = "ORDERTYPE";
+    private static final String TAG_STATUS = "STATUS";
+    private static final String TAG_QUANTITY = "QUANTITY";
+    private static final String TAG_UNTRADEQTY = "UNTRADEQTY";
+    private static final String TAG_ORDERTIME = "ORDERTIME";
+    private static final String TAG_PRICE = "PRICE";
+    private static final String TAG_TRADERID = "TRADERID";
+    private static final String TAG_WITHDRAWTIME = "WITHDRAWTIME";
+    private static final String TAG_WITHDRAWTYPE = "WITHDRAWTYPE";
+    private static final String TAG_CONSIGNERID = "CONSIGNERID";
+    private static final String TAG_WITHDRAWERID = "WITHDRAWERID";
+
+
+    ArrayList<TodayOrderData> dataArrayList;
+
+
+    public void parseXML(String jsString) {
+        try {
+            JSONObject root = checkFail(jsString);
+            if (retCode != 0) {
+                return;
+            }
+            JSONObject body = root.getJSONObject(TAG_MMTS)
+                    .getJSONObject(TAG_REP_BODY);
+
+            int recordNumber;
+            try {
+                recordNumber = body.getJSONArray(TAG_RESULTLIST).length();
+            } catch (JSONException e) {
+                e.printStackTrace();
+                recordNumber = 0;
+            }
+            dataArrayList = new ArrayList<>();
+            for (int j = 0; j < recordNumber; j++) {
+
+                JSONObject rec = body.getJSONArray(TAG_RESULTLIST)
+                        .getJSONObject(j);
+
+
+                TodayOrderData data = new TodayOrderData();
+
+
+                data.setORDERNO(rec.getString(TAG_ORDERNO));
+                data.setFIRMID(rec.getString(TAG_FIRMID));
+                data.setSUB_M_FIRMID(rec.getString(TAG_SUB_M_FIRMID));
+                data.setB_FIRMID(rec.getString(TAG_B_FIRMID));
+                data.setCOMMODITYID(rec.getString(TAG_COMMODITYID));
+                data.setBS_FLAG(rec.getString(TAG_BS_FLAG));
+                data.setBS_FLAG_CH(rec.getString(TAG_BS_FLAG).equals("1") ? Constant.MAI_RU : Constant.MAI_CHU);
+
+                String state;
+//                1-已委托 2-已成交
+//                3-已撤单 4-部分成交
+//                5-部分成交后撤单
+
+                switch (Integer.valueOf(rec.getString(TAG_STATUS))) {
+                    case 1:
+                        state = "已委托";
+                        break;
+                    case 2:
+                        state = "已成交";
+                        break;
+                    case 3:
+                        state = "已撤单";
+                        break;
+                    case 4:
+                        state = "部分成交";
+                        break;
+                    case 5:
+                        state = "部分成交后撤单";
+                        break;
+                    default:
+                        state = "未知状态";
+                        break;
+
+                }
+
+                data.setSTATUS_CH(state);
+
+//                委托类型	ORDERTYPE	数字	1-市价委托 2-限价委托
+                data.setORDERTYPE_CH(rec.getString(TAG_ORDERTYPE).equals("1") ? "市价委托" : "限价委托");
+                data.setORDERTYPE(rec.getString(TAG_ORDERTYPE));
+                data.setSTATUS(rec.getString(TAG_STATUS));
+                data.setQUANTITY(rec.getString(TAG_QUANTITY));
+                data.setUNTRADEQTY(rec.getString(TAG_UNTRADEQTY));
+                data.setORDERTIME(rec.getString(TAG_ORDERTIME));
+                data.setPRICE(rec.getString(TAG_PRICE));
+                data.setTRADERID(rec.getString(TAG_TRADERID));
+                data.setWITHDRAWTIME(rec.getString(TAG_WITHDRAWTIME));
+
+                String chedanType;
+//                撤单类型	WITHDRAWTYPE	数字	1-手动撤单 2-自动撤单
+//                3-闭市自动撤单
+//                4持仓已评
+                switch (Integer.valueOf(rec.getString(TAG_STATUS))) {
+                    case 1:
+                        chedanType = "手动撤单";
+                        break;
+                    case 2:
+                        chedanType = "自动撤单";
+                        break;
+                    case 3:
+                        chedanType = "闭市自动撤单";
+                        break;
+                    case 4:
+                        chedanType = "持仓已评";
+                        break;
+
+                    default:
+                        chedanType = "未知状态";
+                        break;
+
+                }
+                data.setWITHDRAWTYPE_CH(chedanType);
+                data.setWITHDRAWTYPE(rec.getString(TAG_WITHDRAWTYPE));
+                data.setCONSIGNERID(rec.getString(TAG_CONSIGNERID));
+                data.setWITHDRAWERID(rec.getString(TAG_WITHDRAWERID));
+                dataArrayList.add(data);
+            }
+//            myApplication.getTradeEntity().getTradeData().setHoldDetailDataList(holdDetailDataList);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            parseError();
+
+        }
+
+
+    }
+
+    public ArrayList<TodayOrderData> getDataArrayList() {
+        return dataArrayList;
+    }
+}

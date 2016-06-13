@@ -1,0 +1,357 @@
+package com.puxtech.ybk.hangqing.detail;
+
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.puxtech.ybk.R;
+import com.puxtech.ybk.hangqing.BaseHangQingFragment;
+import com.puxtech.ybk.hangqing.HangQingLogger;
+import com.puxtech.ybk.hangqing.charts.FormulaUtil;
+import com.puxtech.ybk.hangqing.charts.KLineChartModel;
+import com.puxtech.ybk.hangqing.charts.KLinePointModel;
+import com.puxtech.ybk.hangqing.charts.KLineView;
+import com.puxtech.ybk.hangqing.error.ErrorCode;
+import com.puxtech.ybk.hangqing.exception.HangQingBasicDataErrorException;
+import com.puxtech.ybk.hangqing.exception.SessionErrorException;
+import com.puxtech.ybk.hangqing.jsondata.RepData;
+import com.puxtech.ybk.hangqing.jsondata.getshortkline.GetShortKLineRepBody;
+import com.puxtech.ybk.hangqing.jsondata.getshortkline.KPointRecord;
+import com.puxtech.ybk.hangqing.protocol.RequestManager;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
+import java.util.Timer;
+import java.util.TimerTask;
+
+/**
+ * Created by fanshuo on 16/5/5.
+ */
+public class KXianFragment extends BaseHangQingFragment {
+
+    private static final int STATUS_EMPTY = 1;
+    private static final int STATUS_REQUESTING_ALL = 2;
+    private static final int STATUS_REFRESHING = 1;
+    private int commodityId;
+    private GetShortKLineRepBody getShortKLineRepBody;
+    private KLineView kLineView;
+    private int period;//周期id
+    private Timer refreshKLineTimer;
+    private AsyncTask<Void, Void, Boolean> refreshKLineTask;
+    private CustomViewPager parentViewPager;
+    private TextView period1TextView,period2TextView,period3TextView,period4TextView,period5TextView,period6TextView,period7TextView,period8TextView,period9TextView;
+    private int requestStatus;//当前请求状态
+
+    public static KXianFragment getFragment(int commodityId){
+        Bundle bundle = new Bundle();
+        bundle.putInt("commodityId", commodityId);
+        KXianFragment fragment = new KXianFragment();
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        commodityId = getArguments().getInt("commodityId");
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.hangqing_fragment_kxian, container, false);
+        kLineView = (KLineView) view.findViewById(R.id.kline_view);
+        period1TextView = (TextView) view.findViewById(R.id.period1);
+        period2TextView = (TextView) view.findViewById(R.id.period2);
+        period3TextView = (TextView) view.findViewById(R.id.period3);
+        period4TextView = (TextView) view.findViewById(R.id.period4);
+        period5TextView = (TextView) view.findViewById(R.id.period5);
+        period6TextView = (TextView) view.findViewById(R.id.period6);
+        period7TextView = (TextView) view.findViewById(R.id.period7);
+        period8TextView = (TextView) view.findViewById(R.id.period8);
+        period9TextView = (TextView) view.findViewById(R.id.period9);
+        kLineView.setOnShowListener(new KLineView.OnShowListener() {
+            @Override
+            public void onShow() {
+                parentViewPager.setCanScroll(false);
+            }
+
+            @Override
+            public void onHide() {
+                parentViewPager.setCanScroll(true);
+            }
+        });
+        period = 6;//默认周期为日，周期id=6
+        period6TextView.setSelected(true);
+        requestStatus = STATUS_EMPTY;
+        return view;
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if(isVisibleToUser){
+            if(requestStatus == STATUS_EMPTY|| requestStatus == STATUS_REQUESTING_ALL){
+                requestShortKLine();
+            }
+            if(requestStatus == STATUS_REFRESHING){
+                startRefreshKLine();
+            }
+        }
+        else{
+            if(refreshKLineTimer != null){
+                refreshKLineTimer.cancel();
+            }
+        }
+    }
+
+    public void setParentViewPager(CustomViewPager parentViewPager) {
+        this.parentViewPager = parentViewPager;
+    }
+
+    public void onPeriodButtonClick(View view){
+        int viewId = view.getId();
+        //取消选中所有按钮
+        period1TextView.setSelected(false);
+        period2TextView.setSelected(false);
+        period3TextView.setSelected(false);
+        period4TextView.setSelected(false);
+        period5TextView.setSelected(false);
+        period6TextView.setSelected(false);
+        period7TextView.setSelected(false);
+        period8TextView.setSelected(false);
+        period9TextView.setSelected(false);
+        view.setSelected(true);
+        if(viewId == R.id.period1){
+            period = 1;
+        }
+        if(viewId == R.id.period2){
+            period = 2;
+        }
+        if(viewId == R.id.period3){
+            period = 3;
+        }
+        if(viewId == R.id.period4){
+            period = 4;
+        }
+        if(viewId == R.id.period5){
+            period = 5;
+        }
+        if(viewId == R.id.period6){
+            period = 6;
+        }
+        if(viewId == R.id.period7){
+            period = 7;
+        }
+        if(viewId == R.id.period8){
+            period = 8;
+        }
+        if(viewId == R.id.period9){
+            period = 9;
+        }
+        requestStatus = STATUS_EMPTY;
+        kLineView.setkLineChartModel(null);
+        kLineView.invalidate();
+        requestShortKLine();
+    }
+
+    /**
+     * 获取k线
+     */
+    private void requestShortKLine(){
+        requestStatus = STATUS_REQUESTING_ALL;
+        new AsyncTask<Void, Void, Boolean>() {
+            String msg;
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                try {
+                    int marketId = myApplication.getHangQingData().getMarketId();
+                    int panId = myApplication.getHangQingData().getPanId();
+                    RequestManager requestManager = new RequestManager();
+                    JSONObject repJson = requestManager.getShortKLine(myApplication, marketId, panId, commodityId, period, -1, 0, 600);
+                    Gson gson = new Gson();
+                    TypeToken typeToken = new TypeToken<RepData<GetShortKLineRepBody>>(){};
+                    RepData<GetShortKLineRepBody> repData = gson.fromJson(repJson.toString(),typeToken.getType());
+                    int ret = repData.getMmts().getRepHeader().getRet();
+                    if(ret == 0){
+                        getShortKLineRepBody = repData.getMmts().getRepBody();
+                        return true;
+                    }
+                    else{
+                        msg = repData.getMmts().getRepHeader().getMsg();
+                        return false;
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    msg = "（"+ ErrorCode.ERROR_JSON_PARSE+"）";
+                    return false;
+                } catch (SessionErrorException e) {
+                    e.printStackTrace();
+                    msg = e.getMessage();
+                    return false;
+                } catch (HangQingBasicDataErrorException e) {
+                    e.printStackTrace();
+                    msg = e.getMessage();
+                    return false;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                super.onPostExecute(aBoolean);
+                if(aBoolean){
+                    if(getShortKLineRepBody.getTdll() == null || getShortKLineRepBody.getTdll().size() == 0){
+                        HangQingLogger.d("k线返回数据为空");
+                        return;
+                    }
+                    KLineChartModel kLineChartModel = new KLineChartModel();
+                    List<KPointRecord> kPointRecordList = getShortKLineRepBody.getTdll();
+                    List<KLinePointModel> kLinePointModelList = new ArrayList<>();
+                    for (int i = 0; i < kPointRecordList.size(); i++) {
+                        KPointRecord kPointRecord = kPointRecordList.get(i);
+                        KLinePointModel kLinePointModel = new KLinePointModel(kPointRecord.getTime(),kPointRecord.getOpep(),kPointRecord.getClop(),kPointRecord.getHigp(),kPointRecord.getLowp(),kPointRecord.getNvol(),kPointRecord.getPrid());
+                        kLinePointModelList.add(kLinePointModel);
+                    }
+                    kLineChartModel.setMcu(getShortKLineRepBody.getMcu());
+                    kLineChartModel.setPoints(kLinePointModelList);
+                    //计算pma和指标
+                    FormulaUtil formulaUtil = new FormulaUtil();
+                    formulaUtil.calAllPMA(kLineChartModel.getPoints());
+                    formulaUtil.calAllPointMACD(kLineChartModel.getPoints());
+                    formulaUtil.calAllPointKDJ(kLineChartModel.getPoints());
+                    formulaUtil.calAllUpOrDown(kLineChartModel.getPoints());
+                    kLineView.setkLineChartModel(kLineChartModel);
+                    kLineView.invalidate();
+
+                    //开始向右刷新k线
+                    startRefreshKLine();
+                }
+                else{
+                    //请求失败，不作任何处理
+                }
+            }
+        }.execute();
+    }
+
+    public void startRefreshKLine(){
+        requestStatus = STATUS_REFRESHING;
+        if(refreshKLineTimer != null){
+            refreshKLineTimer.cancel();
+        }
+        if (refreshKLineTask != null){
+            refreshKLineTask.cancel(true);
+        }
+        refreshKLineTimer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                refreshKLineTask = new AsyncTask<Void, Void, Boolean>() {
+                    String msg;
+                    GetShortKLineRepBody rep;
+                    @Override
+                    protected Boolean doInBackground(Void... params) {
+                        try {
+                            int marketId = myApplication.getHangQingData().getMarketId();
+                            int panId = myApplication.getHangQingData().getPanId();
+                            RequestManager requestManager = new RequestManager();
+                            List<KPointRecord> kPointRecordList = getShortKLineRepBody.getTdll();
+                            KPointRecord lastPoint = kPointRecordList.get(kPointRecordList.size() - 1);
+                            String lastTime;
+                            if(period == 1){
+                                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmm");
+                                simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT+08:00"));
+                                lastTime = simpleDateFormat.format(new Date(lastPoint.getTime()));
+                            }
+                            else{
+                                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+                                simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT+08:00"));
+                                lastTime = simpleDateFormat.format(new Date(lastPoint.getTime()));
+                            }
+                            long lastTimeLong = Long.parseLong(lastTime);
+                            JSONObject repJson = requestManager.getShortKLine(myApplication, marketId, panId, commodityId, period, lastTimeLong, 1, 600);
+                            Gson gson = new Gson();
+                            TypeToken typeToken = new TypeToken<RepData<GetShortKLineRepBody>>(){};
+                            RepData<GetShortKLineRepBody> repData = gson.fromJson(repJson.toString(),typeToken.getType());
+                            int ret = repData.getMmts().getRepHeader().getRet();
+                            if(ret == 0){
+                                rep = repData.getMmts().getRepBody();
+                                return true;
+                            }
+                            else{
+                                msg = repData.getMmts().getRepHeader().getMsg();
+                                return false;
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            msg = "（"+ ErrorCode.ERROR_JSON_PARSE+"）";
+                            return false;
+                        } catch (SessionErrorException e) {
+                            e.printStackTrace();
+                            msg = e.getMessage();
+                            return false;
+                        } catch (HangQingBasicDataErrorException e) {
+                            e.printStackTrace();
+                            msg = e.getMessage();
+                            return false;
+                        }
+                    }
+
+                    @Override
+                    protected void onPostExecute(Boolean aBoolean) {
+                        super.onPostExecute(aBoolean);
+                        if(aBoolean){
+                            if(rep.getTdll() == null || rep.getTdll().size() == 0){
+                                HangQingLogger.d("k线返回数据为空");
+                                return;
+                            }
+                            List<KPointRecord> kPointRecordList = rep.getTdll();
+                            List<KLinePointModel> kLinePointModelList = new ArrayList<>();
+                            for (int i = 0; i < kPointRecordList.size(); i++) {
+                                KPointRecord kPointRecord = kPointRecordList.get(i);
+                                KLinePointModel kLinePointModel = new KLinePointModel(kPointRecord.getTime(),kPointRecord.getOpep(),kPointRecord.getClop(),kPointRecord.getHigp(),kPointRecord.getLowp(),kPointRecord.getNvol(),kPointRecord.getPrid());
+                                kLinePointModelList.add(kLinePointModel);
+                            }
+                            getShortKLineRepBody.getTdll().remove(getShortKLineRepBody.getTdll().size()-1);
+                            getShortKLineRepBody.getTdll().addAll(kPointRecordList);
+                            kLineView.addNewPoints(kLinePointModelList);
+                            //计算pma和指标
+                            FormulaUtil formulaUtil = new FormulaUtil();
+                            formulaUtil.calAllPMA(kLineView.getkLineChartModel().getPoints());
+                            formulaUtil.calAllPointMACD(kLineView.getkLineChartModel().getPoints());
+                            formulaUtil.calAllPointKDJ(kLineView.getkLineChartModel().getPoints());
+                            kLineView.invalidate();
+                        }
+                        else{
+                            //请求失败，不作任何处理
+                        }
+                    }
+                }.execute();
+            }
+        };
+        refreshKLineTimer.schedule(task, 500, 2000);
+
+    }
+
+    public void stopRefreshKLine(){
+        if(refreshKLineTimer != null){
+            refreshKLineTimer.cancel();
+        }
+        if (refreshKLineTask != null){
+            refreshKLineTask.cancel(true);
+        }
+    }
+
+
+}

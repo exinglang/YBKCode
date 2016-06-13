@@ -1,0 +1,116 @@
+package com.puxtech.ybk.hangqing.controller;
+
+import android.content.Context;
+import android.content.Intent;
+import android.os.Handler;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.puxtech.ybk.MyApplication;
+import com.puxtech.ybk.hangqing.HangQingData;
+import com.puxtech.ybk.hangqing.error.ErrorCode;
+import com.puxtech.ybk.hangqing.exception.HangQingBasicDataErrorException;
+import com.puxtech.ybk.hangqing.exception.SessionErrorException;
+import com.puxtech.ybk.hangqing.jsondata.RepData;
+import com.puxtech.ybk.hangqing.jsondata.getpriceforcommodity.GetPriceForCommodityRepBody;
+import com.puxtech.ybk.hangqing.protocol.RequestManager;
+import com.puxtech.ybk.util.ActivityUtils;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Timer;
+import java.util.TimerTask;
+
+/**
+ * Created by fanshuo on 16/4/28.
+ */
+public class HangQingDetailController {
+
+    private Context context;
+    private Timer refreshPriceTimer;
+    private Handler handler;
+
+
+    public HangQingDetailController(Context context) {
+        this.context = context;
+        this.handler = new Handler();
+    }
+
+
+    //private methods
+
+
+
+    //public methods
+
+    /**
+     * 开始请求商品详情
+     */
+    public void startRequestPriceForCommodity(final int cid){
+        refreshPriceTimer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    MyApplication mApplication = (MyApplication) context.getApplicationContext();
+                    RequestManager requestManager = new RequestManager();
+                    int marketId = mApplication.getHangQingData().getMarketId();
+                    int panId = mApplication.getHangQingData().getPanId();
+                    if (cid == -1){
+                        return;
+                    }
+                    JSONObject repJson = requestManager.getPriceForCommodity(mApplication, marketId, panId, cid, 0, 0,0,5);
+                    Gson gson = new Gson();
+                    TypeToken typeToken = new TypeToken<RepData<GetPriceForCommodityRepBody>>(){};
+                    RepData<GetPriceForCommodityRepBody> repData = gson.fromJson(repJson.toString(),typeToken.getType());
+                    int ret = repData.getMmts().getRepHeader().getRet();
+                    if(ret == 0){
+                        //发送广播
+                        Intent intent = new Intent();
+                        intent.setAction(HangQingData.ACTION_PRICE_FOR_COMMODITY);
+                        intent.putExtra(HangQingData.BUNDLE_KEY_PRICE_FOR_COMMODITY, repData.getMmts().getRepBody());
+                        intent.setPackage(context.getPackageName());
+                        context.sendBroadcast(intent);
+                    }
+                    else{
+                        //TODO 获取失败
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            ActivityUtils.showAlert(context,"加载失败（"+ ErrorCode.ERROR_JSON_PARSE+"）");
+                        }
+                    });
+                } catch (final SessionErrorException e) {
+                    e.printStackTrace();
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            ActivityUtils.showAlert(context, "加载失败"+e.getMessage());
+                        }
+                    });
+                } catch (final HangQingBasicDataErrorException e) {
+                    e.printStackTrace();
+                    e.printStackTrace();
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            ActivityUtils.showAlert(context, "加载失败" + e.getMessage());
+                        }
+                    });
+                }
+            }
+        };
+        refreshPriceTimer.schedule(task,100,2000);
+    }
+
+    /**
+     * 停止请求商品详情
+     */
+    public void stopRequestPriceForCommodity(){
+        refreshPriceTimer.cancel();
+    }
+}

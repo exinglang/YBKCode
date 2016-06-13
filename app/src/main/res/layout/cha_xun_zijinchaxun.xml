@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    android:fitsSystemWindows="false">
+
+
+    <include layout="@layout/toolbar" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout style="@style/zijinchaxun_ll">
+
+            <TextView
+                style="@style/zijinchaxun_left_textview"
+                android:text="币种类别" />
+
+            <TextView
+                android:id="@+id/tv_bizhongleibie"
+                style="@style/zijinchaxun_right_textview" />
+        </LinearLayout>
+
+        <View style="@style/devider_orizontal" />
+
+        <LinearLayout style="@style/zijinchaxun_ll">
+
+            <TextView
+                style="@style/zijinchaxun_left_textview"
+                android:text="资金余额" />
+
+            <TextView
+                android:id="@+id/tv_zijinyue"
+                style="@style/zijinchaxun_right_textview" />
+        </LinearLayout>
+
+        <View style="@style/devider_orizontal" />
+
+        <LinearLayout style="@style/zijinchaxun_ll"
+            android:visibility="gone"
+            >
+
+            <TextView
+                style="@style/zijinchaxun_left_textview"
+                android:text="可用余额" />
+
+            <TextView
+                android:id="@+id/tv_keyongyue"
+                style="@style/zijinchaxun_right_textview" />
+        </LinearLayout>
+
+        <View style="@style/devider_orizontal"
+            android:visibility="gone"
+            />
+
+        <LinearLayout style="@style/zijinchaxun_ll">
+
+            <TextView
+                style="@style/zijinchaxun_left_textview"
+                android:text="可取资金" />
+
+            <TextView
+                android:id="@+id/tv_kequzijin"
+                style="@style/zijinchaxun_right_textview" />
+        </LinearLayout>
+
+        <View style="@style/devider_orizontal" />
+
+        <LinearLayout style="@style/zijinchaxun_ll">
+
+            <TextView
+                style="@style/zijinchaxun_left_textview"
+                android:text="市值" />
+
+            <TextView
+                android:id="@+id/tv_shizhi"
+                style="@style/zijinchaxun_right_textview" />
+        </LinearLayout>
+
+        <View style="@style/devider_orizontal" />
+
+        <LinearLayout style="@style/zijinchaxun_ll">
+
+            <TextView
+                style="@style/zijinchaxun_left_textview"
+                android:text="总资产" />
+
+            <TextView
+                android:id="@+id/tv_zongzichan"
+                style="@style/zijinchaxun_right_textview" />
+        </LinearLayout>
+
+        <View style="@style/devider_orizontal" />
+    </LinearLayout>
+
+
+</android.support.design.widget.CoordinatorLayout>

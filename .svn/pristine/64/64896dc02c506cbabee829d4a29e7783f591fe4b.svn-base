@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.puxtech.ybk" >
+
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <!-- 访问互联网的权限 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <application
+        android:name=".MyApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar" >
+
+        </activity>
+        <activity android:name=".qidong.WelcomeActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
+
+        <!-- 请求目录服务器需要的APP_KEY -->
+        <meta-data
+            android:name="YBK_APP_KEY"
+            android:value="c8c95066-8f8a-4507-9373-67e7d98eca9c" />
+        <!-- 目录服务器地址1 -->
+        <meta-data
+            android:name="YBK_CONTENTSERVER_URL_1"
+            android:value="http://101.200.90.95:8180/quotation_catalogue/query.do" />
+        <!-- 目录服务器地址2 -->
+        <meta-data
+            android:name="YBK_CONTENTSERVER_URL_2"
+            android:value="http://101.200.73.201:8180/quotation_catalogue/query.do" />
+    </application>
+
+</manifest>

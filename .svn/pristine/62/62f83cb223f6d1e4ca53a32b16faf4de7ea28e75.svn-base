@@ -1,0 +1,129 @@
+package com.puxtech.ybk.util;
+
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
+
+import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.text.TextUtils;
+import android.util.Base64;
+import android.view.LayoutInflater;
+import android.view.View;
+
+import android.widget.TextView;
+
+import com.puxtech.ybk.MyApplication;
+import com.puxtech.ybk.R;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+/**
+ * Created by mac on 15/11/4.
+ */
+public class ActivityUtils {
+
+    /**
+     * 进度圈对话框
+     *
+     * @param context
+     * @return
+     */
+    public static Dialog showLoadingProgressDialog(Context context) {
+        View view = LayoutInflater.from(context).inflate(
+                R.layout.view_progress_dialog, null);
+
+        Dialog dialog = new Dialog(context,
+                R.style.Dialog_Transparent);
+        dialog.setContentView(view);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+        return dialog;
+    }
+    // 将long型时间转化为可读格式
+    public static String millisTime(long time) {
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                .format(new Date(time));
+    }
+    /**
+     * 带标题的进度圈对话框，没有标题，自定义内容
+     *
+     * @param context
+     * @return
+     */
+    public static Dialog showLoadingProgressDialog(Context context,
+                                                   String message) {
+        View view = LayoutInflater.from(context).inflate(
+                R.layout.view_progress_dialog, null);
+        if (!TextUtils.isEmpty(message)) {
+            TextView tv_message = (TextView) view.findViewById(R.id.tv_message);
+            tv_message.setText(message);
+        }
+        Dialog dialog = new Dialog(context,
+                R.style.Dialog_Transparent);
+        dialog.setContentView(view);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+        return dialog;
+    }
+
+    /**
+     * 获得每次用户上传的id 要求同一个用户在不同的时间上传不同的id，不同的用户在
+     */
+    public static String getId() {
+        // String zid = myapp.getZid();
+        long time = System.currentTimeMillis();
+        // return bytesToHexString(MD5.getMD5(zid + time));
+        return bytesToHexString(MD5.getMD5(String.valueOf(time)));
+    }
+
+    //BASE64编码转为IMG
+    public static Bitmap getBitmap(String imgBase64Str){
+        try {
+            byte[] bitmapArray;
+            bitmapArray = Base64.decode(imgBase64Str, Base64.DEFAULT);
+            return BitmapFactory.decodeByteArray(bitmapArray, 0, bitmapArray.length);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+
+    }
+
+    /**
+     * 将byte数组转化为16进制字符串
+     *
+     * @param src
+     * @return
+     */
+    public static String bytesToHexString(byte[] src) {
+        StringBuilder stringBuilder = new StringBuilder("");
+        if (src == null || src.length <= 0) {
+            return null;
+        }
+        for (int i = 0; i < src.length; i++) {
+            int v = src[i] & 0xFF;
+            String hv = Integer.toHexString(v);
+            if (hv.length() < 2) {
+                stringBuilder.append(0);
+            }
+            stringBuilder.append(hv);
+        }
+        return stringBuilder.toString();
+    }
+    public static void showAlert(Context context, String msg) {
+        // if (isVisabing)
+        new AlertDialog.Builder(context)
+
+                .setMessage(msg)
+                .setPositiveButton(R.string.confirm,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,
+                                                int which) {
+                                dialog.cancel();
+                            }
+                        }).setCancelable(false).show();
+    }
+}

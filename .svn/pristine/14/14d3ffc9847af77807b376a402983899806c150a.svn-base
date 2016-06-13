@@ -1,0 +1,42 @@
+package com.puxtech.ybk.jiaoyi.page;
+
+import android.app.Fragment;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import com.puxtech.ybk.BaseFragment;
+import com.puxtech.ybk.R;
+
+
+public class TradeChaXun extends BaseFragment {
+    View view;
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        view =inflater.inflate(R.layout.fragment_trade_cha_xun, container, false);
+        initWidget();
+        return  view;
+    }
+    TextView tv_zijinchaxun,tv_shangpinchicang,tv_dangriweituo,tv_dangrichengjiao,tv_lishichengjiao,tv_peihaochaxun,tv_zhongqianchaxun;
+    private void initWidget() {
+        tv_zijinchaxun=(TextView)view.findViewById(R.id.tv_zijinchaxun);
+        tv_shangpinchicang=(TextView)view.findViewById(R.id.tv_shangpinchicang);
+        tv_dangriweituo=(TextView)view.findViewById(R.id.tv_dangriweituo);
+        tv_dangrichengjiao=(TextView)view.findViewById(R.id.tv_dangrichengjiao);
+        tv_lishichengjiao=(TextView)view.findViewById(R.id.tv_lishichengjiao);
+        tv_peihaochaxun=(TextView)view.findViewById(R.id.tv_peihaochaxun);
+        tv_zhongqianchaxun=(TextView)view.findViewById(R.id.tv_zhongqianchaxun);
+
+    }
+
+
+}

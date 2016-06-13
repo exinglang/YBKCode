@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/listview_ll"
+
+    android:orientation="horizontal">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/listview_ll_tv_content_left"
+
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_1"
+            style="@style/listview_ll_tv_content_left"
+            android:text="--" />
+
+        <TextView
+            android:id="@+id/tv_2"
+            style="@style/listview_ll_tv_content_left"
+            android:text="--" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_height="wrap_content"
+        style="@style/listview_ll_tv_content_center_long"
+        android:layout_width="wrap_content"
+        android:layout_weight="0"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_3"
+            style="@style/listview_ll_tv_content_left"
+            android:text="--" />
+
+        <TextView
+            android:id="@+id/tv_4"
+            style="@style/listview_ll_tv_content_center_long"
+
+            android:text="--" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/listview_ll_tv_content_right"
+
+        android:orientation="vertical">
+
+
+        <TextView
+            android:id="@+id/tv_5"
+            style="@style/listview_ll_tv_content_center_long"
+            android:layout_width="wrap_content"
+            android:layout_weight="0"
+            android:text="--" />
+
+        <TextView
+            android:id="@+id/tv_6"
+            style="@style/listview_ll_tv_content_right"
+            android:text="--" />
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,78 @@
+package com.puxtech.ybk.jiaoyi.page;
+
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import com.puxtech.ybk.jiaoyi.Logger;
+import com.puxtech.ybk.jiaoyi.TradeHelper;
+import com.puxtech.ybk.jiaoyi.entitydata.CommodityData;
+
+public class TradeMaiChu extends TradeMai {
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        MAI_TYPE = MAI_CHU;
+        return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        Logger.v("MAI_CHUisVisibleToUser:" + isVisibleToUser);
+        try {
+            if (isVisibleToUser) {
+                if (TradeHelper.getCommodityDataByCode(context, act_code.getText().toString()) == null || act_code.getText().toString().equals("")) {
+                    clearWidget();
+                    try {
+                        myApplication.getHangQingData().stopRefreshHangQingDetail();
+                    } catch (Exception e) {
+
+                    }
+
+                } else {
+                    CommodityData commodityData = TradeHelper.getCommodityDataByCode(context, act_code.getText().toString());
+                    selectedCommodity(commodityData);
+
+                }
+
+            }
+        }catch (Exception e) {
+
+        }
+        super.setUserVisibleHint(isVisibleToUser);
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        Logger.v("MAI_CHUhidden:" + hidden);
+
+        if (hidden){
+            clearWidget();
+
+            try {
+                myApplication.getHangQingData().stopRefreshHangQingDetail();
+            }catch (Exception e){
+
+            }
+
+        }
+        else{
+            try {
+                myApplication.getHangQingData().stopRefreshHangQingDetail();
+            }catch (Exception e){
+
+            }
+
+        }
+        super.onHiddenChanged(hidden);
+    }
+
+}

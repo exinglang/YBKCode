@@ -1,0 +1,312 @@
+package com.puxtech.ybk.util;
+
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
+
+import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.text.TextUtils;
+import android.util.Base64;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.puxtech.ybk.MyApplication;
+import com.puxtech.ybk.R;
+
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
+/**
+ * Created by mac on 15/11/4.
+ */
+public class ActivityUtils {
+    public static void showCenterToast(Context context, CharSequence text,
+                                       int duration) {
+        Toast toast = null;
+        toast = Toast.makeText(context, text, duration);
+        if (toast != null) {
+            LayoutInflater inflater = LayoutInflater.from(context);
+            View layout = inflater.inflate(R.layout.toastlayout, null);
+            TextView tv_content = (TextView) layout
+                    .findViewById(R.id.tv_content);
+            tv_content.setText(text);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.setView(layout);
+            toast.setDuration(duration);
+            toast.show();
+        }
+    }
+
+    /**
+     * 将指定字符串转换成保留两位的double形式
+     *
+     * @param d
+     * @return
+     * @throws Exception
+     */
+    public static String changeDouble(String d) throws NumberFormatException {
+
+        BigDecimal bd1 = new BigDecimal(d);
+        try {
+            bd1 = bd1.setScale(2, BigDecimal.ROUND_HALF_UP);
+        } catch (NumberFormatException e) {
+        }
+        return bd1.toString();
+    }
+    /**
+     * 将yyyy-MM-dd转为毫秒,多线程时,可能出现转换时间不对的问题,此处直接设置为00:00:00
+     *
+     * @param yyyymmdd
+     * @return
+     */
+    public static String getTimeMillisFromYYYYMMDDset000000(String yyyymmdd, boolean addUTC) {
+
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");// 设置日期格式
+        Long timeMillis1 = null;
+        try {
+            Date date = df.parse(yyyymmdd);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
+            timeMillis1 = calendar.getTimeInMillis();//        if (start.after(end)) {
+            if (addUTC) {
+                timeMillis1 = addUTCTime(timeMillis1);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return timeMillis1 + "";
+    }
+
+    public static String getTimeMillisFromYYYYMMDDset235959(String yyyymmdd, boolean addUTC) {
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");// 设置日期格式
+        Long timeMillis1 = null;
+        try {
+            Date date = df.parse(yyyymmdd);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), 23, 59, 59);
+
+
+            timeMillis1 = calendar.getTimeInMillis();//        if (start.after(end)) {
+            if (addUTC) {
+                timeMillis1 = addUTCTime(timeMillis1);
+            }
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return timeMillis1 + "";
+    }
+    /**
+     * 将yyyy-MM-dd转为毫秒
+     *
+     * @param yyyymmdd
+     * @return
+     */
+    public static String getTimeMillisFromYYYYMMDD(String yyyymmdd) {
+
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");// 设置日期格式
+        Long timeMillis1 = null;
+        try {
+            Date date = df.parse(yyyymmdd);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+            timeMillis1 = calendar.getTimeInMillis();//        if (start.after(end)) {
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return timeMillis1 + "";
+    }
+    //因服务器将传过去时间的作了UTC转换,但实际前置内核查询并未转换时间,所以此处做逆向操作,将查询的时间,加上相应的UTC时差
+    public static long addUTCTime(long timeMillis) {
+
+        Calendar cal = Calendar.getInstance(Locale.getDefault());
+        int zoneOffset = cal.get(java.util.Calendar.ZONE_OFFSET);
+        int dstOffset = cal.get(java.util.Calendar.DST_OFFSET);
+
+        timeMillis = timeMillis + zoneOffset + dstOffset;//        if (start.after(end)) {
+
+
+        return timeMillis;
+    }
+
+    /**
+     * 进度圈对话框
+     *
+     * @param context
+     * @return
+     */
+    public static Dialog showLoadingProgressDialog(Context context) {
+        View view = LayoutInflater.from(context).inflate(
+                R.layout.view_progress_dialog, null);
+
+        Dialog dialog = new Dialog(context,
+                R.style.Dialog_Transparent);
+        dialog.setContentView(view);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+        return dialog;
+    }
+    // 将long型时间转化为可读格式
+    public static String millisTime(long time) {
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                .format(new Date(time));
+    }
+    /**
+     * 将 String类型的参数转换成2012-01-02 09:21:11 格式的时间类型
+     *
+     * @param data 1970 - 1 -1 0：0 ：0 至指定时间的毫秒数
+     * @return
+     */
+    public static String getRealData(String data) {
+        SimpleDateFormat sdf5 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date d = new Date(Long.valueOf(data));
+        return sdf5.format(d);
+    }
+    /**
+     * 将String类型的参数转换成2012-01-02 格式的时间类型
+     *
+     * @param data 1970 - 1 -1 0：0 ：0 至指定时间的毫秒数
+     * @return
+     */
+    public static String getRealDataFixDay(String data) {
+        SimpleDateFormat sdf5 = new SimpleDateFormat("yyyy-MM-dd");
+        Date d = new Date(Long.valueOf(data));
+        return sdf5.format(d);
+    }
+    /**
+     * 带标题的进度圈对话框，没有标题，自定义内容
+     *
+     * @param context
+     * @return
+     */
+    public static Dialog showLoadingProgressDialog(Context context,
+                                                   String message) {
+        View view = LayoutInflater.from(context).inflate(
+                R.layout.view_progress_dialog, null);
+        if (!TextUtils.isEmpty(message)) {
+            TextView tv_message = (TextView) view.findViewById(R.id.tv_message);
+            tv_message.setText(message);
+        }
+        Dialog dialog = new Dialog(context,
+                R.style.Dialog_Transparent);
+        dialog.setContentView(view);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+        return dialog;
+    }
+
+    /**
+     * 获得每次用户上传的id 要求同一个用户在不同的时间上传不同的id，不同的用户在
+     */
+    public static String getId() {
+        // String zid = myapp.getZid();
+        long time = System.currentTimeMillis();
+        // return bytesToHexString(MD5.getMD5(zid + time));
+        return bytesToHexString(MD5.getMD5(String.valueOf(time)));
+    }
+
+    //BASE64编码转为IMG
+    public static Bitmap getBitmap(String imgBase64Str){
+        try {
+            byte[] bitmapArray;
+            bitmapArray = Base64.decode(imgBase64Str, Base64.DEFAULT);
+            return BitmapFactory.decodeByteArray(bitmapArray, 0, bitmapArray.length);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+
+    }
+
+    /**
+     * 将byte数组转化为16进制字符串
+     *
+     * @param src
+     * @return
+     */
+    public static String bytesToHexString(byte[] src) {
+        StringBuilder stringBuilder = new StringBuilder("");
+        if (src == null || src.length <= 0) {
+            return null;
+        }
+        for (int i = 0; i < src.length; i++) {
+            int v = src[i] & 0xFF;
+            String hv = Integer.toHexString(v);
+            if (hv.length() < 2) {
+                stringBuilder.append(0);
+            }
+            stringBuilder.append(hv);
+        }
+        return stringBuilder.toString();
+    }
+    public static void showAlert(Context context, String msg) {
+        // if (isVisabing)
+        new AlertDialog.Builder(context)
+
+                .setMessage(msg)
+                .setPositiveButton(R.string.confirm,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,
+                                                int which) {
+                                dialog.cancel();
+                            }
+                        }).setCancelable(false).show();
+    }
+    /**
+     * 显示一个包含是否两个按钮的提示
+     *
+     * @param
+     */
+    public static void showAlertWithConfirmText(Context context, String alertText, String confirmText, final Runnable confirmRunnable) {
+        AlertDialog.Builder bd = new AlertDialog.Builder(context);
+        bd.setMessage(alertText);
+        bd.setPositiveButton(confirmText,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        confirmRunnable.run();
+                    }
+                });
+        bd.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        bd.show();
+    }
+    /**
+     * 得到 YYYY-MM-DD格式的字符串
+     *
+     * @param timeMillis
+     * @return
+     */
+    public static String getYYYYMMDDforTimeMillis(long timeMillis) {
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");// 设置日期格式
+        String date = df.format(new Date(timeMillis));
+        return date;
+    }
+    public static int dip2px(Context context, float dpValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
+    }
+
+    public static int px2dip(Context context, float pxValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (pxValue / scale + 0.5f);
+    }
+}

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar_only" />
+
+
+    <View style="@style/devider_orizontal" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/large_padding"
+        android:layout_marginTop="@dimen/large_padding"
+
+        android:text="行情" />
+
+    <ListView
+
+        android:id="@+id/listView_hangqin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <View style="@style/devider_orizontal" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/large_padding"
+        android:layout_marginTop="@dimen/large_padding"
+        android:text="交易" />
+
+    <ListView
+
+        android:id="@+id/listView_trade"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <View style="@style/devider_orizontal" />
+
+    <Button
+        android:id="@+id/bt_ok"
+        style="@style/fill_button"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dip"
+        android:text="测速" />
+
+    />"
+
+</LinearLayout>

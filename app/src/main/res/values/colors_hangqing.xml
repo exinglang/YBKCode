@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="hangqing_list_row_header_text_blue">#75b5e3</color>
+    <color name="hangqing_red_text">#ff1717</color>
+    <color name="hangqing_green_text">#17e100</color>
+    <color name="hangqing_yellow_text">#f2e400</color>
+    <color name="hangqing_white_text">#ffffff</color>
+    <color name="hangqing_list_row_header_bg">#251f21</color>
+    <color name="hangqing_list_bg">#212121</color>
+
+    <!-- 分时数据价格线的颜色 -->
+    <color name="fenshi_price_line">#FFFFFF</color>
+    <!-- 分时数据价格线的填充颜色 -->
+    <color name="fenshi_price_fill">#330000ff</color>
+    <!-- 框架和虚线 -->
+    <color name="fenshi_frame_line_dash">#393b47</color>
+    <!--十字线颜色-->
+    <color name="hangqing_cross_line">#EA6300</color>
+    <!--行情详情顶部价格名称-->
+    <color name="hangqing_detail_top_price_name">#d4d4d4</color>
+    <!--行情详情五档名称文字-->
+    <color name="hangqing_detail_wd_name">#898989</color>
+
+    <color name="hangqing_kline_pma5">#ffffffff</color>
+    <color name="hangqing_kline_pma10">#B9A51E</color>
+    <color name="hangqing_kline_pma20">#C81E5E</color>
+    <color name="hangqing_kline_pma30">#0099BD</color>
+    <color name="hangqing_kline_macd">#C81E5E</color>
+    <color name="hangqing_kline_dif">#AEAAA9</color>
+    <color name="hangqing_kline_dea">#B9A51E</color>
+
+    <!--k线周期小按钮-->
+    <color name="hangqing_period_btn_bg_normal">#00000000</color>
+    <color name="hangqing_period_btn_bg_selected">#FF1F1D1E</color>
+    <color name="hangqing_period_btn_text_normal">#686667</color>
+    <color name="hangqing_period_btn_text_selected">#FFFFFF</color>
+</resources>

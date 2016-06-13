@@ -1,0 +1,115 @@
+package com.puxtech.ybk.jiaoyi.page;
+
+import android.app.Fragment;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import com.puxtech.ybk.BaseFragment;
+import com.puxtech.ybk.R;
+
+
+public class TradeChaXun extends BaseTradeFragment implements View.OnClickListener {
+    View view;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        view = inflater.inflate(R.layout.fragment_trade_cha_xun, container, false);
+        initWidget();
+        return view;
+    }
+
+    TextView tv_zijinchaxun, tv_shangpinchicang, tv_dangriweituo, tv_dangrichengjiao, tv_lishichengjiao, tv_peihaochaxun, tv_zhongqianchaxun;
+    TextView tv_shenggouchaxun, tv_tuoguanchaxun, tv_tihuochaxun,tv_gonggao;
+
+    private void initWidget() {
+        tv_zijinchaxun = (TextView) view.findViewById(R.id.tv_zijinchaxun);
+        tv_gonggao = (TextView) view.findViewById(R.id.tv_gonggao);
+        tv_shangpinchicang = (TextView) view.findViewById(R.id.tv_shangpinchicang);
+        tv_dangriweituo = (TextView) view.findViewById(R.id.tv_dangriweituo);
+        tv_dangrichengjiao = (TextView) view.findViewById(R.id.tv_dangrichengjiao);
+        tv_lishichengjiao = (TextView) view.findViewById(R.id.tv_lishichengjiao);
+        tv_peihaochaxun = (TextView) view.findViewById(R.id.tv_peihaochaxun);
+        tv_zhongqianchaxun = (TextView) view.findViewById(R.id.tv_zhongqianchaxun);
+        tv_shenggouchaxun = (TextView) view.findViewById(R.id.tv_shenggouchaxun);
+        tv_tuoguanchaxun = (TextView) view.findViewById(R.id.tv_tuoguanchaxun);
+        tv_tihuochaxun = (TextView) view.findViewById(R.id.tv_tihuochaxun);
+
+        tv_shenggouchaxun.setOnClickListener(this);
+        tv_gonggao.setOnClickListener(this);
+        tv_tuoguanchaxun.setOnClickListener(this);
+        tv_tihuochaxun.setOnClickListener(this);
+        tv_zijinchaxun.setOnClickListener(this);
+        tv_shangpinchicang.setOnClickListener(this);
+        tv_dangriweituo.setOnClickListener(this);
+        tv_dangrichengjiao.setOnClickListener(this);
+        tv_lishichengjiao.setOnClickListener(this);
+        tv_peihaochaxun.setOnClickListener(this);
+        tv_zhongqianchaxun.setOnClickListener(this);
+
+    }
+
+
+    @Override
+    public void onClick(View v) {
+        Intent intent = new Intent();
+        switch (v.getId()) {
+
+            case R.id.tv_zijinchaxun:
+                intent.setClass(context, TradeChaXunZiJinChaXun.class);
+
+                break;
+            case R.id.tv_gonggao:
+                intent.setClass(context, TradeChaXunGongGao.class);
+
+                break;
+
+            case R.id.tv_shangpinchicang:
+                intent.setClass(context, TradeChaXunShangPinChiCang.class);
+
+                break;
+            case R.id.tv_dangriweituo:
+                intent.setClass(context, TradeChaXunDangRiWeiTuo.class);
+
+                break;
+            case R.id.tv_dangrichengjiao:
+                intent.setClass(context, TradeChaXunDangRiChengJiao.class);
+
+                break;
+            case R.id.tv_lishichengjiao:
+                intent.setClass(context, TradeChaXunLiShiChengJiao.class);
+
+                break;
+            case R.id.tv_peihaochaxun:
+                intent.setClass(context, TradeChaXunPeiHaoChaXun.class);
+
+                break;
+            case R.id.tv_zhongqianchaxun:
+                intent.setClass(context, TradeChaXunZhongQianChaXun.class);
+
+                break;
+            case R.id.tv_shenggouchaxun:
+                intent.setClass(context, TradeChaXunShengGouChaXun.class);
+
+                break; case R.id.tv_tuoguanchaxun:
+                intent.setClass(context, TradeChaXunTuoGuanChaXun.class);
+
+                break; case R.id.tv_tihuochaxun:
+                intent.setClass(context, TradeChaXunTiHuoChaXun.class);
+
+                break;
+        }
+        startActivity(intent);
+
+    }
+}

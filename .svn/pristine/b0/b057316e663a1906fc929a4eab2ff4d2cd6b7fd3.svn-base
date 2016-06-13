@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">@color/ybk_red</color>
+    <color name="colorPrimaryDark">@color/ybk_red</color>
+    <color name="colorAccent">@color/ybk_red</color>
+
+    <color name="tab_title_bar_red_bg">@color/ybk_red</color>
+
+
+
+</resources>

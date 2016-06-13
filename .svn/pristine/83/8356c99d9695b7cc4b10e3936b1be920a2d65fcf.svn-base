@@ -1,0 +1,415 @@
+<resources xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+    <!-- toolbar弹出菜单样式 -->
+    <style name="ToolbarPopupTheme" parent="@style/ThemeOverlay.AppCompat">
+        <item name="android:colorBackground">@color/ybk_red</item>
+    </style>
+
+    <!-- toolbar菜单样式 -->
+    <style name="ToolbarTheme" parent="@style/ThemeOverlay.AppCompat.ActionBar">
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="actionMenuTextColor">@android:color/white</item>
+        <item name="subtitleTextColor">@android:color/white</item>
+        <!--<item name="actionMenuTextAppearance">@style/ToolbarMenuTextSize</item>-->
+    </style>
+
+    <style name="toolbar">
+        <item name="popupTheme">@style/ToolbarPopupTheme</item>
+        <item name="theme">@style/ToolbarTheme</item>
+        <item name="android:id" tools:ignore="AaptCrash">@+id/toolbar</item>
+
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <!--<item name="android:minHeight">45dp</item>-->
+        <item name="android:background">?attr/colorPrimary</item>
+    </style>
+
+    <style name="trade_login_tabrow_style">
+        <item name="android:gravity">center</item>
+        <item name="android:padding">0.0dip</item>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_marginBottom">10.0dip</item>
+    </style>
+
+    <style name="trade_login_label_style">
+        <item name="android:textSize">?attr/middle</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:gravity">right|center</item>
+        <item name="android:paddingRight">6.0dip</item>
+        <item name="android:layout_width">80.0dip</item>
+        <item name="android:layout_height">fill_parent</item>
+    </style>
+
+    <style name="fill_button">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/login_confirm_btn_bg</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">?attr/middle</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+
+    <style name="trade_check_style" parent="@android:style/Widget.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/btn_checkbox_bg</item>
+    </style>
+
+    <style name="Dialog_Transparent">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+
+    <style name="titleBar">
+        <item name="android:layout_height">50dp</item>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:paddingRight">4dp</item>
+        <item name="android:background">@drawable/login_confirm_btn_bg</item>
+    </style>
+
+    <style name="titleText">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_centerInParent">true</item>
+        <item name="android:textSize">?attr/large</item>
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
+    <style name="backButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:paddingLeft">17dip</item>
+        <item name="android:paddingRight">80dip</item>
+        <item name="android:layout_height">48dip</item>
+        <item name="android:src">@drawable/ic_back</item>
+        <item name="android:background">@null</item>
+        <item name="android:layout_alignParentLeft">true</item>
+        <item name="android:layout_centerVertical">true</item>
+    </style>
+
+    <style name="tablayout">
+        <item name="tabGravity">center</item>
+        <item name="tabIndicatorColor">@color/ybk_red</item>
+        <item name="tabMode">scrollable</item>
+        <item name="tabSelectedTextColor">@color/black</item>
+        <item name="tabTextColor">@color/black</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="tabTextAppearance">@style/MyTabLayoutTextAppearance</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="MyTabLayoutTextAppearance" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textSize">?attr/small</item>
+    </style>
+    <style name="listview_ll">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">@dimen/common_padding</item>
+    </style>
+
+
+    <style name="common_spinner">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">40.0dip</item>
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:background">@drawable/selectbox</item>
+        <item name="android:drawSelectorOnTop">true</item>
+        <item name="android:paddingLeft">13.0dip</item>
+        <item name="android:textSize">?attr/middle</item>
+    </style>
+
+    <style name="common_right_row">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">40.0dip</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:paddingLeft">13.0dip</item>
+        <item name="android:scrollHorizontally">true</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textSize">?attr/middle</item>
+        <item name="android:gravity">center_vertical</item>
+
+    </style>
+
+    <style name="common_textview" parent="common_right_row"></style>
+
+    <style name="common_edittext" parent="common_right_row">
+        <item name="android:background">@drawable/trade_edittext</item>
+    </style>
+
+
+    <style name="textview_time_select" parent="common_right_row">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">5dp</item>
+        <item name="android:layout_marginRight">5dp</item>
+        <item name="android:background">@drawable/textview_corners_bg</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:padding">3dp</item>
+        <item name="android:paddingLeft">6dp</item>
+        <item name="android:paddingRight">6dp</item>
+        <item name="android:text">2012/04/05</item>
+        <item name="android:drawableRight">@drawable/drop_down_arrow</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">?attr/middle</item>
+
+    </style>
+
+
+    <style name="xia_dan_textview">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/xiadan_textview_blue</item>
+        <item name="android:textSize">?attr/middle</item>
+
+    </style>
+
+    <style name="xia_dan_textview_four">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/xiadan_textview_blue</item>
+        <item name="android:textSize">?attr/small</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:background">@drawable/btn_quanchang</item>
+
+
+    </style>
+
+    <style name="xia_dan_edittext">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">?attr/middle</item>
+        <item name="android:layout_weight">1</item>
+
+    </style>
+
+    <style name="xia_dan_textview_right">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">?attr/middle</item>
+        <item name="android:layout_weight">1</item>
+
+    </style>
+
+    <style name="listview_title_ll" parent="listview_ll">
+        <item name="android:background">@color/listview_title_bg</item>
+
+    </style>
+
+    <style name="listview_ll_tv">
+        <item name="android:textSize">?attr/middle</item>
+
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">1</item>
+    </style>
+
+    <style name="listview_ll_tv_title_color" parent="listview_ll_tv">
+        <item name="android:textColor">@color/listview_title_text_color</item>
+    </style>
+
+    <style name="listview_ll_tv_title_left" parent="listview_ll_tv_title_color">
+        <item name="android:gravity">left</item>
+    </style>
+
+    <style name="listview_ll_tv_title_center" parent="listview_ll_tv_title_color">
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:layout_weight">0.8</item>
+
+    </style>
+
+    <style name="listview_ll_tv_title_right" parent="listview_ll_tv_title_color">
+        <item name="android:gravity">right</item>
+    </style>
+
+    <style name="listview_ll_tv_title_right_action">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/listview_title_text_color</item>
+        <item name="android:paddingLeft">35dp</item>
+        <item name="android:textSize">?attr/middle</item>
+
+
+    </style>
+
+    <style name="listview_ll_tv_content_left" parent="listview_ll_tv">
+        <item name="android:gravity">left|center_vertical</item>
+    </style>
+
+    <style name="listview_ll_tv_content_center" parent="listview_ll_tv">
+        <item name="android:layout_weight">1.5</item>
+        <item name="android:gravity">center_vertical</item>
+
+
+    </style>
+
+    <style name="listview_ll_tv_content_center_long" parent="listview_ll_tv">
+        <item name="android:layout_weight">0.8</item>
+
+    </style>
+
+    <style name="listview_ll_tv_content_right" parent="listview_ll_tv">
+        <item name="android:gravity">right|center_vertical</item>
+    </style>
+
+    <style name="Trade_Buy_Table_Volume_Text_Style">
+        <item name="android:textSize">14.0sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/deep_background_yellow</item>
+        <item name="android:gravity">right</item>
+        <item name="android:padding">1.0dip</item>
+        <item name="android:layout_weight">1.0</item>
+    </style>
+
+    <style name="devider_orizontal">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1px</item>
+        <item name="android:background">@color/listview_devider_color</item>
+
+    </style>
+    <style name="devider_vertical">
+        <item name="android:layout_width">1px</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:background">@color/listview_devider_color</item>
+
+    </style>
+    <style name="Trade_Buy_Table_Price_Text_Style">
+        <item name="android:textSize">?attr/middle</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:gravity">center</item>
+        <item name="android:padding">1.0dip</item>
+        <item name="android:layout_weight">1.0</item>
+    </style>
+
+    <style name="Trade_Buy_Table_Name_Text_Style">
+        <item name="android:textSize">?attr/middle</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/colligate_detail_text_color</item>
+        <item name="android:gravity">left</item>
+        <item name="android:padding">1.0dip</item>
+        <item name="android:layout_weight">1.0</item>
+    </style>
+
+    <style name="trade_five_sellbuy_table_row">
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/trade_five_selbuy_table_selector</item>
+        <item name="android:clickable">true</item>
+        <item name="android:layout_weight">1.0</item>
+    </style>
+    <style name="zijinchaxun_ll">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:padding">@dimen/large_padding</item>
+    </style>
+    <style name="zijinchaxun_left_textview">
+
+
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">right</item>
+        <item name="android:paddingRight">@dimen/common_padding</item>
+        <item name="android:layout_weight">1</item>
+
+        <item name="android:textSize">?attr/middle</item>
+
+    </style>
+
+    <style name="zijinchaxun_right_textview">
+
+        <item name="android:layout_weight">1</item>
+
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">left</item>
+        <item name="android:paddingLeft">@dimen/common_padding</item>
+        <item name="android:textSize">?attr/middle</item>
+
+    </style>
+
+    <style name="row_text">
+
+
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:drawablePadding">4dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:padding">@dimen/large_padding</item>
+        <item name="android:textSize">?attr/middle</item>
+
+    </style>
+
+    <style name="text_size_0">
+        <item name="large">13sp</item>
+        <item name="middle">11sp</item>
+        <item name="small">9sp</item>
+    </style>
+
+    <style name="text_size_1">
+        <item name="large">14sp</item>
+        <item name="middle">12sp</item>
+        <item name="small">10sp</item>
+    </style>
+
+    <style name="text_size_2">
+        <item name="large">15sp</item>
+        <item name="middle">13sp</item>
+        <item name="small">11sp</item>
+    </style>
+
+    <style name="text_size_3">
+        <item name="large">16sp</item>
+        <item name="middle">14sp</item>
+        <item name="small">12sp</item>
+    </style>
+
+    <style name="text_size_4">
+        <item name="large">17sp</item>
+        <item name="middle">15sp</item>
+        <item name="small">13sp</item>
+    </style>
+
+    <style name="text_size_5">
+        <item name="large">18sp</item>
+        <item name="middle">16sp</item>
+        <item name="small">14sp</item>
+    </style>
+
+    <style name="text_size_6">
+        <item name="large">19sp</item>
+        <item name="middle">17sp</item>
+        <item name="small">15sp</item>
+    </style>
+
+    <style name="text_size_7">
+        <item name="large">20sp</item>
+        <item name="middle">18sp</item>
+        <item name="small">16sp</item>
+    </style>
+
+    <style name="text_size_8">
+        <item name="large">21sp</item>
+        <item name="middle">19sp</item>
+        <item name="small">17sp</item>
+    </style>
+
+    <style name="text_size_9">
+        <item name="large">22sp</item>
+        <item name="middle">20sp</item>
+        <item name="small">18sp</item>
+    </style>
+
+    <style name="text_size_10">
+        <item name="large">23sp</item>
+        <item name="middle">21sp</item>
+        <item name="small">19sp</item>
+    </style>
+
+    <item name="toolbar" type="id">toolbar</item>
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="small" format="dimension" />
+    <attr name="large" format="dimension" />
+    <attr name="middle" format="dimension" />
+    <item name="bt_add" type="id" />
+    <item name="tabLayout" type="id" />
+
+
+</resources>

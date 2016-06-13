@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:padding="@dimen/common_padding"
+    android:orientation="vertical">
+
+    <LinearLayout
+        style="@style/listview_ll"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/xia_dan_textview"
+            android:text="代码" />
+
+        <AutoCompleteTextView
+            android:id="@+id/act_code"
+            style="@style/xia_dan_edittext"
+            android:singleLine="true"/>
+
+        <ImageView
+            android:id="@+id/img_code_clear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/close" />
+    </LinearLayout>
+
+    <LinearLayout
+        style="@style/listview_ll"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/xia_dan_textview"
+            android:text="名称" />
+
+        <TextView
+            android:id="@+id/tv_name"
+            style="@style/xia_dan_textview_right" />
+    </LinearLayout>
+
+    <LinearLayout
+        style="@style/listview_ll"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/xia_dan_textview"
+            android:text="价格" />
+
+        <ImageView
+            android:id="@+id/img_jian"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/btn_jian" />
+
+        <EditText
+            android:id="@+id/et_price"
+            android:inputType="numberDecimal"
+            style="@style/xia_dan_edittext" />
+
+        <ImageView
+            android:id="@+id/img_jia"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/btn_jia" />
+    </LinearLayout>
+
+    <LinearLayout
+        style="@style/listview_ll"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/xia_dan_textview"
+            android:text="可买" />
+
+        <TextView
+            android:id="@+id/tv_kemai"
+            style="@style/xia_dan_textview_right" />
+    </LinearLayout>
+
+    <LinearLayout
+        style="@style/listview_ll"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/xia_dan_textview"
+            android:text="数量" />
+
+        <EditText
+            android:id="@+id/et_number"
+            android:inputType="number"
+            style="@style/xia_dan_edittext" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        style="@style/listview_ll"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tv_number_1"
+            style="@style/xia_dan_textview_four"
+            android:layout_marginRight="15dp"
+            android:text="全部" />
+
+        <TextView
+            android:id="@+id/tv_number_2"
+
+            style="@style/xia_dan_textview_four"
+            android:layout_marginRight="15dp"
+            android:text="1/2" />
+
+        <TextView
+            android:id="@+id/tv_number_3"
+
+            style="@style/xia_dan_textview_four"
+            android:layout_marginRight="15dp"
+            android:text="1/3" />
+
+        <TextView
+            android:id="@+id/tv_number_4"
+            android:layout_marginRight="15dp"
+
+            style="@style/xia_dan_textview_four"
+            android:text="1/4" />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/bt_commit"
+        style="@style/fill_button"
+        android:text="" />
+</LinearLayout>

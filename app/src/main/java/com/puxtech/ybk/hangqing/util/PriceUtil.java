@@ -1,0 +1,40 @@
+package com.puxtech.ybk.hangqing.util;
+
+import java.math.BigDecimal;
+
+/**
+ * 价格转化和计算工具类，如小数位数等等
+ */
+public class PriceUtil {
+
+	/**
+	 * 格式化百分比，保留两位小数，前面带加减号
+	 */
+	public static String formatPercentage(float percentage){
+		String s = keepPrecision(percentage, 2);
+		s = s + "%";
+		return s;
+	}
+
+	/**
+	 * 对float类型的数值保留指定位数的小数。<br>
+	 * 该方法舍入模式：向“最接近的”数字舍入，如果与两个相邻数字的距离相等，则为向上舍入的舍入模式。<br>
+	 * <b>注意：</b>如果精度要求比较精确请使用 keepPrecision(String number, int precision)方法
+	 * 
+	 * @param number
+	 *            要保留小数的数字
+	 * @param precision
+	 *            小数位数
+	 * @return double 如果数值较大，则使用科学计数法表示
+	 */
+	public static String keepPrecision(float number, int precision) {
+		if(number==Float.POSITIVE_INFINITY)return "INFINITY";
+		if(number==Float.NEGATIVE_INFINITY)return "-INFINITY";
+		//NaN 不能直接用==比较，全返回false
+		if(Float.compare(number, Float.NaN)==0)return "NaN";
+		BigDecimal bg = new BigDecimal(number);
+		String ret = bg.setScale(precision, BigDecimal.ROUND_HALF_UP).toPlainString();
+		return ret;
+	}
+
+}
